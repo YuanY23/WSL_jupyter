@@ -1,0 +1,162 @@
+import os
+from jinja2 import ChoiceLoader, FileSystemLoader
+from nativeauthenticator import NativeAuthenticator
+from nativeauthenticator.handlers import SignUpHandler, LocalBase
+from tornado import web
+from traitlets import Unicode
+
+# Directory of THIS file, containing our custom templates/
+CUSTOM_TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+
+
+class CustomSignUpHandler(SignUpHandler):
+    """Override SignUpHandler to extract 'role' from POST and pass it to create_user."""
+
+    _custom_template_registered = False
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Register our custom templates dir BEFORE the NativeAuthenticator one
+        # so our signup.html takes priority
+        if not CustomSignUpHandler._custom_template_registered:
+            self.log.info("Registering custom template dir: %s", CUSTOM_TEMPLATE_DIR)
+            env = self.settings["jinja2_env"]
+            previous_loader = env.loader
+            # ChoiceLoader tries loaders in order; put ours first
+            env.loader = ChoiceLoader([FileSystemLoader([CUSTOM_TEMPLATE_DIR]), previous_loader])
+            CustomSignUpHandler._custom_template_registered = True
+
+    async def post(self):
+        """Handle signup POST with role extraction."""
+
+        # 404 if users aren't allowed to sign up
+        if not self.authenticator.enable_signup:
+            raise web.HTTPError(404)
+
+        # reCAPTCHA check (simplified — match parent logic)
+        if not self.authenticator.recaptcha_key:
+            assume_user_is_human = True
+        else:
+            assume_user_is_human = False
+            import requests as req
+            recaptcha_response = self.get_body_argument("g-recaptcha-response", strip=True)
+            if recaptcha_response != "":
+                data = {
+                    "secret": self.authenticator.recaptcha_secret,
+                    "response": recaptcha_response,
+                }
+                validation = req.post("https://www.google.com/recaptcha/api/siteverify", data=data)
+                assume_user_is_human = validation.json().get("success")
+
+        # ---- Extract role (our custom field) ----
+        role = self.get_body_argument("role", "student")
+
+        # Standard user info
+        user_info = {
+            "username": self.get_body_argument("username", strip=False),
+            "password": self.get_body_argument("signup_password", strip=False),
+            "email": self.get_body_argument("email", "", strip=False),
+            "has_2fa": bool(self.get_body_argument("2fa", "", strip=False)),
+        }
+        username = user_info["username"]
+
+        password = user_info["password"]
+        confirmation = self.get_body_argument("signup_password_confirmation", strip=False)
+        confirmation_matches = password == confirmation
+        user_is_admin = username in self.authenticator.admin_users
+        username_already_taken = self.authenticator.user_exists(username)
+
+        # Create user if everything checks out
+        user = None
+        if assume_user_is_human and not username_already_taken and confirmation_matches:
+            user = self.authenticator.create_user(role=role, **user_info)
+
+        # Build response message
+        alert, message = self.get_result_message(
+            user,
+            assume_user_is_human,
+            username_already_taken,
+            confirmation_matches,
+            user_is_admin,
+        )
+
+        otp_secret, user_2fa = "", ""
+        if user:
+            otp_secret = user.otp_secret
+            user_2fa = user.has_2fa
+
+        html = await self.render_template(
+            "signup.html",
+            ask_email=self.authenticator.ask_email_on_signup,
+            result_message=message,
+            alert=alert,
+            two_factor_auth=self.authenticator.allow_2fa,
+            two_factor_auth_user=user_2fa,
+            two_factor_auth_value=otp_secret,
+            recaptcha_key=self.authenticator.recaptcha_key,
+            tos=self.authenticator.tos,
+        )
+        self.finish(html)
+
+
+class CustomNativeAuthenticator(NativeAuthenticator):
+    """Extends NativeAuthenticator with teacher/student role selection on signup."""
+
+    teacher_group = Unicode(
+        'formgrade-course_test',
+        config=True,
+        help="JupyterHub group name for teachers",
+    )
+    student_group = Unicode(
+        'nbgrader-course_test',
+        config=True,
+        help="JupyterHub group name for students",
+    )
+
+    def get_handlers(self, app):
+        """Replace the default SignUpHandler with our CustomSignUpHandler."""
+        handlers = super().get_handlers(app)
+        new_handlers = []
+        for path, handler in handlers:
+            if path == r"/signup":
+                new_handlers.append((path, CustomSignUpHandler))
+            else:
+                new_handlers.append((path, handler))
+        return new_handlers
+
+    def create_user(self, username, password, role='student', **kwargs):
+        """
+        Create user in NativeAuthenticator DB, then add them
+        to the appropriate JupyterHub group for nbgrader.
+        """
+        user_info = super().create_user(username, password, **kwargs)
+
+        if user_info:
+            from jupyterhub import orm
+
+            self.log.info(f"User '{username}' created with role='{role}'")
+
+            # Ensure Hub user record exists
+            hub_user = orm.User.find(self.db, name=username)
+            if not hub_user:
+                hub_user = orm.User(name=username)
+                self.db.add(hub_user)
+                self.db.commit()
+
+            # Determine group based on role
+            group_name = self.teacher_group if role == 'teacher' else self.student_group
+
+            # Ensure group exists
+            hub_group = orm.Group.find(self.db, name=group_name)
+            if not hub_group:
+                hub_group = orm.Group(name=group_name)
+                self.db.add(hub_group)
+                self.db.commit()
+
+            # Add user to group
+            if hub_user not in hub_group.users:
+                hub_group.users.append(hub_user)
+                self.db.commit()
+                self.log.info(f"Added '{username}' to group '{group_name}'")
+
+        return user_info

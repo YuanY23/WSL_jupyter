@@ -1,0 +1,12 @@
+# Python temporary files
+__pycache__/
+*.pyc
+
+# JupyterHub persistent and sensitive files
+jupyterhub.sqlite
+jupyterhub_cookie_secret
+jupyterhub-proxy.pid
+
+# Optional: Add other files you don't want to track
+# e.g., local logs
+*.log
