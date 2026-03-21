@@ -1,0 +1,426 @@
+{% extends "page.html" %}
+
+{% block stylesheet %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        min-height: 100vh;
+        font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        overflow: hidden;
+        color: #f1f5f9;
+        margin: 0;
+    }
+
+    .layout-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* Hide the default bootstrap modal that gets rendered as a flex sibling otherwise */
+    /* If an actual error happens, JupyterHub might use .show to display it, but we force hide it to keep UI clean, or let .show override it */
+    .modal:not(.show) {
+        display: none !important;
+    }
+
+    /* Animated background orbs */
+    body::before,
+    body::after {
+        content: '';
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: 0;
+        animation: float 8s ease-in-out infinite alternate;
+    }
+
+    body::before {
+        width: 500px;
+        height: 500px;
+        background: rgba(99, 102, 241, 0.15);
+        top: -100px;
+        left: -100px;
+    }
+
+    body::after {
+        width: 400px;
+        height: 400px;
+        background: rgba(14, 165, 233, 0.12);
+        bottom: -80px;
+        right: -80px;
+        animation-delay: -4s;
+    }
+
+    @keyframes float {
+        from {
+            transform: translate(0, 0) scale(1);
+        }
+
+        to {
+            transform: translate(30px, 20px) scale(1.05);
+        }
+    }
+
+    .glass-card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 600px;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 24px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        animation: slide-up 0.5s ease-out;
+    }
+
+    @keyframes slide-up {
+        from {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Custom Navbar */
+    .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .logo-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #38bdf8, #6366f1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+
+    .logo-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: none;
+        stroke: white;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .logo-title {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .nav-links a {
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+        color: #f1f5f9;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
+    .logout-btn {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        color: #f1f5f9;
+        text-decoration: none;
+        font-size: 13px;
+        transition: background 0.2s, border-color 0.2s;
+        cursor: pointer;
+    }
+
+    .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Server Action Buttons */
+    .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        margin: 40px 0;
+    }
+
+    .btn-action {
+        width: 100%;
+        max-width: 300px;
+        padding: 16px 24px;
+        text-align: center;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        letter-spacing: 0.05em;
+        transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+        border: none;
+    }
+
+    .btn-action:hover {
+        opacity: 0.92;
+        transform: translateY(-2px);
+    }
+
+    .btn-action:active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6366f1, #38bdf8);
+        color: white;
+        box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444, #f43f5e);
+        color: white;
+        box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+    }
+
+    /* Named servers table */
+    .named-servers-table {
+        margin-top: 30px;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .named-servers-table th {
+        text-align: left;
+        color: #94a3b8;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-weight: 500;
+    }
+
+    .named-servers-table td {
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .table-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        color: white;
+        margin-right: 6px;
+    }
+
+    .table-start {
+        background: #3b82f6;
+    }
+
+    .table-stop {
+        background: #ef4444;
+    }
+
+    .table-del {
+        background: #475569;
+    }
+
+    .table-link {
+        color: #60a5fa;
+        text-decoration: none;
+    }
+
+    .table-link:hover {
+        text-decoration: underline;
+    }
+
+    .new-server-row input {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: white;
+        font-size: 13px;
+        margin-right: 8px;
+        outline: none;
+    }
+
+    .new-server-row input:focus {
+        border-color: #6366f1;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block nav_bar %}{% endblock %}
+
+{% block main %}
+<div class="layout-wrapper">
+    <div class="glass-card">
+
+        <!-- Top Nav Mimicking -->
+        <div class="top-nav">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <div class="logo-title">Hub 控制面板</div>
+            </div>
+
+            <div class="nav-links">
+                <a href="{{ base_url }}home">主页</a>
+                <a href="{{ base_url }}token">令牌</a>
+            </div>
+
+            <div class="user-info">
+                <span><i class="fa fa-user"></i> {{ user.name }}</span>
+                <a id="logout" href="{{ logout_url }}" class="logout-btn"><i class="fa fa-sign-out"></i> 退出登录</a>
+            </div>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="controls">
+            {% if default_server.active %}
+            <a id="stop" role="button" class="btn-action btn-danger">
+                <i class="fa fa-stop-circle"></i> 停止我的服务器
+            </a>
+            {% endif %}
+
+            <a id="start" role="button" class="btn-action btn-primary" href="{{ url }}">
+                <i
+                    class="fa fa-{% if not default_server.active %}play-circle{% else %}external-link-alt{% endif %}"></i>
+                {% if not default_server.active %}启动{% endif %}我的服务器
+            </a>
+        </div>
+
+        <!-- Named Servers (If Enabled) -->
+        {% if allow_named_servers %}
+        <div style="margin-top: 40px;">
+            <h3 style="font-size: 16px; margin-bottom: 8px;">命名服务器</h3>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+                除了默认服务器，您还可以创建额外的服务器并发运行。
+            </p>
+
+            {% set named_spawners = user.all_spawners(include_default=False)|list %}
+            <table class="named-servers-table server-table">
+                <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>URL</th>
+                        <th>最后活动时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="home-server-row add-server-row new-server-row">
+                        <td colspan="4" style="padding-top: 16px;">
+                            <input class="new-server-name" placeholder="服务器名称" aria-label="server name">
+                            <button role="button" type="button"
+                                class="new-server-btn table-btn table-start">添加服务器</button>
+                        </td>
+                    </tr>
+                    {% for spawner in named_spawners %}
+                    <tr class="home-server-row" data-server-name="{{ spawner.name }}">
+                        <td>{{ spawner.name }}</td>
+                        <td>
+                            <a class="server-link table-link {% if not spawner.ready %}hidden{% endif %}"
+                                href="{{ user.server_url(spawner.name) }}">{{ user.server_url(spawner.name) }}</a>
+                        </td>
+                        <td class="time-col">
+                            {% if spawner.last_activity %}
+                            {{ spawner.last_activity.isoformat() + 'Z' }}
+                            {% else %}
+                            从不
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a role="button"
+                                class="stop-server table-btn table-stop {% if not spawner.active %} hidden{% endif %}"
+                                id="stop-{{ spawner.name }}">停止</a>
+                            <a role="button"
+                                class="start-server table-btn table-start {% if spawner.active %}hidden{% endif %}"
+                                id="start-{{ spawner.name }}"
+                                href="{{ base_url }}spawn/{{ user.name }}/{{ spawner.name }}">启动</a>
+                            <button role="button"
+                                class="delete-server table-btn table-del {% if spawner.active %} hidden{% endif %}"
+                                id="delete-{{ spawner.name }}">删除</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script type="text/javascript">
+    require(["home"]);
+</script>
+{% endblock script %}

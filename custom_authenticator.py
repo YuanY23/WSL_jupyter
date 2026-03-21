@@ -26,6 +26,55 @@ class CustomSignUpHandler(SignUpHandler):
             env.loader = ChoiceLoader([FileSystemLoader([CUSTOM_TEMPLATE_DIR]), previous_loader])
             CustomSignUpHandler._custom_template_registered = True
 
+    def get_result_message(
+        self,
+        user,
+        assume_user_is_human,
+        username_already_taken,
+        confirmation_matches,
+        user_is_admin,
+    ):
+        """Override to translate messages into Simplified Chinese."""
+        if not assume_user_is_human:
+            alert = "alert-danger"
+            message = "您未通过 reCAPTCHA 验证，请重试。"
+        elif username_already_taken:
+            alert = "alert-danger"
+            message = (
+                "出错了！\n"
+                "该用户名已被使用。请尝试使用其他用户名注册。"
+            )
+        elif not confirmation_matches:
+            alert = "alert-danger"
+            message = "两次输入的密码不一致，请重试。"
+        elif not user:
+            alert = "alert-danger"
+            minimum_password_length = self.authenticator.minimum_password_length
+            if minimum_password_length > 0:
+                message = (
+                    "出错了！\n"
+                    "请确保用户名不包含空格、逗号或斜杠，且您的"
+                    f"密码至少为 {minimum_password_length} 个"
+                    "字符，并避免过于简单。"
+                )
+            else:
+                message = (
+                    "出错了！\n"
+                    "请确保用户名不包含空格、逗号或斜杠，且"
+                    "密码不应过于简单。"
+                )
+        elif (user is not None) and (self.authenticator.open_signup or user_is_admin):
+            alert = "alert-success"
+            message = "注册成功！您现在可以返回主页并登录系统了。"
+        else:
+            alert = "alert-info"
+            message = "您的注册信息已发送给管理员审核。"
+
+            if (user is not None) and getattr(user, 'login_email_sent', False):
+                message = "注册成功！请检查您的邮箱以授权访问权限。"
+
+        return alert, message
+
     async def post(self):
         """Handle signup POST with role extraction."""
 

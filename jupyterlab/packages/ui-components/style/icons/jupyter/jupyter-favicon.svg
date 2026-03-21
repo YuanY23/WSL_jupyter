@@ -1,6 +1,13 @@
-<svg width="152" height="165" viewBox="0 0 152 165" version="1.1" xmlns="http://www.w3.org/2000/svg">
-   <g class="jp-jupyter-icon-color" fill="#F37726">
-    <path transform="translate(0.078947, 110.582927)" d="M75.9422842,29.5804561 C43.3023947,29.5804561 14.7967832,17.6534634 0,0 C5.51083211,15.8406829 15.7815389,29.5667732 29.3904947,39.2784171 C42.9997,48.9898537 59.2737,54.2067805 75.9605789,54.2067805 C92.6474579,54.2067805 108.921458,48.9898537 122.530663,39.2784171 C136.139453,29.5667732 146.410284,15.8406829 151.921158,0 C137.087868,17.6534634 108.582589,29.5804561 75.9422842,29.5804561 L75.9422842,29.5804561 Z" />
-    <path transform="translate(0.037368, 0.704878)" d="M75.9784579,24.6264073 C108.618763,24.6264073 137.124458,36.5534415 151.921158,54.2067805 C146.410284,38.366222 136.139453,24.6401317 122.530663,14.9284878 C108.921458,5.2168439 92.6474579,0 75.9605789,0 C59.2737,0 42.9997,5.2168439 29.3904947,14.9284878 C15.7815389,24.6401317 5.51083211,38.366222 0,54.2067805 C14.8330816,36.5899293 43.3385684,24.6264073 75.9784579,24.6264073 L75.9784579,24.6264073 Z" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef08a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#grad)" filter="url(#shadow)"/>
+  <text x="50" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="70" font-weight="900" fill="#78350f" text-anchor="middle">Y</text>
 </svg>

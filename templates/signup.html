@@ -1,140 +1,475 @@
-{% extends "page.html" %}
+<!DOCTYPE html>
+<html lang="zh-CN">
 
-{% block script %}
-{{ super() }}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        let button = document.getElementById('eye');
-        button.addEventListener("click", function (e) {
-            let pwd = document.getElementById("password_input");
-            let pwdc = document.getElementById("password_confirmation_input");
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>教学平台 — 注册</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-            if (pwd.getAttribute("type") === "password") {
-                pwd.setAttribute("type", "text");
-                pwdc.setAttribute("type", "text");
-                button.textContent = "🔑";
-            } else {
-                pwd.setAttribute("type", "password");
-                pwdc.setAttribute("type", "password");
-                button.textContent = "👁";
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            overflow: hidden;
+            color: #f1f5f9;
+        }
+
+        /* Animated background orbs */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+            background: rgba(99, 102, 241, 0.15);
+            top: -100px;
+            left: -100px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: rgba(14, 165, 233, 0.12);
+            bottom: -80px;
+            right: -80px;
+            animation-delay: -4s;
+        }
+
+        @keyframes float {
+            from {
+                transform: translate(0, 0) scale(1);
             }
-        });
-    });
 
-    {% if tos %}
-    document.addEventListener('DOMContentLoaded', function () {
-        let checkbox = document.getElementById('tos_check');
-        checkbox.addEventListener("click", function (e) {
-            let submit_button = document.getElementById("signup_submit");
-            submit_button.disabled = !checkbox.checked;
-        });
-    });
+            to {
+                transform: translate(30px, 20px) scale(1.05);
+            }
+        }
+
+        .login-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: slide-up 0.5s ease-out;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar for the card if it overflows */
+        .login-card::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .login-card::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .login-card::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: rgba(148, 163, 184, 0.8);
+            margin-bottom: 28px;
+            letter-spacing: 0.03em;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .alert-warning,
+        .alert-info {
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #fcd34d;
+            font-size: 12px;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            letter-spacing: 0.02em;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 15px;
+            color: #f1f5f9;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        select option {
+            background: #1e293b;
+            color: #f1f5f9;
+        }
+
+        input::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+            background: rgba(255, 255, 255, 0.09);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .eye-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: rgba(148, 163, 184, 0.6);
+            transition: color 0.2s;
+        }
+
+        .eye-btn:hover {
+            color: #94a3b8;
+        }
+
+        .checkbox-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-wrap input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #6366f1;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%;
+            margin-top: 8px;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            color: white;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active:not(:disabled) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: rgba(148, 163, 184, 0.7);
+        }
+
+        .footer-link a {
+            color: #818cf8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer-link a:hover {
+            color: #a5b4fc;
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+
+    {% if recaptcha_key %}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     {% endif %}
+</head>
 
-    if (window.location.protocol === "http:") {
-        // unhide http warning
-        let warning = document.getElementById('insecure-login-warning');
-        warning.className = warning.className.replace(/\bhidden\b/, '');
-    }
-</script>
+<body>
 
-{% if recaptcha_key %}
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-{% endif %}
-{% endblock script %}
-
-
-{% block main %}
-{% block login %}
-<div id="login-main" class="container">
-    <form action="{{post_url}}" method="post" role="form">
-        <div class="auth-form-header">
-            注册
-        </div>
-        <div class='auth-form-body'>
-            <p id='insecure-login-warning' class='hidden'>
-                警告：JupyterHub 似乎在未加密的 HTTP 连接上运行。我们强烈建议启用 HTTPS。
-            </p>
-
-            {% if alert %}
-            <div class="alert {{alert}}" role="alert">
-                <p>
-                    {{result_message}}
-                </p>
-
-                {% if two_factor_auth_user %}
-                <p>
-                    <strong>Attention!</strong> You have configured two factor authentication.
-                    Your two factor authentication code is <strong>{{ two_factor_auth_value }}</strong>.
-                </p>
-                {% endif %}
+    <div class="login-card">
+        <!-- Icon -->
+        <div class="logo-wrap">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                </svg>
             </div>
+        </div>
+
+        <h1>注册账号</h1>
+        <p class="subtitle">Jupyter 教学管理系统</p>
+
+        <!-- HTTP warning -->
+        <p id="insecure-login-warning" class="alert alert-warning hidden">
+            ⚠ 警告：当前连接未加密，建议启用 HTTPS 进行注册。
+        </p>
+
+        {% if alert %}
+        <div class="alert {% if alert == 'error' %}alert-error{% else %}alert-info{% endif %}">
+            <p>{{ result_message }}</p>
+            {% if two_factor_auth_user %}
+            <p style="margin-top: 8px;">
+                <strong>注意：</strong> 您已配置双因素认证。您的 2FA 验证码是 <strong>{{ two_factor_auth_value }}</strong>。
+            </p>
             {% endif %}
+        </div>
+        {% endif %}
+
+        <form action="{{ post_url }}" method="post" role="form">
             <input type="hidden" name="_xsrf" value="{{ xsrf }}" />
-            <label for="username_input">用户名：</label>
-            <input id="username_input" type="text" name="username" val="{{username}}" autocapitalize="off"
-                autocorrect="off" class="form-control" autofocus="autofocus" required />
-            <p></p>
+
+            <div class="field">
+                <label for="username_input">用户名</label>
+                <input id="username_input" type="text" name="username" value="{{ username }}" autocapitalize="off"
+                    autocorrect="off" autofocus required placeholder="请输入用户名" />
+            </div>
 
             {% if ask_email %}
-            <label for="email_input">邮箱：</label>
-            <input id="email_input" type="email" name="email" val="{{email}}" class="form-control" required />
-            <p></p>
+            <div class="field">
+                <label for="email_input">邮箱</label>
+                <input id="email_input" type="email" name="email" value="{{ email }}" required placeholder="请输入邮箱地址" />
+            </div>
             {% endif %}
 
-            <label for="role_select">角色：</label>
-            <select id="role_select" name="role" class="form-control" required>
-                <option value="student">学生</option>
-                <option value="teacher">老师</option>
-            </select>
-            <p></p>
-
-            <label for="password_input">密码：</label>
-            <div class="input-group">
-                <input id="password_input" type="password" name="signup_password" val="" autocapitalize="off"
-                    autocorrect="off" class="form-control" />
-                <span class="input-group-addon">
-                    <button id="eye" type="button" style="border:0;">👁</button>
-                </span>
+            <div class="field">
+                <label for="role_select">角色</label>
+                <select id="role_select" name="role" required>
+                    <option value="student">学生</option>
+                    <option value="teacher">老师</option>
+                </select>
             </div>
-            <p></p>
 
-            <label for="password_confirm">确认密码：</label>
-            <div class="input-group">
-                <input id="password_confirmation_input" type="password" name="signup_password_confirmation" val=""
-                    autocapitalize="off" autocorrect="off" class="form-control" />
+            <div class="field">
+                <label for="password_input">密码</label>
+                <div class="input-wrap">
+                    <input id="password_input" type="password" name="signup_password" autocomplete="new-password"
+                        autocapitalize="off" autocorrect="off" required placeholder="请设置登录密码"
+                        style="padding-right: 44px;" />
+                    <button id="eye" type="button" class="eye-btn" aria-label="显示/隐藏密码">👁</button>
+                </div>
             </div>
-            <p></p>
+
+            <div class="field">
+                <label for="password_confirmation_input">确认密码</label>
+                <div class="input-wrap">
+                    <input id="password_confirmation_input" type="password" name="signup_password_confirmation"
+                        autocomplete="new-password" autocapitalize="off" autocorrect="off" required
+                        placeholder="请再次输入登录密码" />
+                </div>
+            </div>
 
             {% if two_factor_auth %}
-            <input type="checkbox" id="2fa" name="2fa" value="2fa">
-            设置双因素认证 (2FA)
-            </input>
-            <p></p>
+            <div class="field checkbox-wrap">
+                <input type="checkbox" id="2fa" name="2fa" value="2fa">
+                <label for="2fa" style="margin: 0; display: inline; color: inherit; cursor: pointer;">设置双因素认证
+                    (2FA)</label>
+            </div>
             {% endif %}
 
             {% if tos %}
-            <input type="checkbox" id="tos_check">
-            {{tos|safe}}
-            </input>
-            <p></p>
+            <div class="field checkbox-wrap" style="align-items: flex-start;">
+                <input type="checkbox" id="tos_check" style="margin-top: 2px;">
+                <label for="tos_check"
+                    style="margin: 0; display: inline; color: inherit; line-height: 1.4; cursor: pointer;">
+                    {{ tos|safe }}
+                </label>
+            </div>
             {% endif %}
 
             {% if recaptcha_key %}
-            <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}"></div>
-            <p></p>
+            <div class="field">
+                <div class="g-recaptcha" data-sitekey="{{ recaptcha_key }}"></div>
+            </div>
             {% endif %}
 
-            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='注册用户' {% if tos %}disabled{% endif
-                %} />
-            <p></p>
+            <button type="submit" id="signup_submit" class="btn-submit" {% if tos %}disabled{% endif %}>立即注册</button>
 
-            <hr />
-            <p>
-                <a href="{{ base_url }}login">登录</a> 已有账号
-            </p>
+        </form>
+
+        <div class="footer-link">
+            已有账号？<a href="{{ base_url }}login">前往登录</a>
         </div>
-    </form>
-</div>
-{% endblock login %}
-{% endblock main %}
+
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.addEventListener('DOMContentLoaded', function () {
+            let button = document.getElementById('eye');
+            if (button) {
+                button.addEventListener("click", function (e) {
+                    let pwd = document.getElementById("password_input");
+                    let pwdc = document.getElementById("password_confirmation_input");
+                    if (pwd.getAttribute("type") === "password") {
+                        pwd.setAttribute("type", "text");
+                        if (pwdc) pwdc.setAttribute("type", "text");
+                        button.textContent = "🔑";
+                    } else {
+                        pwd.setAttribute("type", "password");
+                        if (pwdc) pwdc.setAttribute("type", "password");
+                        button.textContent = "👁";
+                    }
+                });
+            }
+        });
+
+        // TOS Checkbox Logic
+        {% if tos %}
+        document.addEventListener('DOMContentLoaded', function () {
+            let checkbox = document.getElementById('tos_check');
+            let submit_button = document.getElementById("signup_submit");
+            if (checkbox && submit_button) {
+                checkbox.addEventListener("change", function (e) {
+                    submit_button.disabled = !checkbox.checked;
+                });
+            }
+        });
+        {% endif %}
+
+        // HTTP warning
+        if (window.location.protocol === "http:") {
+            let warning = document.getElementById('insecure-login-warning');
+            if (warning) warning.classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>
