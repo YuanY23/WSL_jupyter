@@ -53,3 +53,15 @@ c.JupyterHub.spawner_class = SimpleLocalProcessSpawner
 c.Spawner.default_url = '/lab'
 c.Spawner.cmd = ['/home/yuan/miniconda3/envs/jupyter/bin/jupyterhub-singleuser']
 c.Spawner.environment = {'PATH': '/home/yuan/miniconda3/envs/jupyter/bin:' + os.environ.get('PATH', '')}
+
+# 设置 notebook 目录为项目目录，确保 nbgrader 能找到配置文件
+c.Spawner.notebook_dir = '/home/yuan/my_project'
+
+# 增加超时时间：nbgrader + 可编辑安装的 JupyterLab 启动较慢
+c.Spawner.http_timeout = 120   # 等待服务器响应的超时（秒）
+c.Spawner.start_timeout = 120  # 等待服务器启动的超时（秒）
+c.Spawner.args = ['--LabApp.custom_css=True']
+
+# --- Template Paths ---
+c.JupyterHub.template_paths = ['/home/yuan/my_project/templates']
+

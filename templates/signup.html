@@ -3,9 +3,9 @@
 {% block script %}
 {{ super() }}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         let button = document.getElementById('eye');
-        button.addEventListener("click", function(e) {
+        button.addEventListener("click", function (e) {
             let pwd = document.getElementById("password_input");
             let pwdc = document.getElementById("password_confirmation_input");
 
@@ -22,11 +22,11 @@
     });
 
     {% if tos %}
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         let checkbox = document.getElementById('tos_check');
-        checkbox.addEventListener("click", function(e) {
+        checkbox.addEventListener("click", function (e) {
             let submit_button = document.getElementById("signup_submit");
-            submit_button.disabled = ! checkbox.checked;
+            submit_button.disabled = !checkbox.checked;
         });
     });
     {% endif %}
@@ -49,12 +49,11 @@
 <div id="login-main" class="container">
     <form action="{{post_url}}" method="post" role="form">
         <div class="auth-form-header">
-            Sign Up
+            注册
         </div>
         <div class='auth-form-body'>
             <p id='insecure-login-warning' class='hidden'>
-                Warning: JupyterHub seems to be served over an unsecured HTTP connection.
-                We strongly recommend enabling HTTPS for JupyterHub.
+                警告：JupyterHub 似乎在未加密的 HTTP 连接上运行。我们强烈建议启用 HTTPS。
             </p>
 
             {% if alert %}
@@ -71,49 +70,52 @@
                 {% endif %}
             </div>
             {% endif %}
-            <input type="hidden" name="_xsrf" value="{{ xsrf }}"/>
-            <label for="username_input">Username:</label>
-            <input id="username_input" type="text" name="username" val="{{username}}" autocapitalize="off" autocorrect="off" class="form-control" autofocus="autofocus" required />
+            <input type="hidden" name="_xsrf" value="{{ xsrf }}" />
+            <label for="username_input">用户名：</label>
+            <input id="username_input" type="text" name="username" val="{{username}}" autocapitalize="off"
+                autocorrect="off" class="form-control" autofocus="autofocus" required />
             <p></p>
 
             {% if ask_email %}
-            <label for="email_input">Email:</label>
+            <label for="email_input">邮箱：</label>
             <input id="email_input" type="email" name="email" val="{{email}}" class="form-control" required />
             <p></p>
             {% endif %}
 
-            <label for="role_select">Role:</label>
+            <label for="role_select">角色：</label>
             <select id="role_select" name="role" class="form-control" required>
-                <option value="student">Student</option>
-                <option value="teacher">Teacher</option>
+                <option value="student">学生</option>
+                <option value="teacher">老师</option>
             </select>
             <p></p>
 
-            <label for="password_input">Password:</label>
+            <label for="password_input">密码：</label>
             <div class="input-group">
-                <input id="password_input" type="password" name="signup_password" val="" autocapitalize="off" autocorrect="off" class="form-control" />
+                <input id="password_input" type="password" name="signup_password" val="" autocapitalize="off"
+                    autocorrect="off" class="form-control" />
                 <span class="input-group-addon">
                     <button id="eye" type="button" style="border:0;">👁</button>
                 </span>
             </div>
             <p></p>
-            
-            <label for="password_confirm">Confirm password:</label>
+
+            <label for="password_confirm">确认密码：</label>
             <div class="input-group">
-                <input id="password_confirmation_input" type="password" name="signup_password_confirmation" val="" autocapitalize="off" autocorrect="off" class="form-control" />
+                <input id="password_confirmation_input" type="password" name="signup_password_confirmation" val=""
+                    autocapitalize="off" autocorrect="off" class="form-control" />
             </div>
             <p></p>
 
             {% if two_factor_auth %}
             <input type="checkbox" id="2fa" name="2fa" value="2fa">
-                Setup two factor authentication
+            设置双因素认证 (2FA)
             </input>
             <p></p>
             {% endif %}
 
             {% if tos %}
             <input type="checkbox" id="tos_check">
-                {{tos|safe}}
+            {{tos|safe}}
             </input>
             <p></p>
             {% endif %}
@@ -123,12 +125,13 @@
             <p></p>
             {% endif %}
 
-            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='Create User' {% if tos %}disabled{% endif %} />
+            <input type="submit" id="signup_submit" class='btn btn-jupyter' value='注册用户' {% if tos %}disabled{% endif
+                %} />
             <p></p>
 
             <hr />
             <p>
-                <a href="{{ base_url }}login">Login</a> with an existing user.
+                <a href="{{ base_url }}login">登录</a> 已有账号
             </p>
         </div>
     </form>
