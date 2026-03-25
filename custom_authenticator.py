@@ -3,7 +3,6 @@ from jinja2 import ChoiceLoader, FileSystemLoader
 from nativeauthenticator import NativeAuthenticator
 from nativeauthenticator.handlers import SignUpHandler, LocalBase
 from tornado import web
-from traitlets import Unicode
 
 # Directory of THIS file, containing our custom templates/
 CUSTOM_TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
@@ -97,8 +96,9 @@ class CustomSignUpHandler(SignUpHandler):
                 validation = req.post("https://www.google.com/recaptcha/api/siteverify", data=data)
                 assume_user_is_human = validation.json().get("success")
 
-        # ---- Extract role (our custom field) ----
+        # ---- Extract role and course_id (our custom fields) ----
         role = self.get_body_argument("role", "student")
+        course_id = self.get_body_argument("course_id", "").strip()
 
         # Standard user info
         user_info = {
@@ -118,7 +118,7 @@ class CustomSignUpHandler(SignUpHandler):
         # Create user if everything checks out
         user = None
         if assume_user_is_human and not username_already_taken and confirmation_matches:
-            user = self.authenticator.create_user(role=role, **user_info)
+            user = self.authenticator.create_user(role=role, course_id=course_id, **user_info)
 
         # Build response message
         alert, message = self.get_result_message(
@@ -149,18 +149,7 @@ class CustomSignUpHandler(SignUpHandler):
 
 
 class CustomNativeAuthenticator(NativeAuthenticator):
-    """Extends NativeAuthenticator with teacher/student role selection on signup."""
-
-    teacher_group = Unicode(
-        'formgrade-course_test',
-        config=True,
-        help="JupyterHub group name for teachers",
-    )
-    student_group = Unicode(
-        'nbgrader-course_test',
-        config=True,
-        help="JupyterHub group name for students",
-    )
+    """Extends NativeAuthenticator with dynamic multi-course role assignment."""
 
     def get_handlers(self, app):
         """Replace the default SignUpHandler with our CustomSignUpHandler."""
@@ -173,10 +162,14 @@ class CustomNativeAuthenticator(NativeAuthenticator):
                 new_handlers.append((path, handler))
         return new_handlers
 
-    def create_user(self, username, password, role='student', **kwargs):
+    def create_user(self, username, password, role='student', course_id='', **kwargs):
         """
         Create user in NativeAuthenticator DB, then add them
         to the appropriate JupyterHub group for nbgrader.
+
+        - Teachers: added to formgrade-{course_id}
+        - Students: NOT added to any group at registration.
+          Teachers add students via Formgrader later.
         """
         user_info = super().create_user(username, password, **kwargs)
 
@@ -192,20 +185,35 @@ class CustomNativeAuthenticator(NativeAuthenticator):
                 self.db.add(hub_user)
                 self.db.commit()
 
-            # Determine group based on role
-            group_name = self.teacher_group if role == 'teacher' else self.student_group
+            if role == 'teacher' and course_id:
+                group_name = f'formgrade-{course_id}'
 
-            # Ensure group exists
-            hub_group = orm.Group.find(self.db, name=group_name)
-            if not hub_group:
-                hub_group = orm.Group(name=group_name)
-                self.db.add(hub_group)
-                self.db.commit()
+                # Ensure group exists
+                hub_group = orm.Group.find(self.db, name=group_name)
+                if not hub_group:
+                    hub_group = orm.Group(name=group_name)
+                    self.db.add(hub_group)
+                    self.db.commit()
+                    self.log.info(f"Created new course group '{group_name}'")
 
-            # Add user to group
-            if hub_user not in hub_group.users:
-                hub_group.users.append(hub_user)
-                self.db.commit()
-                self.log.info(f"Added '{username}' to group '{group_name}'")
+                # Add teacher to course group
+                if hub_user not in hub_group.users:
+                    hub_group.users.append(hub_user)
+                    self.db.commit()
+                    self.log.info(f"Added teacher '{username}' to group '{group_name}'")
+                    
+                # Ensure global 'teachers' group exists and add teacher to it
+                teachers_group = orm.Group.find(self.db, name='teachers')
+                if not teachers_group:
+                    teachers_group = orm.Group(name='teachers')
+                    self.db.add(teachers_group)
+                    self.db.commit()
+                if hub_user not in teachers_group.users:
+                    teachers_group.users.append(hub_user)
+                    self.db.commit()
+                    self.log.info(f"Added teacher '{username}' to global 'teachers' group")
+            else:
+                # Students: no group assignment at registration
+                self.log.info(f"Student '{username}' registered (no course assigned yet)")
 
         return user_info

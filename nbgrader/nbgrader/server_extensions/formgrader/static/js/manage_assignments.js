@@ -43,7 +43,7 @@ var AssignmentUI = Backbone.View.extend({
         body.append(tablebody);
         var name = $("<tr/>");
         tablebody.append(name);
-        name.append($("<td/>").addClass("align-middle").text("Name"));
+        name.append($("<td/>").addClass("align-middle").text("名称"));
         name.append($("<td/>").append($("<input/>")
             .addClass("modal-name")
             .attr("type", "text")
@@ -51,26 +51,26 @@ var AssignmentUI = Backbone.View.extend({
 
         var duedate = $("<tr/>");
         tablebody.append(duedate);
-        duedate.append($("<td/>").addClass("align-middle").text("Due date (optional)"));
+        duedate.append($("<td/>").addClass("align-middle").text("截止日期（可选）"));
         duedate.append($("<td/>").append($("<input/>").addClass("modal-duedate").attr("type", "datetime-local")));
 
         var timezone = $("<tr/>");
         tablebody.append(timezone);
-        timezone.append($("<td/>").addClass("align-middle").text("Timezone as UTC offset (optional)"));
+        timezone.append($("<td/>").addClass("align-middle").text("时区偏移UTC（可选）"));
         timezone.append($("<td/>").append($("<input/>").addClass("modal-timezone").attr("type", "text")));
 
         var footer = $("<div/>");
         footer.append($("<button/>")
             .addClass("btn btn-primary save")
             .attr("type", "button")
-            .text("Save"));
+            .text("保存"));
         footer.append($("<button/>")
             .addClass("btn btn-danger")
             .attr("type", "button")
             .attr("data-dismiss", "modal")
-            .text("Cancel"));
+            .text("取消"));
 
-        this.$modal = createModal("edit-assignment-modal", "Editing " + this.model.get("name"), body, footer);
+        this.$modal = createModal("edit-assignment-modal", "正在编辑 " + this.model.get("name"), body, footer);
         this.$modal.find("input.modal-name").val(this.model.get("name"));
         this.$modal_duedate = this.$modal.find("input.modal-duedate");
         this.$modal_duedate.val(this.model.get("duedate_notimezone"));
@@ -118,12 +118,12 @@ var AssignmentUI = Backbone.View.extend({
 
         // status
         var status = this.model.get("status");
-        if (status === "draft") {
-            this.$status.attr("data-order", "draft");
-            this.$status.append($("<span/>").addClass("label label-info").text("draft"));
-        } else if (status === "released") {
-            this.$status.attr("data-order", "released");
-            this.$status.append($("<span/>").addClass("label label-success").text("released"));
+        if (status === "草稿") {
+            this.$status.attr("data-order", "草稿");
+            this.$status.append($("<span/>").addClass("label label-info").text("草稿"));
+        } else if (status === "已发布") {
+            this.$status.attr("data-order", "已发布");
+            this.$status.append($("<span/>").addClass("label label-success").text("已发布"));
         }
 
         // edit metadata
@@ -161,7 +161,7 @@ var AssignmentUI = Backbone.View.extend({
         // release
         var releaseable = this.model.get("releaseable");
         if (release_path && releaseable) {
-            if (status === "draft") {
+            if (status === "草稿") {
                 this.$release.append($("<a/>")
                     .attr("href", "#")
                     .click(_.bind(this.release, this))
@@ -184,7 +184,7 @@ var AssignmentUI = Backbone.View.extend({
 
         // collect
         if (release_path && releaseable) {
-            if (status === "released") {
+            if (status === "已发布") {
                 this.$collect.append($("<a/>")
                     .attr("href", "#")
                     .click(_.bind(this.collect, this))
@@ -236,7 +236,7 @@ var AssignmentUI = Backbone.View.extend({
 
     assign: function () {
         this.clear();
-        this.$name.text("Please wait...");
+        this.$name.text("请稍候...");
         $.post(base_url + "/formgrader/api/assignment/" + this.model.get("name") + "/assign")
             .done(_.bind(this.assign_success, this))
             .fail(_.bind(this.assign_failure, this));
@@ -248,15 +248,15 @@ var AssignmentUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully created the student version of '" + this.model.get("name") + "':",
+                "成功",
+                "成功生成学生版 '" + this.model.get("name") + "':",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
-                "There was an error creating the student version of '" + this.model.get("name") + "':",
+                "错误",
+                "生成学生版作业时发生错误 '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -266,13 +266,13 @@ var AssignmentUI = Backbone.View.extend({
         this.model.fetch();
         createModal(
             "error-modal",
-            "Error",
-            "There was an error creating the student version of '" + this.model.get("name") + "'.");
+            "错误",
+            "生成学生版作业时发生错误 '" + this.model.get("name") + "'.");
     },
 
     unrelease: function () {
         this.clear();
-        this.$name.text("Please wait...");
+        this.$name.text("请稍候...");
         $.post(base_url + "/formgrader/api/assignment/" + this.model.get("name") + "/unrelease")
             .done(_.bind(this.unrelease_success, this))
             .fail(_.bind(this.unrelease_failure, this));
@@ -284,15 +284,15 @@ var AssignmentUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully unreleased '" + this.model.get("name") + "'.",
+                "成功",
+                "成功取消发布 '" + this.model.get("name") + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
-                "There was an error unreleasing '" + this.model.get("name") + "':",
+                "错误",
+                "取消发布时发生错误 '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -302,13 +302,13 @@ var AssignmentUI = Backbone.View.extend({
         this.model.fetch();
         createModal(
             "error-modal",
-            "Error",
-            "There was an error unreleasing '" + this.model.get("name") + "'.");
+            "错误",
+            "取消发布时发生错误 '" + this.model.get("name") + "'.");
     },
 
     release: function () {
         this.clear();
-        this.$name.text("Please wait...");
+        this.$name.text("请稍候...");
         $.post(base_url + "/formgrader/api/assignment/" + this.model.get("name") + "/release")
             .done(_.bind(this.release_success, this))
             .fail(_.bind(this.release_failure, this));
@@ -320,15 +320,15 @@ var AssignmentUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully released '" + this.model.get("name") + "'.",
+                "成功",
+                "成功发布 '" + this.model.get("name") + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
-                "There was an error releasing '" + this.model.get("name") + "':",
+                "错误",
+                "发布作业时发生错误 '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -338,13 +338,13 @@ var AssignmentUI = Backbone.View.extend({
         this.model.fetch();
         createModal(
             "error-modal",
-            "Error",
-            "There was an error releasing '" + this.model.get("name") + "'.");
+            "错误",
+            "发布作业时发生错误 '" + this.model.get("name") + "'.");
     },
 
     collect: function () {
         this.clear();
-        this.$name.text("Please wait...");
+        this.$name.text("请稍候...");
         $.post(base_url + "/formgrader/api/assignment/" + this.model.get("name") + "/collect")
             .done(_.bind(this.collect_success, this))
             .fail(_.bind(this.collect_failure, this));
@@ -356,14 +356,14 @@ var AssignmentUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully collected submissions of '" + this.model.get("name") + "'.",
+                "成功",
+                "成功收集提交的作业 '" + this.model.get("name") + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
+                "错误",
                 "There was an error collecting '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
@@ -374,8 +374,8 @@ var AssignmentUI = Backbone.View.extend({
         this.model.fetch();
         createModal(
             "error-modal",
-            "Error",
-            "There was an error collecting submissions of '" + this.model.get("name") + "'.");
+            "错误",
+            "收集作业时发生错误 '" + this.model.get("name") + "'.");
     },
 
     save: function () {
@@ -396,7 +396,7 @@ var AssignmentUI = Backbone.View.extend({
 
     generate_feedback: function () {
         this.clear();
-        this.$name.text("Please wait...");
+        this.$name.text("请稍候...");
         $.post(base_url + "/formgrader/api/assignment/" + this.model.get("name") + "/generate_feedback")
             .done(_.bind(this.generate_feedback_success, this))
             .fail(_.bind(this.generate_feedback_failure, this));
@@ -408,15 +408,15 @@ var AssignmentUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully generated feedback of '" + this.model.get("name") + "'.",
+                "成功",
+                "成功生成反馈 '" + this.model.get("name") + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
-                "There was an error generating feedback of '" + this.model.get("name") + "':",
+                "错误",
+                "生成反馈时发生错误 '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -426,13 +426,13 @@ var AssignmentUI = Backbone.View.extend({
         this.model.fetch();
         createModal(
             "error-modal",
-            "Error",
-            "There was an error generating feedback of '" + this.model.get("name") + "'.");
+            "错误",
+            "生成反馈时发生错误 '" + this.model.get("name") + "'.");
     },
 
     release_feedback: function () {
         this.clear();
-        this.$name.text("Please wait...");
+        this.$name.text("请稍候...");
         $.post(base_url + "/formgrader/api/assignment/" + this.model.get("name") + "/release_feedback")
             .done(_.bind(this.release_feedback_success, this))
             .fail(_.bind(this.release_feedback_failure, this));
@@ -444,15 +444,15 @@ var AssignmentUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully released feedback of '" + this.model.get("name") + "'.",
+                "成功",
+                "成功发布 feedback of '" + this.model.get("name") + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
-                "There was an error releasing feedback of '" + this.model.get("name") + "':",
+                "错误",
+                "发布作业时发生错误 feedback of '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -462,8 +462,8 @@ var AssignmentUI = Backbone.View.extend({
         this.model.fetch();
         createModal(
             "error-modal",
-            "Error",
-            "There was an error releasing feedback of '" + this.model.get("name") + "'.");
+            "错误",
+            "发布作业时发生错误 feedback of '" + this.model.get("name") + "'.");
     },
 
     closeModal: function () {
@@ -515,7 +515,7 @@ var createAssignmentModal = function () {
         }
         if (name.indexOf("+") != -1) {
             var err = $("#create-error");
-            err.text("Assignment names may not include the '+' character.");
+            err.text("作业名称不能包含 '+' 字符。");
             err.show();
             return;
         } else {
@@ -551,17 +551,17 @@ var createAssignmentModal = function () {
     body.append(table.append(tablebody));
     var name = $("<tr/>");
     tablebody.append(name);
-    name.append($("<td/>").addClass("align-middle").text("Name"));
+    name.append($("<td/>").addClass("align-middle").text("名称"));
     name.append($("<td/>").append($("<input/>").addClass("name").attr("type", "text").attr("size", "31")));
 
     var duedate = $("<tr/>");
     tablebody.append(duedate);
-    duedate.append($("<td/>").addClass("align-middle").text("Due date (optional)"));
+    duedate.append($("<td/>").addClass("align-middle").text("截止日期（可选）"));
     duedate.append($("<td/>").append($("<input/>").addClass("duedate").attr("type", "datetime-local")));
 
     var timezone = $("<tr/>");
     tablebody.append(timezone);
-    timezone.append($("<td/>").addClass("align-middle").text("Timezone as UTC offset (optional)"));
+    timezone.append($("<td/>").addClass("align-middle").text("时区偏移UTC（可选）"));
     timezone.append($("<td/>").append($("<input/>").addClass("timezone").attr("type", "text")));
 
     var footer = $("<div/>");
@@ -569,14 +569,14 @@ var createAssignmentModal = function () {
         .addClass("btn btn-primary save")
         .attr("type", "button")
         .click(createAssignment)
-        .text("Save"));
+        .text("保存"));
     footer.append($("<button/>")
         .addClass("btn btn-danger")
         .attr("type", "button")
         .attr("data-dismiss", "modal")
-        .text("Cancel"));
+        .text("取消"));
 
-    modal = createModal("add-assignment-modal", "Add New Assignment", body, footer);
+    modal = createModal("add-assignment-modal", "添加新作业", body, footer);
 };
 
 var loadAssignments = function () {

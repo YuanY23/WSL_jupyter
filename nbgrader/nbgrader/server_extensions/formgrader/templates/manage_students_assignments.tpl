@@ -27,5 +27,5 @@ var student_id = "{{ student_id }}";
 {%- endblock -%}
 
 {%- block table_body -%}
-<tr><td colspan="5">Loading, please wait...</td></tr>
+<tr><td colspan="5">加载中，请稍候...</td></tr>
 {%- endblock -%}

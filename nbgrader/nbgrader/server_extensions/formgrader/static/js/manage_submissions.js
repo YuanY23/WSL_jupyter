@@ -132,7 +132,7 @@ var SubmissionUI = Backbone.View.extend({
 
     autograde: function () {
         this.clear();
-        this.$student_name.text("Please wait...");
+        this.$student_name.text("请稍候...");
         var student = this.model.get("student");
         var assignment = this.model.get("name");
         $.post(base_url + "/formgrader/api/submission/" + assignment + "/" + student + "/autograde")
@@ -148,14 +148,14 @@ var SubmissionUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
+                "成功",
                 "Successfully autograded '" + assignment + "' for student '" + student + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
+                "错误",
                 "There was an error autograding '" + assignment + "' for student '" + student + "':",
                 response["log"],
                 response["error"]);
@@ -168,13 +168,13 @@ var SubmissionUI = Backbone.View.extend({
         var assignment = this.model.get("name");
         createModal(
             "error-modal",
-            "Error",
+            "错误",
             "There was an error autograding '" + assignment + "' for student '" + student + "'.");
     },
 
     generate_feedback: function () {
         this.clear();
-        this.$student_name.text("Please wait...");
+        this.$student_name.text("请稍候...");
         var student = this.model.get("student");
         var assignment = this.model.get("name");
         $.post(base_url + "/formgrader/api/assignment/" + assignment + "/" + student + "/generate_feedback")
@@ -190,14 +190,14 @@ var SubmissionUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
+                "成功",
                 "Successfully generated feedback for '" + assignment + "' for student '" + student + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
+                "错误",
                 "There was an error generating feedback for '" + assignment + "' for student '" + student + "':",
                 response["log"],
                 response["error"]);
@@ -210,13 +210,13 @@ var SubmissionUI = Backbone.View.extend({
         var assignment = this.model.get("name");
         createModal(
             "error-modal",
-            "Error",
+            "错误",
             "There was an error generating feedback for '" + assignment + "' for student '" + student + "'.");
     },
 
     release_feedback: function () {
         this.clear();
-        this.$student_name.text("Please wait...");
+        this.$student_name.text("请稍候...");
         var student = this.model.get("student");
         var assignment = this.model.get("name");
         $.post(base_url + "/formgrader/api/assignment/" + assignment + "/" + student + "/release_feedback")
@@ -232,15 +232,15 @@ var SubmissionUI = Backbone.View.extend({
         if (response["success"]) {
             createLogModal(
                 "success-modal",
-                "Success",
-                "Successfully released feedback for '" + assignment + "' for student '" + student + "'.",
+                "成功",
+                "成功发布 feedback for '" + assignment + "' for student '" + student + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
-                "Error",
-                "There was an error releasing feedback for '" + assignment + "' for student '" + student + "':",
+                "错误",
+                "发布作业时发生错误 feedback for '" + assignment + "' for student '" + student + "':",
                 response["log"],
                 response["error"]);
         }
@@ -252,8 +252,8 @@ var SubmissionUI = Backbone.View.extend({
         var assignment = this.model.get("name");
         createModal(
             "error-modal",
-            "Error",
-            "There was an error releasing feedback for '" + assignment + "' for student '" + student + "'.");
+            "错误",
+            "发布作业时发生错误 feedback for '" + assignment + "' for student '" + student + "'.");
     },
 
 });

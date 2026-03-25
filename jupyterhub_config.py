@@ -20,10 +20,6 @@ c.CustomNativeAuthenticator.enable_signup = True
 c.CustomNativeAuthenticator.open_signup = True  # No admin approval needed
 c.CustomNativeAuthenticator.minimum_password_length = 1  # For testing
 
-# Custom groups for nbgrader role assignment
-c.CustomNativeAuthenticator.teacher_group = 'formgrade-course_test'
-c.CustomNativeAuthenticator.student_group = 'nbgrader-course_test'
-
 # Admin users
 c.Authenticator.admin_users = {'yuan'}
 c.Authenticator.allow_all = True
@@ -39,29 +35,86 @@ c.ConfigurableHTTPProxy.command = [
 ]
 
 # --- nbgrader Integration ---
-# Define groups (JupyterHub 3.2+ format)
-c.JupyterHub.load_groups = {
-    'formgrade-course_test': {'users': []},    # Teachers
-    'nbgrader-course_test': {'users': []},     # Students
+# Groups are created dynamically by CustomNativeAuthenticator.
+# No need to predefine them here.
+
+# Admin API token for nbgrader to manage groups (add/remove students)
+import secrets
+_nbgrader_api_token = secrets.token_hex(32)
+c.JupyterHub.services = [
+    {
+        'name': 'nbgrader',
+        'api_token': _nbgrader_api_token,
+        'admin': True,
+    }
+]
+
+# --- Spawner Configuration (DockerSpawner) ---
+import dockerspawner
+
+c.JupyterHub.spawner_class = dockerspawner.DockerSpawner
+c.DockerSpawner.image = 'my-custom-nbgrader:latest'
+
+# Explicitly tell containers how to reach the Hub (Docker default bridge IP)
+c.JupyterHub.hub_ip = '0.0.0.0'
+c.JupyterHub.hub_connect_ip = '172.17.0.1'
+
+c.DockerSpawner.default_url = '/lab'
+c.DockerSpawner.notebook_dir = '/home/jovyan'
+
+# Base Volumes for EVERY user
+c.DockerSpawner.volumes = {
+    # 1. Persist user home directories across restarts
+    'jupyterhub-user-{username}': '/home/jovyan',
+    
+    # 2. Global shared exchange directory for assignment distribution
+    '/srv/nbgrader/exchange': '/srv/nbgrader/exchange',
+    
+    # 3. LIVE DEVELOPMENT MOUNT: Map local host code to container
+    '/home/yuan/my_project/nbgrader': '/src/nbgrader',
 }
 
-# --- Spawner Configuration ---
-# Use SimpleLocalProcessSpawner: does NOT require system users.
-# All notebook servers run as the current user (yuan).
-from jupyterhub.spawner import SimpleLocalProcessSpawner
-c.JupyterHub.spawner_class = SimpleLocalProcessSpawner
-c.Spawner.default_url = '/lab'
-c.Spawner.cmd = ['/home/yuan/miniconda3/envs/jupyter/bin/jupyterhub-singleuser']
-c.Spawner.environment = {'PATH': '/home/yuan/miniconda3/envs/jupyter/bin:' + os.environ.get('PATH', '')}
+# Automatically remove Docker containers when stopped
+c.DockerSpawner.remove = True
 
-# 设置 notebook 目录为项目目录，确保 nbgrader 能找到配置文件
-c.Spawner.notebook_dir = '/home/yuan/my_project'
+# Dynamically add volumes for teachers based on their groups
+def pre_spawn_hook(spawner):
+    username = spawner.user.name
+    user_groups = [g.name for g in spawner.user.groups]
+    
+    for group in user_groups:
+        if group.startswith('formgrade-'):
+            course_id = group.split('-', 1)[1]
+            # Auto-create course directory on host if it doesn't exist
+            host_course_dir = f'/home/yuan/my_project/courses/{course_id}'
+            os.makedirs(host_course_dir, exist_ok=True)
+            # Ensure the directory is writable by jovyan (UID 1000, GID 100) in the container
+            os.chown(host_course_dir, 1000, 100)
+            # Mount it into the teacher's container
+            spawner.volumes[host_course_dir] = f'/home/jovyan/{course_id}'
+    
+    # REMOVED: Do not overwrite JUPYTERHUB_API_TOKEN as it breaks the single-user server OAuth flow!
+    # The server needs its own token. We will give teachers RBAC roles instead if needed.
+    # spawner.environment['JUPYTERHUB_API_TOKEN'] = _nbgrader_api_token
 
-# 增加超时时间：nbgrader + 可编辑安装的 JupyterLab 启动较慢
+c.DockerSpawner.pre_spawn_hook = pre_spawn_hook
+
+# timeouts
 c.Spawner.http_timeout = 120   # 等待服务器响应的超时（秒）
 c.Spawner.start_timeout = 120  # 等待服务器启动的超时（秒）
-c.Spawner.args = ['--LabApp.custom_css=True']
 
 # --- Template Paths ---
 c.JupyterHub.template_paths = ['/home/yuan/my_project/templates']
 
+# --- RBAC Configuration for nbgrader ---
+# Allow teachers to read users and groups to populate student lists
+c.JupyterHub.load_roles = [
+    {
+        "name": "formgrade-teacher",
+        # list:users allows seeing the list of users
+        # read:users allows seeing user details
+        # read:groups allows seeing group members
+        "scopes": ["list:users", "read:users", "read:groups", "list:groups", "access:services"],
+        "groups": ["teachers"] 
+    }
+]

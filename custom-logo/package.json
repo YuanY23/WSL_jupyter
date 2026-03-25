@@ -1,0 +1,22 @@
+{
+    "name": "custom-logo",
+    "version": "1.0.0",
+    "description": "Custom JupyterLab logo override",
+    "keywords": [
+        "jupyter",
+        "jupyterlab",
+        "jupyterlab-extension"
+    ],
+    "files": [
+        "static/**/*.{js,css,json}"
+    ],
+    "jupyterlab": {
+        "extension": false,
+        "themePath": "",
+        "disabledExtensions": [],
+        "_build": {
+            "load": "",
+            "style": "./style"
+        }
+    }
+}

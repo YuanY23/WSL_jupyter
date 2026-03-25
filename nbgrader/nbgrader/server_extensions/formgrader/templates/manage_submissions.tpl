@@ -13,9 +13,9 @@ Manage Submissions
 {%- endblock -%}
 
 {%- block sidebar -%}
-<li role="presentation" class="active"><a href="{{ base_url }}/formgrader/manage_assignments">Manage Assignments</a></li>
-<li role="presentation"><a href="{{ base_url }}/formgrader/gradebook">Manual Grading</a></li>
-<li role="presentation"><a href="{{ base_url }}/formgrader/manage_students">Manage Students</a></li>
+<li role="presentation" class="active"><a href="{{ base_url }}/formgrader/manage_assignments">作业管理</a></li>
+<li role="presentation"><a href="{{ base_url }}/formgrader/gradebook">手动评分</a></li>
+<li role="presentation"><a href="{{ base_url }}/formgrader/manage_students">学生管理</a></li>
 {%- endblock -%}
 
 {%- block breadcrumbs -%}
@@ -31,7 +31,7 @@ Manage Submissions
     <div class="panel-heading" role="tab" id="headingOne">
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-          Instructions (click to expand)
+          操作说明（点击展开）
         </a>
       </h4>
     </div>
@@ -59,17 +59,17 @@ nbgrader autograde "{{ assignment_id }}"</pre>
   <th>Student Name</th>
   <th class="text-center">Student ID</th>
   <th class="text-center">Timestamp</th>
-  <th class="text-center">Status</th>
+  <th class="text-center">状态</th>
   <th class="text-center">Score</th>
   <th class="text-center no-sort">Autograde</th>
-  <th class="text-center no-sort">Generate Feedback</th>
-  <th class="text-center no-sort">Release Feedback</th>
+  <th class="text-center no-sort">生成反馈</th>
+  <th class="text-center no-sort">发布反馈</th>
 </tr>
 {%- endblock -%}
 
 {%- block table_body -%}
 <tr>
-  <td>Loading, please wait...</td>
+  <td>加载中，请稍候...</td>
   <td></td>
   <td></td>
   <td></td>

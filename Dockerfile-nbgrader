@@ -1,0 +1,111 @@
+# ============================================================
+# Dockerfile for Custom JupyterLab + nbgrader
+# ============================================================
+FROM jupyter/base-notebook:ubuntu-22.04
+
+USER root
+
+# Install required system packages
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    git \
+    nodejs \
+    npm \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Create exchange directory placeholder (will be overwritten by volume mount)
+RUN mkdir -p /srv/nbgrader/exchange && \
+    chmod 777 /srv/nbgrader/exchange
+
+# Setup global nbgrader config
+RUN mkdir -p /etc/jupyter
+COPY docker_nbgrader_config.py /etc/jupyter/nbgrader_config.py
+
+USER $NB_UID
+
+# Install backend dependencies for nbgrader and custom authenticator
+RUN mamba install --quiet --yes \
+    'jupyterlab=4.2.7' \
+    'notebook=7.2.2' \
+    'jupyter_server=2.14.2' \
+    'alembic' \
+    'sqlalchemy' \
+    'traitlets' \
+    'tornado' \
+    'pytest' \
+    'jupyterhub' \
+    'rapidfuzz' \
+    'requests' \
+ && mamba clean --all -f -y
+
+# Install Chinese language pack for JupyterLab
+RUN pip install --no-cache-dir jupyterlab-language-pack-zh-CN
+
+# Make sure lab extensions are enabled
+RUN mkdir -p /opt/conda/etc/jupyter/jupyter_server_config.d && \
+    echo '{"ServerApp":{"tornado_settings":{"headers":{"Content-Security-Policy":"frame-ancestors '"'"'self'"'"' * *"}}}}' > /opt/conda/etc/jupyter/jupyter_server_config.d/csp.json
+
+# Copy source code directory (requires nbgrader and jupyterlab folders in build context)
+COPY --chown=$NB_UID:$NB_GID custom-logo /opt/conda/share/jupyter/labextensions/custom-logo
+COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
+COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
+
+# Install custom jupyterlab first 
+WORKDIR /src/jupyterlab
+RUN pip install hatchling && pip install -e .
+RUN git config --global init.defaultBranch main && \
+    git init && \
+    git config --global user.email "a@b.com" && \
+    git config --global user.name "A" && \
+    git add . && \
+    git commit -m "init" && \
+    jlpm install && \
+    jlpm run build
+    
+# Install custom nbgrader
+WORKDIR /src/nbgrader
+RUN pip install -e .
+
+# Overwrite the official SVG icons with our custom ones BEFORE building
+RUN cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
+    cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter-favicon.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
+    cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyterlab-wordmark.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true
+
+# Also overwrite in the installed npm package so `jupyter lab build` picks them up
+RUN UICOMP_DIR=$(find /opt/conda -path "*/labextensions/@jupyterlab/ui-components" -type d 2>/dev/null | head -1) && \
+    if [ -n "$UICOMP_DIR" ]; then \
+      cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
+      cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter-favicon.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
+      cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyterlab-wordmark.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
+    fi
+
+# Rebuild JupyterLab to bake in the custom nbgrader extensions + custom icons
+WORKDIR /home/jovyan
+RUN jupyter lab build --minimize=False
+
+# Copy custom translation settings
+RUN cp /src/jupyterlab/packages/translation-extension/schema/plugin.json \
+       /opt/conda/share/jupyter/lab/schemas/@jupyterlab/translation-extension/plugin.json 2>/dev/null || true
+
+# Copy settings overrides (Chinese locale as default and disabled extensions)
+RUN mkdir -p /opt/conda/share/jupyter/lab/settings && \
+    echo '{ \
+      "@jupyterlab/translation-extension:plugin": { "locale": "zh_CN" }, \
+      "@jupyterlab/extensionmanager-extension:plugin": { "enabled": false }, \
+      "@jupyterlab/toc-extension:registry": { "enabled": false } \
+    }' > /opt/conda/share/jupyter/lab/settings/overrides.json
+
+# Force inject the custom yellow 'Y' logo into the JupyterLab Light & Dark themes
+RUN for theme in "theme-light-extension" "theme-dark-extension"; do \
+      THEME_CSS=$(find /opt/conda/share/jupyter/lab/themes -name "index.css" -path "*/@jupyterlab/$theme/*" | head -1); \
+      if [ -n "$THEME_CSS" ]; then \
+        echo '#jp-MainLogo svg { display: none !important; } #jp-MainLogo::before { content: "Y"; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 7px; font-size: 18px; font-weight: 800; color: #1a1a2e; font-family: "Inter", "PingFang SC", sans-serif; letter-spacing: -0.03em; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4); margin: auto 4px; cursor: pointer; flex-shrink: 0; } #jp-MainLogo { display: flex !important; align-items: center !important; } #jp-MainLogo button { background: transparent !important; border: none !important; padding: 0 !important; }' >> "$THEME_CSS"; \
+      fi; \
+    done
+
+CMD ["start-singleuser.sh"]

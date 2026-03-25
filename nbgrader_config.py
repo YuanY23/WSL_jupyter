@@ -15,7 +15,7 @@ c.CourseDirectory.course_id = 'course_test'
 c.CourseDirectory.root = '/home/yuan/my_project/course_test'
 
 # Exchange directory - shared location for assignment distribution
-c.Exchange.root = '/tmp/exchange'
+c.Exchange.root = '/srv/nbgrader/exchange'
 
 # Use JupyterHub auth plugin so nbgrader checks Hub groups for permissions
 c.Authenticator.plugin_class = JupyterHubAuthPlugin

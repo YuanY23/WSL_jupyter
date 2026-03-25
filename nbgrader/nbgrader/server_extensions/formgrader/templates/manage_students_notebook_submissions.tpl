@@ -31,5 +31,5 @@ var assignment_id = "{{ assignment_id }}";
 {%- endblock -%}
 
 {%- block table_body -%}
-<tr><td colspan="7">Loading, please wait...</td></tr>
+<tr><td colspan="7">加载中，请稍候...</td></tr>
 {%- endblock -%}

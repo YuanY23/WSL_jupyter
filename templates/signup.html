@@ -377,6 +377,12 @@
                 </select>
             </div>
 
+            <div class="field" id="course_field" style="display: none;">
+                <label for="course_input">课程名称</label>
+                <input id="course_input" type="text" name="course_id" placeholder="英文标识，如 math101"
+                    pattern="[a-zA-Z0-9_]+" title="只能使用英文字母、数字和下划线" />
+            </div>
+
             <div class="field">
                 <label for="password_input">密码</label>
                 <div class="input-wrap">
@@ -451,6 +457,24 @@
             }
         });
 
+        // Toggle course_id field based on role
+        document.addEventListener('DOMContentLoaded', function () {
+            let roleSelect = document.getElementById('role_select');
+            let courseField = document.getElementById('course_field');
+            let courseInput = document.getElementById('course_input');
+            if (roleSelect && courseField) {
+                roleSelect.addEventListener('change', function () {
+                    if (this.value === 'teacher') {
+                        courseField.style.display = 'block';
+                        courseInput.required = true;
+                    } else {
+                        courseField.style.display = 'none';
+                        courseInput.required = false;
+                        courseInput.value = '';
+                    }
+                });
+            }
+        });
         // TOS Checkbox Logic
         {% if tos %}
         document.addEventListener('DOMContentLoaded', function () {

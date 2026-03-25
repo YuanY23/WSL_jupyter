@@ -11,7 +11,7 @@ var notebook_id = "{{ notebook_id }}";
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li><a href="{{ base_url }}/formgrader/gradebook">Manual Grading</a></li>
+  <li><a href="{{ base_url }}/formgrader/gradebook">手动评分</a></li>
   <li><a href="{{ base_url }}/formgrader/gradebook/{{ assignment_id }}">{{ assignment_id }}</a></li>
   <li class="active">{{ notebook_id }}</li>
 </ol>
@@ -37,5 +37,5 @@ var notebook_id = "{{ notebook_id }}";
 {%- endblock -%}
 
 {%- block table_body -%}
-<tr><td colspan="8">Loading, please wait...</td></tr>
+<tr><td colspan="8">加载中，请稍候...</td></tr>
 {%- endblock -%}

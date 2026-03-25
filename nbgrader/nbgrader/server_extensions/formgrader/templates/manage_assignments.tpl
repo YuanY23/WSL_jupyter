@@ -13,9 +13,9 @@ Manage Assignments
 {%- endblock -%}
 
 {%- block sidebar -%}
-<li role="presentation" class="active"><a href="{{ base_url }}/formgrader/manage_assignments">Manage Assignments</a></li>
-<li role="presentation"><a href="{{ base_url }}/formgrader/gradebook">Manual Grading</a></li>
-<li role="presentation"><a href="{{ base_url }}/formgrader/manage_students">Manage Students</a></li>
+<li role="presentation" class="active"><a href="{{ base_url }}/formgrader/manage_assignments">作业管理</a></li>
+<li role="presentation"><a href="{{ base_url }}/formgrader/gradebook">手动评分</a></li>
+<li role="presentation"><a href="{{ base_url }}/formgrader/manage_students">学生管理</a></li>
 {%- endblock -%}
 
 {%- block breadcrumbs -%}
@@ -30,25 +30,25 @@ Manage Assignments
     <div class="panel-heading" role="tab" id="headingOne">
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-          Instructions (click to expand)
+          操作说明（点击展开）
         </a>
       </h4>
     </div>
     <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
       <div class="panel-body">
         <ol>
-          <li>To <b>create</b> an assignment, click the "Add new assignment..." button below.</li>
-          <li>To <b>edit assignment files</b>, click on the name of an assignment.</li>
-          <li>To <b>edit the assignment metadata</b>, click on the edit button.</li>
-          <li>To <b>generate</b> the student version of an assignment, click on the generate button.</li>
-          <li>To <b>preview</b> the student version of an assignment, click on the preview button.</li>
-          <li><i>(JupyterHub only)</i> To <b>release</b> the assignment to students, click the release button.
+          <li>要<b>创建</b>作业，请点击下方的“添加新作业...”按钮。</li>
+          <li>要<b>编辑作业文件</b>，请点击作业名称。</li>
+          <li>要<b>编辑作业属性</b>，请点击编辑按钮。</li>
+          <li>要<b>生成</b>学生版作业，请点击生成按钮。</li>
+          <li>要<b>预览</b>学生版作业，请点击预览按钮。</li>
+          <li><i>(JupyterHub only)</i> 要<b>发布</b>作业给学生，请点击发布按钮。
           You can "unrelease" an assignment by clicking again, though note some students may have
           already accessed the assignment. <b>Note</b> that for the release button to become
           available, the <code>course_id</code> option must be set in <code>nbgrader_config.py</code>.
           For details, see <a href="http://nbgrader.readthedocs.io/en/stable/configuration/config_options.html">the documentation</a>.</li>
-          <li><i>(JupyterHub only)</i> To <b>collect</b> assignments, click the collect button.</li>
-          <li>To <b>autograde</b> submissions, click on the number of collected submissions. You must run
+          <li><i>(JupyterHub only)</i> 要<b>收集</b>学生作业，请点击收集按钮。</li>
+          <li>要<b>自动评分</b>，请点击已收集提交的数量。 You must run
           the autograder on the submissions before you can manually grade them.</li>
         </ol>
       </div>
@@ -61,7 +61,7 @@ Manage Assignments
     <div class="panel-heading" role="tab" id="headingConfig">
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseConfig" aria-expanded="false" aria-controls="collapseConfig">
-          Current configuration (click to expand)
+          当前配置（点击展开）
         </a>
       </h4>
     </div>
@@ -96,29 +96,29 @@ for instructions.
 
 {%- block table_header -%}
 <tr>
-  <th>Name</th>
-  <th class="text-center">Due Date</th>
-  <th class="text-center">Status</th>
-  <th class="text-center no-sort">Edit</th>
-  <th class="text-center no-sort">Generate</th>
-  <th class="text-center no-sort">Preview</th>
-  <th class="text-center no-sort">Release</th>
-  <th class="text-center no-sort">Collect</th>
-  <th class="text-center"># Submissions</th>
-  <th class="text-center no-sort">Generate Feedback</th>
-  <th class="text-center no-sort">Release Feedback</th>
+  <th>名称</th>
+  <th class="text-center">截止日期</th>
+  <th class="text-center">状态</th>
+  <th class="text-center no-sort">编辑</th>
+  <th class="text-center no-sort">生成学生版</th>
+  <th class="text-center no-sort">预览</th>
+  <th class="text-center no-sort">发布</th>
+  <th class="text-center no-sort">收集</th>
+  <th class="text-center">提交份数</th>
+  <th class="text-center no-sort">生成反馈</th>
+  <th class="text-center no-sort">发布反馈</th>
 </tr>
 {%- endblock -%}
 
 {%- block table_body -%}
-<tr><td colspan="11">Loading, please wait...</td></tr>
+<tr><td colspan="11">加载中，请稍候...</td></tr>
 {%- endblock -%}
 
 {%- block table_footer -%}
 <tr>
   <td colspan="11">
     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    <a href="#" onClick="createAssignmentModal();">Add new assignment...</a>
+    <a href="#" onClick="createAssignmentModal();">＋ 添加新作业...</a>
   </td>
 </tr>
 {%- endblock -%}

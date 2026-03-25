@@ -1,0 +1,5 @@
+{
+    "packageManager": "python",
+    "packageName": "custom-logo",
+    "uninstallInstructions": "Delete this directory to uninstall."
+}

@@ -62,14 +62,14 @@ var StudentUI = Backbone.View.extend({
         footer.append($("<button/>")
             .addClass("btn btn-primary save")
             .attr("type", "button")
-            .text("Save"));
+            .text("保存"));
         footer.append($("<button/>")
             .addClass("btn btn-danger")
             .attr("type", "button")
             .attr("data-dismiss", "modal")
-            .text("Cancel"));
+            .text("取消"));
 
-        this.$modal = createModal("edit-student-modal", "Editing " + this.model.get("id"), body, footer);
+        this.$modal = createModal("edit-student-modal", "正在编辑 " + this.model.get("id"), body, footer);
         this.$modal.find("input.modal-id").val(this.model.get("id"));
         this.$modal_first_name = this.$modal.find("input.modal-first-name");
         this.$modal_first_name.val(this.model.get("first_name"));
@@ -249,12 +249,12 @@ var createStudentModal = function () {
         .addClass("btn btn-primary save")
         .attr("type", "button")
         .click(createStudent)
-        .text("Save"));
+        .text("保存"));
     footer.append($("<button/>")
         .addClass("btn btn-danger")
         .attr("type", "button")
         .attr("data-dismiss", "modal")
-        .text("Cancel"));
+        .text("取消"));
 
     modal = createModal("add-student-modal", "Add New Student", body, footer);
 };

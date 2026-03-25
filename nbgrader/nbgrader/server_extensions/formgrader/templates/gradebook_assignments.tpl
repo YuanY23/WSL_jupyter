@@ -6,19 +6,19 @@
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li class="active">Manual Grading</li>
+  <li class="active">手动评分</li>
 </ol>
 {%- endblock -%}
 
 {%- block table_header -%}
 <tr>
   <th>Assignment ID</th>
-  <th class="text-center">Due Date</th>
+  <th class="text-center">截止日期</th>
   <th class="text-center">Submissions</th>
   <th class="text-center">Score</th>
 </tr>
 {%- endblock -%}
 
 {%- block table_body -%}
-<tr><td colspan="4">Loading, please wait...</td></tr>
+<tr><td colspan="4">加载中，请稍候...</td></tr>
 {%- endblock -%}

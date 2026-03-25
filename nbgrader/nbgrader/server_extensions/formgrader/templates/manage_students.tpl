@@ -12,7 +12,7 @@
 
 {%- block table_header -%}
 <tr>
-  <th>Name</th>
+  <th>名称</th>
   <th class="text-center">Student ID</th>
   <th class="text-center">Email</th>
   <th class="text-center">Overall Score</th>
@@ -21,7 +21,7 @@
 {%- endblock -%}
 
 {%- block table_body -%}
-<tr><td colspan="5">Loading, please wait...</td></tr>
+<tr><td colspan="5">加载中，请稍候...</td></tr>
 {%- endblock -%}
 
 {%- block table_footer -%}
