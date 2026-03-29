@@ -21,3 +21,19 @@ c.Exchange.path_includes_course = True
 # because a student could be in multiple courses, and a teacher could teach multiple courses.
 # The nbgrader extensions (Assignment List & Course List) will automatically determine
 # the course_id from the JupyterHub groups the user belongs to.
+
+import os
+course_id = os.environ.get('NBGRADER_COURSE_ID')
+if course_id:
+    # Set the course ID and remap the working directory dynamically when started
+    c.CourseDirectory.course_id = course_id
+    c.CourseDirectory.root = f'/home/jovyan/{course_id}'
+
+# If an admin-level API token is available (teacher containers only),
+# override JUPYTERHUB_API_TOKEN so that JupyterHubAuthPlugin can manage
+# JupyterHub groups (add/remove students from nbgrader-{course_id}).
+# This is safe because OAuth login has already completed by the time
+# this config file is loaded. Student containers don't have this env var.
+admin_token = os.environ.get('NBGRADER_ADMIN_API_TOKEN')
+if admin_token:
+    os.environ['JUPYTERHUB_API_TOKEN'] = admin_token

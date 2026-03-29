@@ -213,7 +213,20 @@ class CustomNativeAuthenticator(NativeAuthenticator):
                     self.db.commit()
                     self.log.info(f"Added teacher '{username}' to global 'teachers' group")
             else:
-                # Students: no group assignment at registration
-                self.log.info(f"Student '{username}' registered (no course assigned yet)")
+                # Students: add to nbgrader-{course_id} group if a course is selected
+                if course_id:
+                    group_name = f'nbgrader-{course_id}'
+                    hub_group = orm.Group.find(self.db, name=group_name)
+                    if not hub_group:
+                        hub_group = orm.Group(name=group_name)
+                        self.db.add(hub_group)
+                        self.db.commit()
+                        self.log.info(f"Created new student group '{group_name}'")
+                    if hub_user not in hub_group.users:
+                        hub_group.users.append(hub_user)
+                        self.db.commit()
+                        self.log.info(f"Added student '{username}' to group '{group_name}'")
+                else:
+                    self.log.info(f"Student '{username}' registered (no course assigned yet)")
 
         return user_info

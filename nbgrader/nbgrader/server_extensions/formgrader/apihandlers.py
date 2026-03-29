@@ -218,6 +218,41 @@ class StudentHandler(BaseApiHandler):
         }
         student_id = student_id.strip()
         self.gradebook.update_or_create_student(student_id, **student)
+
+        # ---- Sync student to JupyterHub nbgrader-{course_id} group ----
+        course_id = os.environ.get('NBGRADER_COURSE_ID')
+        hub_api = os.environ.get('JUPYTERHUB_API_URL')
+        hub_token = os.environ.get('JUPYTERHUB_API_TOKEN')
+
+        if course_id and hub_api and hub_token:
+            import requests
+            group_name = f"nbgrader-{course_id}"
+            headers = {"Authorization": f"token {hub_token}"}
+
+            try:
+                # Ensure the group exists (idempotent)
+                requests.post(
+                    f"{hub_api}/groups/{group_name}",
+                    headers=headers,
+                )
+                # Add student to the group
+                resp = requests.post(
+                    f"{hub_api}/groups/{group_name}/users",
+                    headers=headers,
+                    json={"users": [student_id]},
+                )
+                if resp.status_code == 200:
+                    self.log.info(
+                        f"Synced student '{student_id}' to JupyterHub group '{group_name}'"
+                    )
+                else:
+                    self.log.warning(
+                        f"Failed to sync student '{student_id}' to group '{group_name}': "
+                        f"{resp.status_code} {resp.text}"
+                    )
+            except Exception as e:
+                self.log.error(f"Error syncing student to JupyterHub: {e}")
+
         self.write(json.dumps(self.api.get_student(student_id)))
 
 

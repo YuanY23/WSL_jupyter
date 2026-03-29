@@ -377,9 +377,9 @@
                 </select>
             </div>
 
-            <div class="field" id="course_field" style="display: none;">
-                <label for="course_input">课程名称</label>
-                <input id="course_input" type="text" name="course_id" placeholder="英文标识，如 math101"
+            <div class="field" id="course_field">
+                <label for="course_input" id="course_label">班级/课程 ID（选填，加入已有班级）</label>
+                <input id="course_input" type="text" name="course_id" placeholder="英文标识，如 math101（老师告知）"
                     pattern="[a-zA-Z0-9_]+" title="只能使用英文字母、数字和下划线" />
             </div>
 
@@ -457,22 +457,26 @@
             }
         });
 
-        // Toggle course_id field based on role
+        // Toggle course_id field label/required based on role
         document.addEventListener('DOMContentLoaded', function () {
             let roleSelect = document.getElementById('role_select');
             let courseField = document.getElementById('course_field');
             let courseInput = document.getElementById('course_input');
+            let courseLabel = document.getElementById('course_label');
             if (roleSelect && courseField) {
-                roleSelect.addEventListener('change', function () {
-                    if (this.value === 'teacher') {
-                        courseField.style.display = 'block';
+                function updateCourseField() {
+                    if (roleSelect.value === 'teacher') {
+                        courseLabel.textContent = '课程名称（必填，创建新课程）';
+                        courseInput.placeholder = '英文标识，如 math101';
                         courseInput.required = true;
                     } else {
-                        courseField.style.display = 'none';
+                        courseLabel.textContent = '班级/课程 ID（选填，加入已有班级）';
+                        courseInput.placeholder = '英文标识，如 math101（老师告知）';
                         courseInput.required = false;
-                        courseInput.value = '';
                     }
-                });
+                }
+                roleSelect.addEventListener('change', updateCourseField);
+                updateCourseField(); // Initialize on page load
             }
         });
         // TOS Checkbox Logic

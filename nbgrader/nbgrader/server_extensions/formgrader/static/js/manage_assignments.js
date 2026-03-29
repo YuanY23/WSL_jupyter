@@ -118,11 +118,11 @@ var AssignmentUI = Backbone.View.extend({
 
         // status
         var status = this.model.get("status");
-        if (status === "草稿") {
-            this.$status.attr("data-order", "草稿");
+        if (status === "draft") {
+            this.$status.attr("data-order", "draft");
             this.$status.append($("<span/>").addClass("label label-info").text("草稿"));
-        } else if (status === "已发布") {
-            this.$status.attr("data-order", "已发布");
+        } else if (status === "released") {
+            this.$status.attr("data-order", "released");
             this.$status.append($("<span/>").addClass("label label-success").text("已发布"));
         }
 
@@ -161,7 +161,7 @@ var AssignmentUI = Backbone.View.extend({
         // release
         var releaseable = this.model.get("releaseable");
         if (release_path && releaseable) {
-            if (status === "草稿") {
+            if (status === "draft") {
                 this.$release.append($("<a/>")
                     .attr("href", "#")
                     .click(_.bind(this.release, this))
@@ -184,7 +184,7 @@ var AssignmentUI = Backbone.View.extend({
 
         // collect
         if (release_path && releaseable) {
-            if (status === "已发布") {
+            if (status === "released") {
                 this.$collect.append($("<a/>")
                     .attr("href", "#")
                     .click(_.bind(this.collect, this))
@@ -385,7 +385,7 @@ var AssignmentUI = Backbone.View.extend({
             duedate = null;
             timezone = null;
         }
-        this.model.save({"duedate_notimezone": duedate, "duedate_timezone": timezone});
+        this.model.save({ "duedate_notimezone": duedate, "duedate_timezone": timezone });
     },
 
     animateSaving: function () {

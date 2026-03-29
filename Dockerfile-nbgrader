@@ -19,6 +19,11 @@ RUN mkdir -p /srv/nbgrader/exchange && \
 # Setup global nbgrader config
 RUN mkdir -p /etc/jupyter
 COPY docker_nbgrader_config.py /etc/jupyter/nbgrader_config.py
+COPY docker_jupyter_server_config.py /etc/jupyter/jupyter_server_config.py
+
+# Startup hook: dynamically disable teacher-only labextensions for students
+COPY disable_teacher_extensions.sh /usr/local/bin/before-notebook.d/disable_teacher_extensions.sh
+RUN chmod +x /usr/local/bin/before-notebook.d/disable_teacher_extensions.sh
 
 USER $NB_UID
 
@@ -87,6 +92,14 @@ RUN UICOMP_DIR=$(find /opt/conda -path "*/labextensions/@jupyterlab/ui-component
 # Rebuild JupyterLab to bake in the custom nbgrader extensions + custom icons
 WORKDIR /home/jovyan
 RUN jupyter lab build --minimize=False
+
+# Fix: jupyter lab build may produce an empty static/package.json
+# Copy the staging package.json to static so _get_static_data() can parse it
+RUN STATIC_PKG="/opt/conda/share/jupyter/lab/static/package.json" && \
+    if [ ! -s "$STATIC_PKG" ]; then \
+      cp /src/jupyterlab/jupyterlab/staging/package.json "$STATIC_PKG" 2>/dev/null || \
+      echo '{"name":"@jupyterlab/application-top","version":"4.2.7"}' > "$STATIC_PKG"; \
+    fi
 
 # Copy custom translation settings
 RUN cp /src/jupyterlab/packages/translation-extension/schema/plugin.json \

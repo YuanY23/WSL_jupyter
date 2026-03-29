@@ -82,8 +82,10 @@ def pre_spawn_hook(spawner):
     username = spawner.user.name
     user_groups = [g.name for g in spawner.user.groups]
     
+    is_teacher = False
     for group in user_groups:
         if group.startswith('formgrade-'):
+            is_teacher = True
             course_id = group.split('-', 1)[1]
             # Auto-create course directory on host if it doesn't exist
             host_course_dir = f'/home/yuan/my_project/courses/{course_id}'
@@ -92,10 +94,15 @@ def pre_spawn_hook(spawner):
             os.chown(host_course_dir, 1000, 100)
             # Mount it into the teacher's container
             spawner.volumes[host_course_dir] = f'/home/jovyan/{course_id}'
-    
-    # REMOVED: Do not overwrite JUPYTERHUB_API_TOKEN as it breaks the single-user server OAuth flow!
-    # The server needs its own token. We will give teachers RBAC roles instead if needed.
-    # spawner.environment['JUPYTERHUB_API_TOKEN'] = _nbgrader_api_token
+            # Pass course ID to the container for nbgrader root mapping
+            spawner.environment['NBGRADER_COURSE_ID'] = course_id
+
+    if is_teacher:
+        # Inject admin-level API token so formgrader can manage JupyterHub groups
+        # (add/remove students to nbgrader-{course_id} groups).
+        # NOTE: We do NOT overwrite JUPYTERHUB_API_TOKEN here (that breaks OAuth).
+        # Instead we pass a separate env var that docker_nbgrader_config.py will use.
+        spawner.environment['NBGRADER_ADMIN_API_TOKEN'] = _nbgrader_api_token
 
 c.DockerSpawner.pre_spawn_hook = pre_spawn_hook
 
@@ -114,7 +121,7 @@ c.JupyterHub.load_roles = [
         # list:users allows seeing the list of users
         # read:users allows seeing user details
         # read:groups allows seeing group members
-        "scopes": ["list:users", "read:users", "read:groups", "list:groups", "access:services"],
+        "scopes": ["list:users", "read:users", "read:groups", "list:groups", "admin:groups", "access:services"],
         "groups": ["teachers"] 
     }
 ]
