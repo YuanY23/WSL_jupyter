@@ -1,0 +1,38 @@
+/*
+ *-------------------------------------------------------------------------------------------------------
+ * JupyterLab Thermal Design Base CSS
+ *-------------------------------------------------------------------------------------------------------
+ */
+ .thermal-design-widget {
+    background-color: var(--jp-layout-color1);
+    color: var(--jp-ui-font-color1);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    min-width: 600px;
+  }
+  
+  .thermal-control-panel {
+    background-color: var(--jp-layout-color2);
+    min-width: 300px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--jp-border-color1);
+  }
+  
+  .thermal-control-header {
+    padding: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-bottom: 1px solid var(--jp-border-color1);
+    text-align: center;
+  }
+  
+  .thermal-tabs-area {
+    background-color: var(--jp-layout-color1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  

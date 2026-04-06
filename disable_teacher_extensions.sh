@@ -22,3 +22,12 @@ else
     # Remove any leftover page_config.json from a previous student session
     rm -f /opt/conda/share/jupyter/lab/settings/page_config.json
 fi
+
+# =============================================================
+# Force clear Matplotlib font cache 
+# Prevents stale font lists when the underlying Docker Image adds new fonts
+# =============================================================
+if [ -d "/home/jovyan/.cache/matplotlib" ]; then
+    rm -rf /home/jovyan/.cache/matplotlib
+    echo "[disable_teacher_extensions] Cleared old matplotlib font cache to detect new system fonts."
+fi

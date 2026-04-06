@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     git \
     nodejs \
     npm \
+    fonts-wqy-zenhei \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create exchange directory placeholder (will be overwritten by volume mount)
@@ -40,6 +41,10 @@ RUN mamba install --quiet --yes \
     'jupyterhub' \
     'rapidfuzz' \
     'requests' \
+    'matplotlib' \
+    'numpy' \
+    'scipy' \
+    'numba' \
  && mamba clean --all -f -y
 
 # Install Chinese language pack for JupyterLab
@@ -53,6 +58,7 @@ RUN mkdir -p /opt/conda/etc/jupyter/jupyter_server_config.d && \
 COPY --chown=$NB_UID:$NB_GID custom-logo /opt/conda/share/jupyter/labextensions/custom-logo
 COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
 COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
+COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-design
 
 # Install custom jupyterlab first 
 WORKDIR /src/jupyterlab
@@ -69,6 +75,13 @@ RUN git config --global init.defaultBranch main && \
 # Install custom nbgrader
 WORKDIR /src/nbgrader
 RUN pip install -e .
+
+# Install thermal design plugin
+WORKDIR /src/jupyterlab-thermal-design
+RUN pip install -e . && \
+    jlpm install && \
+    jlpm run build && \
+    jupyter labextension develop . --overwrite
 
 # Overwrite the official SVG icons with our custom ones BEFORE building
 RUN cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter.svg \

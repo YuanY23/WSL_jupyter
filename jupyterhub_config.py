@@ -53,7 +53,7 @@ c.JupyterHub.services = [
 import dockerspawner
 
 c.JupyterHub.spawner_class = dockerspawner.DockerSpawner
-c.DockerSpawner.image = 'my-custom-nbgrader:latest'
+c.DockerSpawner.image = 'my_jupyterhub:latest'
 
 # Explicitly tell containers how to reach the Hub (Docker default bridge IP)
 c.JupyterHub.hub_ip = '0.0.0.0'
@@ -72,7 +72,14 @@ c.DockerSpawner.volumes = {
     
     # 3. LIVE DEVELOPMENT MOUNT: Map local host code to container
     '/home/yuan/my_project/nbgrader': '/src/nbgrader',
+
+    # 4. LIVE DEVELOPMENT MOUNT: Map local host jupyterlab code to container
+    '/home/yuan/my_project/jupyterlab': '/opt/jupyterlab',
 }
+
+# ================= 开发模式临时加的配置 =================
+# c.DockerSpawner.args = ['--dev-mode', '--watch'] # 暂时注释掉这行，它会导致启动崩溃
+# ========================================================
 
 # Automatically remove Docker containers when stopped
 c.DockerSpawner.remove = True
