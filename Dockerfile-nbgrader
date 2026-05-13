@@ -28,11 +28,15 @@ RUN chmod +x /usr/local/bin/before-notebook.d/disable_teacher_extensions.sh
 
 USER $NB_UID
 
-# Install backend dependencies for nbgrader and custom authenticator
-RUN mamba install --quiet --yes \
-    'jupyterlab=4.2.7' \
-    'notebook=7.2.2' \
-    'jupyter_server=2.14.2' \
+# Install backend dependencies for nbgrader and custom authenticator.
+# Use PyPI wheels to avoid slow conda solving and GUI packages such as pyside6.
+RUN pip install --no-cache-dir \
+    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    --timeout 120 \
+    --retries 10 \
+    'jupyterlab==4.2.7' \
+    'notebook==7.2.2' \
+    'jupyter_server==2.14.2' \
     'alembic' \
     'sqlalchemy' \
     'traitlets' \
@@ -44,8 +48,7 @@ RUN mamba install --quiet --yes \
     'matplotlib' \
     'numpy' \
     'scipy' \
-    'numba' \
- && mamba clean --all -f -y
+    'numba'
 
 # Install Chinese language pack for JupyterLab
 RUN pip install --no-cache-dir jupyterlab-language-pack-zh-CN

@@ -1,0 +1,73 @@
+# Default-deny the build context. Re-include only files used by Dockerfile-nbgrader.
+*
+
+!Dockerfile-nbgrader
+!docker_nbgrader_config.py
+!docker_jupyter_server_config.py
+!disable_teacher_extensions.sh
+
+!custom-logo/
+!custom-logo/**
+
+!nbgrader/
+!nbgrader/**
+
+!jupyterlab/
+!jupyterlab/**
+
+!jupyterlab-thermal-design/
+!jupyterlab-thermal-design/**
+
+# Never send local dependency installs or package-manager caches.
+**/node_modules
+**/node_modules/**
+**/.yarn/cache
+**/.yarn/cache/**
+**/.yarn/install-state.gz
+**/.pnp.*
+
+# VCS/editor/local agent state.
+.git
+.git/**
+.agents
+.agents/**
+.codex
+.vscode
+.vscode/**
+**/.git
+**/.git/**
+**/.github
+**/.github/**
+**/.vscode
+**/.vscode/**
+
+# Python and Jupyter runtime artifacts.
+**/__pycache__
+**/__pycache__/**
+**/*.py[cod]
+**/.ipynb_checkpoints
+**/.ipynb_checkpoints/**
+
+# Local outputs and generated development artifacts that are rebuilt in Docker.
+jupyterlab-thermal-design/tests
+jupyterlab-thermal-design/tests/**
+jupyterlab-thermal-design/lib
+jupyterlab-thermal-design/lib/**
+jupyterlab-thermal-design/src/jupyterlab_thermal_design.egg-info
+jupyterlab-thermal-design/src/jupyterlab_thermal_design.egg-info/**
+jupyterlab-thermal-design/jupyterlab_thermal_design.egg-info
+jupyterlab-thermal-design/jupyterlab_thermal_design.egg-info/**
+jupyterlab-thermal-design/仿真结果归档
+jupyterlab-thermal-design/仿真结果归档/**
+
+# Runtime course/user data is mounted or created outside the image.
+courses
+courses/**
+course_test
+course_test/**
+
+# Logs and local databases.
+**/*.log
+**/*.db
+**/*.sqlite
+**/*.sqlite3

@@ -4,98 +4,52 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>正在登录 — 教学平台</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+    <title>正在启动 - 原理仿真系统</title>
     <style>
+        :root {
+            --bg: #ffffff;
+            --panel: #ffffff;
+            --line: #000000;
+            --text: #000000;
+            --muted: #666666;
+            --accent: #000000;
+            --danger: #d00000;
+        }
+
         *,
         *::before,
         *::after {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            color: #f1f5f9;
-            overflow: hidden;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
         }
 
-        /* Animated bg orbs (same as login page) */
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            z-index: 0;
-            animation: float 8s ease-in-out infinite alternate;
+        .panel {
+            width: min(100%, 420px);
+            padding: 40px;
+            border: 2px solid var(--line);
+            background: var(--panel);
+            text-align: center;
+            box-shadow: 4px 4px 0 var(--line);
         }
 
-        body::before {
-            width: 500px;
-            height: 500px;
-            background: rgba(99, 102, 241, 0.15);
-            top: -100px;
-            left: -100px;
-        }
-
-        body::after {
-            width: 400px;
-            height: 400px;
-            background: rgba(14, 165, 233, 0.12);
-            bottom: -80px;
-            right: -80px;
-            animation-delay: -4s;
-        }
-
-        @keyframes float {
-            from {
-                transform: translate(0, 0) scale(1);
-            }
-
-            to {
-                transform: translate(30px, 20px) scale(1.05);
-            }
-        }
-
-        .center {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 24px;
-            animation: fade-in 0.6s ease-out;
-        }
-
-        @keyframes fade-in {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Spinner ring */
-        .spinner {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.08);
-            border-top-color: #6366f1;
-            border-right-color: #38bdf8;
-            animation: spin 1s linear infinite;
+        .loader {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 24px;
+            border: 4px solid var(--bg);
+            border-top-color: var(--accent);
+            border-left-color: var(--accent);
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -104,62 +58,50 @@
             }
         }
 
-        .message {
-            font-size: 22px;
-            font-weight: 500;
-            color: #e2e8f0;
-            letter-spacing: 0.06em;
+        h1 {
+            margin: 0 0 12px;
+            font-size: 24px;
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         .sub {
-            font-size: 13px;
-            color: rgba(148, 163, 184, 0.6);
-            letter-spacing: 0.03em;
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.5;
+            font-weight: 500;
         }
 
-        /* Animated dots */
-        .dots span {
-            animation: blink 1.2s infinite;
-            opacity: 0;
+        .failed {
+            color: var(--danger) !important;
+            font-weight: 600;
         }
-
-        .dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 0;
-            }
-
-            50% {
-                opacity: 1;
+        
+        @media (max-width: 480px) {
+            .panel {
+                box-shadow: none;
+                border-width: 1px;
+                padding: 32px 24px;
             }
         }
     </style>
 </head>
 
 <body>
-
-    <div class="center">
-        <div class="spinner"></div>
-        <div class="message">
-            正在登录<span class="dots"><span>.</span><span>.</span><span>.</span></span>
-        </div>
-        <div class="sub" id="status-text">正在启动您的专属服务器</div>
-    </div>
+    <main class="panel" aria-live="polite">
+        <div class="loader" aria-hidden="true"></div>
+        <h1>正在启动服务器</h1>
+        <p class="sub" id="status-text">请稍候…</p>
+        <span id="container-state" hidden>pending</span>
+    </main>
 
     <script>
-        // Listen to JupyterHub's SSE progress endpoint and redirect when ready
         var progressUrl = "{{ progress_url }}";
         var redirectUrl = "{{ url }}";
         var statusEl = document.getElementById('status-text');
+        var containerState = document.getElementById('container-state');
 
         if (progressUrl && progressUrl !== 'None') {
             var evtSource = new EventSource(progressUrl);
@@ -169,23 +111,27 @@
                     var data = JSON.parse(e.data);
                     if (data.ready) {
                         evtSource.close();
-                        statusEl.textContent = '即将跳转...';
+                        statusEl.textContent = '即将进入系统…';
+                        containerState.textContent = 'ready';
                         window.location.href = redirectUrl;
                     } else if (data.failed) {
                         evtSource.close();
-                        statusEl.textContent = '启动失败，请联系管理员';
+                        statusEl.textContent = '启动失败，请联系管理员。';
+                        statusEl.className = 'sub failed';
+                        containerState.textContent = 'failed';
+                    } else {
+                        containerState.textContent = 'starting';
                     }
                 } catch (err) { }
             };
 
             evtSource.onerror = function () {
-                // On error, try to redirect anyway — server might be up
+                containerState.textContent = 'checking';
                 setTimeout(function () {
                     window.location.href = redirectUrl;
                 }, 5000);
             };
         } else {
-            // Fallback: poll until the server responds
             function poll() {
                 fetch(redirectUrl, { method: 'HEAD' })
                     .then(function (r) {
@@ -195,12 +141,13 @@
                             setTimeout(poll, 2000);
                         }
                     })
-                    .catch(function () { setTimeout(poll, 2000); });
+                    .catch(function () {
+                        setTimeout(poll, 2000);
+                    });
             }
             setTimeout(poll, 3000);
         }
     </script>
-
 </body>
 
 </html>
