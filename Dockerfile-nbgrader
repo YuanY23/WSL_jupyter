@@ -62,6 +62,7 @@ COPY --chown=$NB_UID:$NB_GID custom-logo /opt/conda/share/jupyter/labextensions/
 COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
 COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-design
+COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform /src/jupyterlab-simulation-platform
 
 # Install custom jupyterlab first 
 WORKDIR /src/jupyterlab
@@ -81,6 +82,13 @@ RUN pip install -e .
 
 # Install thermal design plugin
 WORKDIR /src/jupyterlab-thermal-design
+RUN pip install -e . && \
+    jlpm install && \
+    jlpm run build && \
+    jupyter labextension develop . --overwrite
+
+# Install template-based simulation platform plugin
+WORKDIR /src/jupyterlab-simulation-platform
 RUN pip install -e . && \
     jlpm install && \
     jlpm run build && \

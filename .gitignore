@@ -1,12 +1,40 @@
 # Python temporary files
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg-info/**
 
 # JupyterHub persistent and sensitive files
 jupyterhub.sqlite
 jupyterhub_cookie_secret
 jupyterhub-proxy.pid
 
-# Optional: Add other files you don't want to track
-# e.g., local logs
+# JavaScript dependencies and package-manager caches
+node_modules/
+**/node_modules/
+**/.yarn/cache/
+**/.yarn/install-state.gz
+**/.pnp.*
+
+# Build outputs generated from source
+jupyterlab-thermal-design/lib/
+jupyterlab-thermal-design/jupyterlab_thermal_design/labextension/
+jupyterlab-thermal-design/仿真结果归档/
+jupyterlab-simulation-platform/lib/
+jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/
+jupyterlab-simulation-platform/simulation-platform-results/
+
+# Runtime course data, submissions, feedback, and gradebooks
+courses/
+course_test/
+**/gradebook.db
+**/submission_secret.txt
+**/.ipynb_checkpoints/
+
+# Local databases and logs
+*.db
+*.sqlite
+*.sqlite3
 *.log

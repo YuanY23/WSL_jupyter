@@ -1,0 +1,206 @@
+.simulation-platform-workbench {
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  height: 100%;
+  min-width: 760px;
+}
+
+.simulation-platform-panel {
+  box-sizing: border-box;
+  height: 100%;
+  overflow: auto;
+  padding: 18px;
+}
+
+.simulation-platform-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(420px, 1fr);
+  gap: 16px;
+  min-height: 100%;
+}
+
+.simulation-platform-sidebar,
+.simulation-platform-editor,
+.simulation-platform-preview {
+  border: 1px solid var(--jp-border-color1);
+  background: var(--jp-layout-color2);
+  border-radius: 6px;
+}
+
+.simulation-platform-sidebar {
+  padding: 12px;
+}
+
+.simulation-platform-editor {
+  padding: 16px;
+}
+
+.simulation-platform-preview {
+  margin-top: 14px;
+  padding: 14px;
+}
+
+.simulation-platform-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.simulation-platform-subtitle {
+  margin: 0 0 16px;
+  color: var(--jp-ui-font-color2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.simulation-template-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--jp-border-color1);
+  border-radius: 6px;
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  text-align: left;
+  cursor: pointer;
+}
+
+.simulation-template-button.is-active {
+  border-color: var(--jp-brand-color1);
+  background: color-mix(in srgb, var(--jp-brand-color1) 12%, var(--jp-layout-color1));
+}
+
+.simulation-template-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.simulation-template-summary {
+  display: block;
+  margin-top: 4px;
+  color: var(--jp-ui-font-color2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.simulation-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulation-platform-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.simulation-platform-field label {
+  color: var(--jp-ui-font-color2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.simulation-platform-field input,
+.simulation-platform-field textarea,
+.simulation-platform-field select {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--jp-border-color1);
+  border-radius: 4px;
+  background: var(--jp-input-background);
+  color: var(--jp-ui-font-color1);
+  font: inherit;
+  padding: 7px 8px;
+}
+
+.simulation-platform-field textarea {
+  min-height: 74px;
+  resize: vertical;
+}
+
+.simulation-platform-section-title {
+  margin: 18px 0 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.simulation-platform-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.simulation-platform-table th,
+.simulation-platform-table td {
+  border-bottom: 1px solid var(--jp-border-color2);
+  padding: 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.simulation-platform-table th {
+  color: var(--jp-ui-font-color2);
+  font-size: 12px;
+}
+
+.simulation-platform-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.simulation-platform-button {
+  border: 1px solid var(--jp-border-color1);
+  border-radius: 4px;
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.simulation-platform-button.primary {
+  border-color: var(--jp-brand-color1);
+  background: var(--jp-brand-color1);
+  color: var(--jp-ui-inverse-font-color1);
+}
+
+.simulation-platform-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.simulation-platform-error {
+  border: 1px solid var(--jp-error-color2);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--jp-error-color2) 10%, var(--jp-layout-color1));
+  color: var(--jp-error-color0);
+  margin-top: 10px;
+  padding: 8px 10px;
+}
+
+.simulation-platform-status {
+  border: 1px solid var(--jp-success-color2);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--jp-success-color2) 10%, var(--jp-layout-color1));
+  color: var(--jp-success-color0);
+  margin-top: 10px;
+  padding: 8px 10px;
+}
+
+.simulation-platform-preview ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+@media (max-width: 900px) {
+  .simulation-platform-shell,
+  .simulation-platform-grid {
+    grid-template-columns: 1fr;
+  }
+}

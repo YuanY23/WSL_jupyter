@@ -1,2 +1,0 @@
-jupyterlab_thermal_design
-thermal_solver

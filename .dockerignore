@@ -18,6 +18,9 @@
 !jupyterlab-thermal-design/
 !jupyterlab-thermal-design/**
 
+!jupyterlab-simulation-platform/
+!jupyterlab-simulation-platform/**
+
 # Never send local dependency installs or package-manager caches.
 **/node_modules
 **/node_modules/**
@@ -59,6 +62,12 @@ jupyterlab-thermal-design/jupyterlab_thermal_design.egg-info
 jupyterlab-thermal-design/jupyterlab_thermal_design.egg-info/**
 jupyterlab-thermal-design/仿真结果归档
 jupyterlab-thermal-design/仿真结果归档/**
+jupyterlab-simulation-platform/lib
+jupyterlab-simulation-platform/lib/**
+jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension
+jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/**
+jupyterlab-simulation-platform/simulation-platform-results
+jupyterlab-simulation-platform/simulation-platform-results/**
 
 # Runtime course/user data is mounted or created outside the image.
 courses
