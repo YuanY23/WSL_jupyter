@@ -237,12 +237,95 @@ interface IControlPanelProps {
 
 type CategoryKey = keyof typeof SCENARIOS;
 
+interface IScenarioOption {
+    id: string;
+    name: string;
+    category: CategoryKey;
+}
+
+const SCENARIO_DETAILS: Record<string, { description: string; assumptions: string[] }> = {
+    steady_flat_plate: {
+        description: '研究一维稳态无内热源平板导热，生成温度分布、热流密度和有限差分求解过程。',
+        assumptions: ['温度只沿厚度方向变化', '材料均匀且导热系数为常数', '左右两侧为恒定温度边界']
+    },
+    steady_multilayer_plate: {
+        description: '计算三层复合平板的一维稳态导热过程，分析各层热阻、界面温度和总热流密度。',
+        assumptions: ['各层材料均匀且完全贴合', '忽略接触热阻', '传热过程处于稳态且无内热源']
+    },
+    steady_cylindrical_wall: {
+        description: '模拟空心圆筒壁的径向稳态导热，展示柱坐标下的对数温度分布。',
+        assumptions: ['圆筒长度足够长，忽略轴向传热', '材料导热系数恒定', '内外壁温度保持恒定']
+    },
+    steady_straight_fin: {
+        description: '计算等截面直肋的温度衰减、散热量和肋片效率，用于分析扩展表面换热效果。',
+        assumptions: ['肋片沿长度方向一维导热', '表面对流换热系数恒定', '肋端按绝热边界处理']
+    },
+    steady_internal_heat: {
+        description: '分析带均匀内热源的平壁稳态导热，得到板内抛物线温度分布和最高温度。',
+        assumptions: ['内热源均匀分布', '两侧边界温度已知', '导热系数不随温度变化']
+    },
+    steady_2d_plate: {
+        description: '用二维有限差分方法求解矩形平板稳态温度场，输出等温线和热力云图。',
+        assumptions: ['平板厚度方向温差忽略', '四边为恒定温度边界', '内部无热源且材料均匀']
+    },
+    transient_plate_const_temp: {
+        description: '模拟平板两侧突然恒温加热或冷却后的瞬态温度演化过程。',
+        assumptions: ['初始温度均匀', '两侧壁面温度突变后保持恒定', '使用稳定的显式时间推进格式']
+    },
+    transient_plate_const_flux: {
+        description: '模拟一侧恒定热流输入、另一侧绝热条件下的平板瞬态升温过程。',
+        assumptions: ['材料热物性为常数', '右侧边界绝热', '使用全隐式有限体积格式保证稳定性']
+    },
+    convection_laminar_plate: {
+        description: '基于平板层流边界层关联式计算局部和平均对流换热系数。',
+        assumptions: ['流动保持层流', '壁温均匀', '流体物性按定性温度取常数']
+    },
+    convection_turbulent_plate: {
+        description: '计算长平板强制对流的层流-湍流混合边界层换热特性。',
+        assumptions: ['转捩雷诺数取固定阈值', '忽略过渡区平滑变化', '壁温和来流物性保持恒定']
+    },
+    convection_natural_vertical: {
+        description: '使用 Churchill-Chu 关联式估算竖板自然对流换热和 Rayleigh 数判据。',
+        assumptions: ['无外部强迫流动', '采用 Boussinesq 浮力近似', '流体物性按膜温取值']
+    },
+    convection_internal_tube: {
+        description: '计算圆管内强迫对流的沿程流体温度、努塞尔数和总换热量。',
+        assumptions: ['管壁温度恒定', '管内平均流速已知', '根据雷诺数判断层流或湍流关联式']
+    },
+    radiation_parallel_plates: {
+        description: '计算两块平行灰体平板之间的净辐射换热，并分析遮热板减热效果。',
+        assumptions: ['两板视为无限大平行表面', '中间介质不参与辐射', '表面按灰体处理']
+    },
+    radiation_3surface: {
+        description: '用辐射网络方法估算三表面封闭空腔中的辐射换热关系。',
+        assumptions: ['表面为漫灰体', '角系数满足封闭性约束', '空腔内介质透明不吸收辐射']
+    }
+};
+
+function getScenarioOptions(categoryKeys: CategoryKey[]): IScenarioOption[] {
+    return categoryKeys.reduce<IScenarioOption[]>((options, category) => {
+        SCENARIOS[category].forEach(scenario => {
+            options.push({
+                ...scenario,
+                category
+            });
+        });
+        return options;
+    }, []);
+}
+
 export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
     const categoryKeys = Object.keys(SCENARIOS) as CategoryKey[];
-    const [activeTab, setActiveTab] = useState<CategoryKey>(categoryKeys[0]);
+    const scenarioOptions = getScenarioOptions(categoryKeys);
     const [activeScenario, setActiveScenario] = useState<string>(SCENARIOS[categoryKeys[0]][0].id);
     const [params, setParams] = useState<Record<string, number>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const activeOption = scenarioOptions.find(scenario => scenario.id === activeScenario) || scenarioOptions[0];
+    const activeDetails = SCENARIO_DETAILS[activeScenario] || {
+        description: '根据当前热设计场景参数生成包含计算代码、图表和分析提示的 Notebook。',
+        assumptions: ['参数由当前场景定义', 'Notebook 保留完整计算代码', '用户可在生成后继续修改和运行']
+    };
 
     useEffect(() => {
         handleReset();
@@ -270,116 +353,105 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
     const hasErrors = Object.values(errors).some(err => err !== '');
 
     return (
-        <div className="thermal-control-panel-inner" style={{ padding: '15px', overflowY: 'auto', height: '100%' }}>
+        <div className="thermal-workbench-panel">
+            <div className="thermal-workbench-shell">
+                <aside className="thermal-workbench-sidebar">
+                    <h2 className="thermal-workbench-title">热设计平台</h2>
+                    <p className="thermal-workbench-subtitle">热设计原理仿真工作台</p>
 
-            {/* 1. 四类别 Tab 栏 */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '2px solid #1976d2', marginBottom: '12px' }}>
-                {categoryKeys.map(cat => (
-                    <button
-                        key={cat}
-                        style={{
-                            flex: 1,
-                            minWidth: '70px',
-                            padding: '8px 4px',
-                            cursor: 'pointer',
-                            backgroundColor: activeTab === cat ? '#1976d2' : 'transparent',
-                            color: activeTab === cat ? 'white' : 'inherit',
-                            border: 'none',
-                            fontWeight: activeTab === cat ? 'bold' : 'normal',
-                            fontSize: '13px',
-                            transition: 'all 0.2s',
-                        }}
-                        onClick={() => {
-                            setActiveTab(cat);
-                            setActiveScenario(SCENARIOS[cat][0].id);
-                        }}
-                    >
-                        {CATEGORY_LABELS[cat] || cat}
-                    </button>
-                ))}
-            </div>
+                    <div className="thermal-scenario-list">
+                        {scenarioOptions.map(scenario => (
+                            <button
+                                key={scenario.id}
+                                className={`thermal-scenario-button ${activeScenario === scenario.id ? 'is-active' : ''}`}
+                                onClick={() => setActiveScenario(scenario.id)}
+                            >
+                                <span className="thermal-scenario-name">{scenario.name}</span>
+                                <span className="thermal-scenario-summary">{CATEGORY_LABELS[scenario.category]}</span>
+                            </button>
+                        ))}
+                    </div>
+                </aside>
 
-            {/* 2. 场景选择按钮列表 */}
-            <div style={{ marginBottom: '16px' }}>
-                {SCENARIOS[activeTab].map(s => (
-                    <button
-                        key={s.id}
-                        onClick={() => setActiveScenario(s.id)}
-                        style={{
-                            display: 'block',
-                            width: '100%',
-                            padding: '8px 12px',
-                            marginBottom: '4px',
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            backgroundColor: activeScenario === s.id ? '#e3f2fd' : 'transparent',
-                            border: activeScenario === s.id ? '2px solid #1976d2' : '1px solid #ddd',
-                            borderRadius: '4px',
-                            fontSize: '13px',
-                            fontWeight: activeScenario === s.id ? 'bold' : 'normal',
-                            color: activeScenario === s.id ? '#1565c0' : 'inherit',
-                        }}
-                    >
-                        {s.name}
-                    </button>
-                ))}
-            </div>
+                <section className="thermal-workbench-editor">
+                    <h2 className="thermal-workbench-title">热设计原理仿真工作台</h2>
+                    <p className="thermal-workbench-subtitle">
+                        选择热设计场景，填写几何、物性和边界参数，然后生成可运行、可修改、代码可见的 Notebook。
+                    </p>
 
-            {/* 3. 参数表单 */}
-            <h4 style={{ borderBottom: '1px solid #eee', paddingBottom: '5px', margin: '0 0 10px 0' }}>参数配置</h4>
-            <div style={{ marginBottom: '16px' }}>
-                {Object.keys(params).map(key => {
-                    const config = PARAM_LABELS[key] || { label: key, unit: '', min: -Infinity, max: Infinity };
-                    const err = errors[key];
-                    return (
-                        <div key={key} style={{ marginBottom: '8px' }}>
-                            <label style={{ display: 'block', marginBottom: '2px', fontSize: '12px', color: '#555' }}>
-                                {config.label} {config.unit && `(${config.unit})`}
-                            </label>
-                            <input
-                                type="number"
-                                value={isNaN(params[key]) ? '' : params[key]}
-                                onChange={e => handleChange(key, e.target.value)}
-                                step="any"
-                                style={{
-                                    width: '100%',
-                                    padding: '5px',
-                                    border: err ? '1px solid red' : '1px solid #ccc',
-                                    backgroundColor: err ? '#ffe6e6' : 'white',
-                                    boxSizing: 'border-box',
-                                    fontSize: '13px',
-                                }}
-                            />
-                            {err && <div style={{ color: 'red', fontSize: '11px', marginTop: '2px' }}>{err}</div>}
+                    <div className="thermal-workbench-grid">
+                        <div className="thermal-workbench-field">
+                            <label>仿真名称</label>
+                            <input type="text" value={activeOption.name} readOnly />
                         </div>
-                    );
-                })}
-            </div>
+                        <div className="thermal-workbench-field">
+                            <label>仿真类别</label>
+                            <input type="text" value={CATEGORY_LABELS[activeOption.category]} readOnly />
+                        </div>
+                    </div>
 
-            {/* 4. 操作按钮 */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <button
-                    onClick={handleReset}
-                    style={{ padding: '8px', cursor: 'pointer', border: '1px solid #ccc', background: '#f5f5f5', borderRadius: '4px' }}
-                >
-                    一键重置
-                </button>
-                <button
-                    disabled={hasErrors}
-                    onClick={() => onExecute(activeScenario, params)}
-                    style={{
-                        padding: '12px',
-                        cursor: hasErrors ? 'not-allowed' : 'pointer',
-                        backgroundColor: hasErrors ? '#ccc' : '#1976d2',
-                        color: 'white',
-                        border: 'none',
-                        fontWeight: 'bold',
-                        fontSize: '14px',
-                        borderRadius: '4px',
-                    }}
-                >
-                    🚀 仿真执行 (生成 Notebook)
-                </button>
+                    <div className="thermal-workbench-field">
+                        <label>仿真问题说明</label>
+                        <textarea value={activeDetails.description} readOnly />
+                    </div>
+
+                    <div className="thermal-workbench-field">
+                        <label>模型假设</label>
+                        <textarea value={activeDetails.assumptions.join('\n')} readOnly />
+                    </div>
+
+                    <h3 className="thermal-workbench-section-title">参数和变量</h3>
+                    <div className="thermal-param-table-wrap">
+                        <table className="thermal-param-table">
+                            <thead>
+                                <tr>
+                                    <th>变量名</th>
+                                    <th>显示名</th>
+                                    <th>数值</th>
+                                    <th>单位</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.keys(params).map(key => {
+                                    const config = PARAM_LABELS[key] || { label: key, unit: '', min: -Infinity, max: Infinity };
+                                    const err = errors[key];
+                                    return (
+                                        <tr key={key}>
+                                            <td>
+                                                <code className="thermal-param-code">{key}</code>
+                                            </td>
+                                            <td>
+                                                <input type="text" value={config.label} readOnly />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    className={err ? 'has-error' : ''}
+                                                    type="number"
+                                                    value={isNaN(params[key]) ? '' : params[key]}
+                                                    onChange={e => handleChange(key, e.target.value)}
+                                                    step="any"
+                                                />
+                                                {err && <div className="thermal-param-error">{err}</div>}
+                                            </td>
+                                            <td>
+                                                <input type="text" value={config.unit || '-'} readOnly />
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="thermal-workbench-actions">
+                        <button className="thermal-workbench-button primary" disabled={hasErrors} onClick={() => onExecute(activeScenario, params)}>
+                            生成 Notebook
+                        </button>
+                        <button className="thermal-workbench-button" onClick={handleReset}>
+                            重置参数
+                        </button>
+                    </div>
+                </section>
             </div>
         </div>
     );

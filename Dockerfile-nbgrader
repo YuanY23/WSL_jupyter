@@ -53,12 +53,38 @@ RUN pip install --no-cache-dir \
 # Install Chinese language pack for JupyterLab
 RUN pip install --no-cache-dir jupyterlab-language-pack-zh-CN
 
+# Install Python build helpers before source COPY so this layer is reusable.
+RUN pip install --no-cache-dir hatchling
+
 # Make sure lab extensions are enabled
 RUN mkdir -p /opt/conda/etc/jupyter/jupyter_server_config.d && \
     echo '{"ServerApp":{"tornado_settings":{"headers":{"Content-Security-Policy":"frame-ancestors '"'"'self'"'"' * *"}}}}' > /opt/conda/etc/jupyter/jupyter_server_config.d/csp.json
 
-# Copy source code directory (requires nbgrader and jupyterlab folders in build context)
+# Pre-install custom extension dependencies from stable metadata/package files.
+# Full source is copied later so TypeScript/CSS-only edits can reuse these layers.
 COPY --chown=$NB_UID:$NB_GID custom-logo /opt/conda/share/jupyter/labextensions/custom-logo
+COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/setup.py \
+    jupyterlab-thermal-design/package.json \
+    jupyterlab-thermal-design/yarn.lock \
+    jupyterlab-thermal-design/.yarnrc.yml \
+    /src/jupyterlab-thermal-design/
+COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/jupyterlab_thermal_design/__init__.py /src/jupyterlab-thermal-design/jupyterlab_thermal_design/__init__.py
+COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/thermal_solver /src/jupyterlab-thermal-design/thermal_solver
+WORKDIR /src/jupyterlab-thermal-design
+RUN pip install -e .
+RUN jlpm install
+
+COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform/setup.py \
+    jupyterlab-simulation-platform/package.json \
+    jupyterlab-simulation-platform/yarn.lock \
+    jupyterlab-simulation-platform/.yarnrc.yml \
+    /src/jupyterlab-simulation-platform/
+COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform/jupyterlab_simulation_platform/__init__.py /src/jupyterlab-simulation-platform/jupyterlab_simulation_platform/__init__.py
+WORKDIR /src/jupyterlab-simulation-platform
+RUN pip install -e .
+RUN jlpm install
+
+# Copy source code directory (requires nbgrader and jupyterlab folders in build context)
 COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
 COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-design
@@ -66,15 +92,15 @@ COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform /src/jupyterlab-simu
 
 # Install custom jupyterlab first 
 WORKDIR /src/jupyterlab
-RUN pip install hatchling && pip install -e .
+RUN pip install -e .
 RUN git config --global init.defaultBranch main && \
     git init && \
     git config --global user.email "a@b.com" && \
     git config --global user.name "A" && \
     git add . && \
-    git commit -m "init" && \
-    jlpm install && \
-    jlpm run build
+    git commit -m "init"
+RUN jlpm install
+RUN jlpm run build
     
 # Install custom nbgrader
 WORKDIR /src/nbgrader
@@ -82,15 +108,13 @@ RUN pip install -e .
 
 # Install thermal design plugin
 WORKDIR /src/jupyterlab-thermal-design
-RUN pip install -e . && \
-    jlpm install && \
+RUN jlpm install && \
     jlpm run build && \
     jupyter labextension develop . --overwrite
 
 # Install template-based simulation platform plugin
 WORKDIR /src/jupyterlab-simulation-platform
-RUN pip install -e . && \
-    jlpm install && \
+RUN jlpm install && \
     jlpm run build && \
     jupyter labextension develop . --overwrite
 

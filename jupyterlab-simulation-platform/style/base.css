@@ -8,7 +8,8 @@
 .simulation-platform-panel {
   box-sizing: border-box;
   height: 100%;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 18px;
 }
 
@@ -17,6 +18,10 @@
   grid-template-columns: minmax(220px, 280px) minmax(420px, 1fr);
   gap: 16px;
   min-height: 100%;
+}
+
+.simulation-platform-shell > * {
+  min-width: 0;
 }
 
 .simulation-platform-sidebar,
@@ -33,6 +38,7 @@
 
 .simulation-platform-editor {
   padding: 16px;
+  min-width: 0;
 }
 
 .simulation-platform-preview {
@@ -129,9 +135,20 @@
 }
 
 .simulation-platform-table {
-  width: 100%;
+  width: max-content;
+  min-width: 1180px;
   border-collapse: collapse;
   margin-bottom: 12px;
+}
+
+.simulation-platform-table-scroll {
+  box-sizing: border-box;
+  max-width: 100%;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  scrollbar-color: var(--jp-scrollbar-thumb-color, #9a9a9a) var(--jp-layout-color1);
 }
 
 .simulation-platform-table th,
@@ -142,9 +159,50 @@
   vertical-align: top;
 }
 
+.simulation-platform-table th:nth-child(1),
+.simulation-platform-table td:nth-child(1) {
+  width: 210px;
+}
+
+.simulation-platform-table th:nth-child(2),
+.simulation-platform-table td:nth-child(2) {
+  width: 230px;
+}
+
+.simulation-platform-table th:nth-child(3),
+.simulation-platform-table td:nth-child(3) {
+  width: 230px;
+}
+
+.simulation-platform-table th:nth-child(4),
+.simulation-platform-table td:nth-child(4) {
+  width: 190px;
+}
+
+.simulation-platform-table th:nth-child(5),
+.simulation-platform-table td:nth-child(5) {
+  width: 270px;
+}
+
+.simulation-platform-table th:nth-child(6),
+.simulation-platform-table td:nth-child(6) {
+  width: 70px;
+}
+
 .simulation-platform-table th {
   color: var(--jp-ui-font-color2);
   font-size: 12px;
+}
+
+.simulation-platform-table input {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid var(--jp-border-color1);
+  border-radius: 4px;
+  background: var(--jp-input-background);
+  color: var(--jp-ui-font-color1);
+  font: inherit;
+  padding: 7px 8px;
 }
 
 .simulation-platform-actions {

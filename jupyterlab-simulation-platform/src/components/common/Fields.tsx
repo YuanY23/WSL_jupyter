@@ -130,40 +130,42 @@ export function BaseFields(props: BaseFieldsProps): React.ReactElement {
       />
 
       <h3 className="simulation-platform-section-title">参数和变量</h3>
-      <table className="simulation-platform-table">
-        <thead>
-          <tr>
-            <th>变量名</th>
-            <th>显示名</th>
-            <th>数值</th>
-            <th>单位</th>
-            <th>说明</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {config.parameters.map((parameter, index) => (
-            <tr key={`${parameter.name}-${index}`}>
-              <td><input value={parameter.name} onChange={event => updateParameter(index, { name: event.target.value })} /></td>
-              <td><input value={parameter.label} onChange={event => updateParameter(index, { label: event.target.value })} /></td>
-              <td><input type="number" step="any" value={Number.isNaN(parameter.value) ? '' : parameter.value} onChange={event => updateParameter(index, { value: event.target.value === '' ? NaN : Number(event.target.value) })} /></td>
-              <td><input value={parameter.unit} onChange={event => updateParameter(index, { unit: event.target.value })} /></td>
-              <td><input value={parameter.description} onChange={event => updateParameter(index, { description: event.target.value })} /></td>
-              <td>
-                <button
-                  className="simulation-platform-button"
-                  onClick={() => onChange({
-                    ...config,
-                    parameters: config.parameters.filter((_parameter, currentIndex) => currentIndex !== index)
-                  } as SimulationConfig)}
-                >
-                  删除
-                </button>
-              </td>
+      <div className="simulation-platform-table-scroll" role="region" aria-label="参数和变量">
+        <table className="simulation-platform-table">
+          <thead>
+            <tr>
+              <th>变量名</th>
+              <th>显示名</th>
+              <th>数值</th>
+              <th>单位</th>
+              <th>说明</th>
+              <th>操作</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {config.parameters.map((parameter, index) => (
+              <tr key={`${parameter.name}-${index}`}>
+                <td><input value={parameter.name} onChange={event => updateParameter(index, { name: event.target.value })} /></td>
+                <td><input value={parameter.label} onChange={event => updateParameter(index, { label: event.target.value })} /></td>
+                <td><input type="number" step="any" value={Number.isNaN(parameter.value) ? '' : parameter.value} onChange={event => updateParameter(index, { value: event.target.value === '' ? NaN : Number(event.target.value) })} /></td>
+                <td><input value={parameter.unit} onChange={event => updateParameter(index, { unit: event.target.value })} /></td>
+                <td><input value={parameter.description} onChange={event => updateParameter(index, { description: event.target.value })} /></td>
+                <td>
+                  <button
+                    className="simulation-platform-button"
+                    onClick={() => onChange({
+                      ...config,
+                      parameters: config.parameters.filter((_parameter, currentIndex) => currentIndex !== index)
+                    } as SimulationConfig)}
+                  >
+                    删除
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <button
         className="simulation-platform-button"
         onClick={() => onChange({ ...config, parameters: [...config.parameters, emptyParameter()] } as SimulationConfig)}
