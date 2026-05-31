@@ -38,3 +38,6 @@ course_test/
 *.sqlite
 *.sqlite3
 *.log
+
+# Local agent/runtime state
+.superpowers/
