@@ -71,14 +71,14 @@ c.DockerSpawner.volumes = {
     '/srv/nbgrader/exchange': '/srv/nbgrader/exchange',
     
     # Source-mount development mode for extension testing.
-    '/home/yuan/my_project/nbgrader': '/src/nbgrader',
-    '/home/yuan/my_project/jupyterlab': '/opt/jupyterlab',
-    '/home/yuan/my_project/jupyterlab-param-binding': '/src/jupyterlab-param-binding',
-    'jupyterlab-param-binding-node-modules': '/src/jupyterlab-param-binding/node_modules',
-    '/home/yuan/my_project/jupyterlab-simulation-platform': '/src/jupyterlab-simulation-platform',
-    'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
-    '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',
-    'jupyterlab-thermal-design-node-modules': '/src/jupyterlab-thermal-design/node_modules',
+    # '/home/yuan/my_project/nbgrader': '/src/nbgrader',
+    # '/home/yuan/my_project/jupyterlab': '/opt/jupyterlab',
+    # '/home/yuan/my_project/jupyterlab-param-binding': '/src/jupyterlab-param-binding',
+    # 'jupyterlab-param-binding-node-modules': '/src/jupyterlab-param-binding/node_modules',
+    # '/home/yuan/my_project/jupyterlab-simulation-platform': '/src/jupyterlab-simulation-platform',
+    # 'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
+    # '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',
+    # 'jupyterlab-thermal-design-node-modules': '/src/jupyterlab-thermal-design/node_modules',
 }
 
 # ================= 开发模式临时加的配置 =================
