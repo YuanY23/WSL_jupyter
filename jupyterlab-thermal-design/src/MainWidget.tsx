@@ -5,6 +5,7 @@ import React from 'react';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { showDialog, Dialog } from '@jupyterlab/apputils';
 import { generateNotebook, getScenarioName } from './utils/NotebookGenerator';
+import { THERMAL_RESULTS_DIR } from './utils/resultsDirectory';
 
 class ControlPanelWidget extends ReactWidget {
     private _app: JupyterFrontEnd;
@@ -18,10 +19,13 @@ class ControlPanelWidget extends ReactWidget {
     protected render(): React.ReactElement<any> {
         return (
             <ControlPanel
-                onExecute={async (scenarioId, params) => {
+                onExecute={async (scenarioId, params, controls) => {
                     try {
                         // 1. 生成自包含 notebook JSON
-                        const nbJson = generateNotebook(scenarioId, params);
+                        const nbJson = generateNotebook(scenarioId, {
+                            values: params,
+                            controls
+                        });
 
                         // 2. 生成文件名
                         const name = getScenarioName(scenarioId);
@@ -29,7 +33,7 @@ class ControlPanelWidget extends ReactWidget {
                         const filename = `热设计仿真_${name}_${timestamp}.ipynb`;
 
                         // 3. 确保目录存在
-                        const dirName = '仿真结果归档';
+                        const dirName = THERMAL_RESULTS_DIR;
                         const contentsManager = this._app.serviceManager.contents;
                         try {
                             await contentsManager.get(dirName);

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2018",
+    "jsx": "react",
+    "lib": [
+      "ES2018",
+      "DOM"
+    ],
+    "outDir": "lib",
+    "rootDir": "src",
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

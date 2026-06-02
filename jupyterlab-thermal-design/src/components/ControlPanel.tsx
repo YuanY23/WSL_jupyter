@@ -232,7 +232,17 @@ export const PARAM_LABELS: Record<string, { label: string; unit: string; min: nu
 // 组件
 // ============================================================
 interface IControlPanelProps {
-    onExecute: (scenarioId: string, params: Record<string, number>) => void;
+    onExecute: (
+        scenarioId: string,
+        params: Record<string, number>,
+        controls: Record<string, IParamControlSettings>
+    ) => void;
+}
+
+export interface IParamControlSettings {
+    min?: number;
+    max?: number;
+    step?: number;
 }
 
 type CategoryKey = keyof typeof SCENARIOS;
@@ -314,11 +324,49 @@ function getScenarioOptions(categoryKeys: CategoryKey[]): IScenarioOption[] {
     }, []);
 }
 
+function inferStep(value: number): number {
+    const absValue = Math.abs(value);
+    if (!Number.isFinite(absValue) || absValue === 0) {
+        return 1;
+    }
+    if (Number.isInteger(value) && absValue >= 10) {
+        return 1;
+    }
+    if (absValue < 0.001) {
+        return absValue / 10;
+    }
+    if (absValue < 1) {
+        return 0.01;
+    }
+    if (absValue < 10) {
+        return 0.1;
+    }
+    return 1;
+}
+
+function defaultControlForParam(key: string, value: number): IParamControlSettings {
+    const labelConfig = PARAM_LABELS[key];
+    return {
+        min: labelConfig?.min,
+        max: labelConfig?.max,
+        step: inferStep(value)
+    };
+}
+
+function parseOptionalNumber(value: string): number | undefined {
+    if (value.trim() === '') {
+        return undefined;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
     const categoryKeys = Object.keys(SCENARIOS) as CategoryKey[];
     const scenarioOptions = getScenarioOptions(categoryKeys);
     const [activeScenario, setActiveScenario] = useState<string>(SCENARIOS[categoryKeys[0]][0].id);
     const [params, setParams] = useState<Record<string, number>>({});
+    const [paramControls, setParamControls] = useState<Record<string, IParamControlSettings>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const activeOption = scenarioOptions.find(scenario => scenario.id === activeScenario) || scenarioOptions[0];
@@ -332,22 +380,69 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
     }, [activeScenario]);
 
     const handleReset = () => {
-        setParams({ ...(DEFAULT_PARAMS[activeScenario] || {}) });
+        const nextParams = { ...(DEFAULT_PARAMS[activeScenario] || {}) };
+        const nextControls = Object.entries(nextParams).reduce<Record<string, IParamControlSettings>>(
+            (controls, [key, value]) => {
+                controls[key] = defaultControlForParam(key, value);
+                return controls;
+            },
+            {}
+        );
+        setParams(nextParams);
+        setParamControls(nextControls);
         setErrors({});
+    };
+
+    const validateParam = (key: string, value: number, controls: IParamControlSettings): string => {
+        const messages: string[] = [];
+        const config = PARAM_LABELS[key];
+
+        if (isNaN(value)) {
+            messages.push('请输入数字');
+        }
+        if (
+            controls.min !== undefined &&
+            controls.max !== undefined &&
+            controls.min >= controls.max
+        ) {
+            messages.push('最小值必须小于最大值');
+        }
+        if (controls.step !== undefined && controls.step <= 0) {
+            messages.push('步长必须大于 0');
+        }
+        if (!isNaN(value)) {
+            const min = controls.min ?? config?.min;
+            const max = controls.max ?? config?.max;
+            if (min !== undefined && value < min) {
+                messages.push(`不能小于 ${min}`);
+            }
+            if (max !== undefined && value > max) {
+                messages.push(`不能大于 ${max}`);
+            }
+        }
+
+        return messages.join('；');
     };
 
     const handleChange = (key: string, value: string) => {
         const num = parseFloat(value);
+        const controls = paramControls[key] || {};
         setParams(prev => ({ ...prev, [key]: num }));
+        setErrors(prev => ({ ...prev, [key]: validateParam(key, num, controls) }));
+    };
 
-        let error = '';
-        const config = PARAM_LABELS[key];
-        if (config) {
-            if (isNaN(num)) error = '请输入数字';
-            else if (num < config.min) error = `不能小于 ${config.min}`;
-            else if (num > config.max) error = `不能大于 ${config.max}`;
-        }
-        setErrors(prev => ({ ...prev, [key]: error }));
+    const handleControlChange = (key: string, field: keyof IParamControlSettings, value: string) => {
+        const nextValue = parseOptionalNumber(value);
+        const nextControls = {
+            ...paramControls[key],
+            [field]: nextValue
+        };
+        const nextAllControls = {
+            ...paramControls,
+            [key]: nextControls
+        };
+        setParamControls(nextAllControls);
+        setErrors(prev => ({ ...prev, [key]: validateParam(key, params[key], nextControls) }));
     };
 
     const hasErrors = Object.values(errors).some(err => err !== '');
@@ -356,8 +451,8 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
         <div className="thermal-workbench-panel">
             <div className="thermal-workbench-shell">
                 <aside className="thermal-workbench-sidebar">
-                    <h2 className="thermal-workbench-title">热设计平台</h2>
-                    <p className="thermal-workbench-subtitle">热设计原理仿真工作台</p>
+                    <h2 className="thermal-workbench-title">传热仿真平台</h2>
+                    <p className="thermal-workbench-subtitle">传热仿真平台</p>
 
                     <div className="thermal-scenario-list">
                         {scenarioOptions.map(scenario => (
@@ -374,7 +469,7 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
                 </aside>
 
                 <section className="thermal-workbench-editor">
-                    <h2 className="thermal-workbench-title">热设计原理仿真工作台</h2>
+                    <h2 className="thermal-workbench-title">传热仿真平台</h2>
                     <p className="thermal-workbench-subtitle">
                         选择热设计场景，填写几何、物性和边界参数，然后生成可运行、可修改、代码可见的 Notebook。
                     </p>
@@ -409,11 +504,15 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
                                     <th>显示名</th>
                                     <th>数值</th>
                                     <th>单位</th>
+                                    <th>最小值</th>
+                                    <th>最大值</th>
+                                    <th>步长</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {Object.keys(params).map(key => {
                                     const config = PARAM_LABELS[key] || { label: key, unit: '', min: -Infinity, max: Infinity };
+                                    const controls = paramControls[key] || {};
                                     const err = errors[key];
                                     return (
                                         <tr key={key}>
@@ -436,6 +535,30 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
                                             <td>
                                                 <input type="text" value={config.unit || '-'} readOnly />
                                             </td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    value={controls.min ?? ''}
+                                                    onChange={e => handleControlChange(key, 'min', e.target.value)}
+                                                    step="any"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    value={controls.max ?? ''}
+                                                    onChange={e => handleControlChange(key, 'max', e.target.value)}
+                                                    step="any"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="number"
+                                                    value={controls.step ?? ''}
+                                                    onChange={e => handleControlChange(key, 'step', e.target.value)}
+                                                    step="any"
+                                                />
+                                            </td>
                                         </tr>
                                     );
                                 })}
@@ -444,7 +567,7 @@ export const ControlPanel: React.FC<IControlPanelProps> = ({ onExecute }) => {
                     </div>
 
                     <div className="thermal-workbench-actions">
-                        <button className="thermal-workbench-button primary" disabled={hasErrors} onClick={() => onExecute(activeScenario, params)}>
+                        <button className="thermal-workbench-button primary" disabled={hasErrors} onClick={() => onExecute(activeScenario, params, paramControls)}>
                             生成 Notebook
                         </button>
                         <button className="thermal-workbench-button" onClick={handleReset}>

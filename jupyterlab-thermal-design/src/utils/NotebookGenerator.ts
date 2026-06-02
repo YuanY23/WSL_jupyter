@@ -33,6 +33,24 @@ interface ParamConfig {
     step: number;
 }
 
+export interface ParamControlOverride {
+    type?: 'slider' | 'number' | 'boolean' | 'dropdown';
+    label?: string;
+    min?: number;
+    max?: number;
+    step?: number;
+    group?: string;
+}
+
+export interface ThermalNotebookInput {
+    values: Record<string, number>;
+    controls?: Record<string, ParamControlOverride>;
+}
+
+type ThermalGenerateInput = Record<string, number> | ThermalNotebookInput;
+
+let activeControlOverrides: Record<string, ParamControlOverride> = {};
+
 const PARAM_CONFIGS: Record<string, ParamConfig> = {
     thickness: { label: '平板厚度', unit: 'm', type: 'slider', min: 0.001, max: 10, step: 0.001 },
     L1: { label: '第1层厚度', unit: 'm', type: 'slider', min: 0.001, max: 1, step: 0.001 },
@@ -112,12 +130,94 @@ const PARAM_CONFIGS: Record<string, ParamConfig> = {
 //  Notebook 生成底座
 // ============================================================
 
-function makeNotebook(title: string, cells: any[]): any {
+function cellSourceToString(cell: any): string {
+    const source = cell.source || '';
+    return Array.isArray(source) ? source.join('') : String(source);
+}
+
+function isNumberedMarkdownHeading(cell: any): boolean {
+    return cell.cell_type === 'markdown' && /^##\s+\d+\./.test(cellSourceToString(cell).trim());
+}
+
+function isParameterLayerHeading(cell: any): boolean {
+    return cell.cell_type === 'markdown' && cellSourceToString(cell).includes('参数层代码');
+}
+
+function normalizeParameterLayerHeading(cell: any): any {
+    const source = cellSourceToString(cell).replace(
+        /下方每个参数都各自占用一个单元格，您可以通过拖拽左侧的滑块调节参数，系统会自动同步更新对应单元格的代码并运行计算。/g,
+        '下方参数统一写入同一个代码单元格，您可以通过拖拽左侧的滑块调节参数，系统会自动同步更新参数代码并运行计算。'
+    );
     return {
-        cells: cells,
+        ...cell,
+        source: source.split('\n').map(l => l + '\n')
+    };
+}
+
+function mergeParameterLayerCells(cells: any[]): any[] {
+    const mergedCells: any[] = [];
+
+    for (let index = 0; index < cells.length; index += 1) {
+        const cell = cells[index];
+        if (!isParameterLayerHeading(cell)) {
+            mergedCells.push(cell);
+            continue;
+        }
+
+        mergedCells.push(normalizeParameterLayerHeading(cell));
+
+        const sources: string[] = [];
+        const bindingParameters: Record<string, any> = {};
+        let cursor = index + 1;
+        while (cursor < cells.length && !isNumberedMarkdownHeading(cells[cursor])) {
+            const candidate = cells[cursor];
+            if (candidate.cell_type === 'code') {
+                const source = cellSourceToString(candidate).replace(/\s+$/g, '');
+                if (source) {
+                    sources.push(source);
+                }
+                const cellBindings = candidate.metadata?.simulation_param_bindings?.parameters;
+                if (cellBindings) {
+                    Object.assign(bindingParameters, cellBindings);
+                }
+            }
+            cursor += 1;
+        }
+
+        if (sources.length > 0) {
+            mergedCells.push(code(sources.join('\n'), {
+                simulation_param_bindings: {
+                    parameters: bindingParameters
+                }
+            }));
+        }
+
+        index = cursor - 1;
+    }
+
+    return mergedCells;
+}
+
+function makeNotebook(title: string, cells: any[]): any {
+    const notebookCells = mergeParameterLayerCells(cells);
+    const bindingParameters: Record<string, any> = {};
+    notebookCells.forEach(cell => {
+        const cellBindings = cell.metadata?.simulation_param_bindings?.parameters;
+        if (cellBindings) {
+            Object.assign(bindingParameters, cellBindings);
+        }
+    });
+
+    return {
+        cells: notebookCells,
         metadata: {
             kernelspec: { display_name: 'Python 3 (ipykernel)', language: 'python', name: 'python3' },
-            language_info: { name: 'python', version: '3.10.0', file_extension: '.py' }
+            language_info: { name: 'python', version: '3.10.0', file_extension: '.py' },
+            simulation_param_bindings: {
+                version: 1,
+                title: '参数层代码',
+                parameters: bindingParameters
+            }
         },
         nbformat: 4,
         nbformat_minor: 5
@@ -128,25 +228,52 @@ function md(source: string) {
     return { cell_type: 'markdown', metadata: {}, source: source.split('\n').map(l => l + '\n') };
 }
 
-function code(source: string) {
-    return { cell_type: 'code', execution_count: null, metadata: {}, outputs: [], source: source.split('\n').map(l => l + '\n') };
+function code(source: string, metadata: Record<string, any> = {}) {
+    return { cell_type: 'code', execution_count: null, metadata, outputs: [], source: source.split('\n').map(l => l + '\n') };
 }
 
-// 自动组装生成单个参数的代码单元格（含 # @param）
+function controlOverrideFor(pythonName: string, controlPanelKey: string): ParamControlOverride {
+    return activeControlOverrides[pythonName] || activeControlOverrides[controlPanelKey] || {};
+}
+
+// 自动组装生成单个参数的代码单元格，控件配置写入 Notebook metadata
 function makeParamCell(pythonName: string, controlPanelKey: string, value: number, group: string = '参数层代码'): any {
     const config = PARAM_CONFIGS[controlPanelKey] || PARAM_CONFIGS[pythonName];
+    const override = controlOverrideFor(pythonName, controlPanelKey);
     if (!config) {
-        return code(`${pythonName} = ${value}  # @param {type:"number", label:"${pythonName}", group:"${group}"}`);
+        return code(`${pythonName} = ${value}`, {
+            simulation_param_bindings: {
+                parameters: {
+                    [pythonName]: {
+                        type: override.type || 'slider',
+                        label: override.label || pythonName,
+                        min: override.min,
+                        max: override.max,
+                        step: override.step,
+                        group: override.group || group
+                    }
+                }
+            }
+        });
     }
     const meta: any = {
-        type: config.type,
+        type: override.type || config.type,
         label: `${config.label}${config.unit ? ' (' + config.unit + ')' : ''}`,
-        min: config.min,
-        max: config.max,
-        step: config.step,
-        group: group
+        min: override.min ?? config.min,
+        max: override.max ?? config.max,
+        step: override.step ?? config.step,
+        group: override.group || group
     };
-    return code(`${pythonName} = ${value}  # @param ${JSON.stringify(meta)}`);
+    if (override.label) {
+        meta.label = override.label;
+    }
+    return code(`${pythonName} = ${value}`, {
+        simulation_param_bindings: {
+            parameters: {
+                [pythonName]: meta
+            }
+        }
+    });
 }
 
 // 动态生成 Markdown 格式的参数说明表
@@ -1729,12 +1856,37 @@ const GENERATORS: Record<string, (params: Record<string, number>) => any> = {
     steady_2d_plate: gen_steady_2d_plate,
 };
 
-export function generateNotebook(scenarioId: string, params: Record<string, number>): any {
+function normalizeGenerateInput(input: ThermalGenerateInput): ThermalNotebookInput {
+    if (
+        input &&
+        typeof input === 'object' &&
+        'values' in input &&
+        typeof (input as ThermalNotebookInput).values === 'object'
+    ) {
+        return {
+            values: (input as ThermalNotebookInput).values,
+            controls: (input as ThermalNotebookInput).controls || {}
+        };
+    }
+
+    return {
+        values: input as Record<string, number>,
+        controls: {}
+    };
+}
+
+export function generateNotebook(scenarioId: string, input: ThermalGenerateInput): any {
     const gen = GENERATORS[scenarioId];
     if (!gen) {
         throw new Error(`未知场景 ID: ${scenarioId}`);
     }
-    return gen(params);
+    const normalized = normalizeGenerateInput(input);
+    activeControlOverrides = normalized.controls || {};
+    try {
+        return gen(normalized.values);
+    } finally {
+        activeControlOverrides = {};
+    }
 }
 
 export function getScenarioName(scenarioId: string): string {

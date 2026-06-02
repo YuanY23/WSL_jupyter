@@ -30,6 +30,38 @@ function testAllTemplatesGenerateVisibleCodeNotebooks() {
   }
 }
 
+function testGeneratedNotebooksIncludeParamBindingMetadata() {
+  const config = getDefaultConfig('algebraic-formula');
+  config.parameters = config.parameters.map(parameter => ({
+    ...parameter,
+    controlType: 'slider',
+    min: 0,
+    max: parameter.name === 'efficiency' ? 1 : 1000,
+    step: parameter.name === 'efficiency' ? 0.01 : 1
+  }));
+
+  const notebook = generateSimulationNotebook('algebraic-formula', config);
+  const bindings = notebook.metadata.simulation_param_bindings;
+
+  assert.equal(bindings.version, 1);
+  assert.equal(bindings.title, '参数层代码');
+  assert.equal(bindings.parameters.pv_area.type, 'slider');
+  assert.equal(bindings.parameters.pv_area.label, '组件面积 (m^2)');
+  assert.equal(bindings.parameters.pv_area.min, 0);
+  assert.equal(bindings.parameters.pv_area.max, 1000);
+  assert.equal(bindings.parameters.pv_area.step, 1);
+}
+
+function testGeneratedNumericParametersDefaultToSliderBindings() {
+  const config = getDefaultConfig('first-order-dynamic');
+  const notebook = generateSimulationNotebook('first-order-dynamic', config);
+  const bindings = notebook.metadata.simulation_param_bindings;
+
+  assert.equal(bindings.parameters.charge_power.type, 'slider');
+  assert.equal(bindings.parameters.capacity.type, 'slider');
+  assert.equal(bindings.parameters.eta.type, 'slider');
+}
+
 function testFormulaValidationRejectsUnknownVariables() {
   const result = validateFormulaExpression('pv_area * irradiance * unknown_eta', ['pv_area', 'irradiance']);
   assert.equal(result.valid, false);
@@ -44,6 +76,8 @@ function testFilenameSanitization() {
 }
 
 testAllTemplatesGenerateVisibleCodeNotebooks();
+testGeneratedNotebooksIncludeParamBindingMetadata();
+testGeneratedNumericParametersDefaultToSliderBindings();
 testFormulaValidationRejectsUnknownVariables();
 testFilenameSanitization();
 

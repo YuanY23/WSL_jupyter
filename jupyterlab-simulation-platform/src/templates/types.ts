@@ -13,6 +13,11 @@ export interface ParameterDefinition {
   value: number;
   unit: string;
   description: string;
+  controlType?: 'slider' | 'number' | 'dropdown' | 'boolean' | 'text';
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: string[];
 }
 
 export interface BaseSimulationConfig {

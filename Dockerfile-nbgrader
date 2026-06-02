@@ -28,10 +28,16 @@ RUN chmod +x /usr/local/bin/before-notebook.d/disable_teacher_extensions.sh
 
 USER $NB_UID
 
+ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+ARG PIP_EXTRA_INDEX_URL=https://pypi.org/simple
+ARG PIP_DEFAULT_TIMEOUT=300
+ARG PIP_RETRIES=20
+
 # Install backend dependencies for nbgrader and custom authenticator.
 # Use PyPI wheels to avoid slow conda solving and GUI packages such as pyside6.
 RUN pip install --no-cache-dir \
     --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    --extra-index-url https://pypi.org/simple \
     --timeout 120 \
     --retries 10 \
     'jupyterlab==4.2.7' \
@@ -51,10 +57,22 @@ RUN pip install --no-cache-dir \
     'numba'
 
 # Install Chinese language pack for JupyterLab
-RUN pip install --no-cache-dir jupyterlab-language-pack-zh-CN
+RUN pip install --no-cache-dir \
+    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    --extra-index-url https://pypi.org/simple \
+    --timeout 120 \
+    --retries 10 \
+    jupyterlab-language-pack-zh-CN
 
 # Install Python build helpers before source COPY so this layer is reusable.
-RUN pip install --no-cache-dir hatchling
+RUN pip install --no-cache-dir \
+    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+    --extra-index-url https://pypi.org/simple \
+    --timeout 120 \
+    --retries 10 \
+    'hatchling>=1.21.1' \
+    'hatch-jupyter-builder>=0.7' \
+    'editables>=0.5'
 
 # Make sure lab extensions are enabled
 RUN mkdir -p /opt/conda/etc/jupyter/jupyter_server_config.d && \
@@ -62,7 +80,6 @@ RUN mkdir -p /opt/conda/etc/jupyter/jupyter_server_config.d && \
 
 # Pre-install custom extension dependencies from stable metadata/package files.
 # Full source is copied later so TypeScript/CSS-only edits can reuse these layers.
-COPY --chown=$NB_UID:$NB_GID custom-logo /opt/conda/share/jupyter/labextensions/custom-logo
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/setup.py \
     jupyterlab-thermal-design/package.json \
     jupyterlab-thermal-design/yarn.lock \
@@ -71,7 +88,12 @@ COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/setup.py \
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/jupyterlab_thermal_design/__init__.py /src/jupyterlab-thermal-design/jupyterlab_thermal_design/__init__.py
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design/thermal_solver /src/jupyterlab-thermal-design/thermal_solver
 WORKDIR /src/jupyterlab-thermal-design
-RUN pip install -e .
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    -e .
 RUN jlpm install
 
 COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform/setup.py \
@@ -81,7 +103,26 @@ COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform/setup.py \
     /src/jupyterlab-simulation-platform/
 COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform/jupyterlab_simulation_platform/__init__.py /src/jupyterlab-simulation-platform/jupyterlab_simulation_platform/__init__.py
 WORKDIR /src/jupyterlab-simulation-platform
-RUN pip install -e .
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    -e .
+RUN jlpm install
+
+COPY --chown=$NB_UID:$NB_GID jupyterlab-param-binding/setup.py \
+    jupyterlab-param-binding/package.json \
+    jupyterlab-param-binding/.yarnrc.yml \
+    /src/jupyterlab-param-binding/
+COPY --chown=$NB_UID:$NB_GID jupyterlab-param-binding/jupyterlab_param_binding/__init__.py /src/jupyterlab-param-binding/jupyterlab_param_binding/__init__.py
+WORKDIR /src/jupyterlab-param-binding
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    -e .
 RUN jlpm install
 
 # Copy source code directory (requires nbgrader and jupyterlab folders in build context)
@@ -89,10 +130,16 @@ COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
 COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-design
 COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform /src/jupyterlab-simulation-platform
+COPY --chown=$NB_UID:$NB_GID jupyterlab-param-binding /src/jupyterlab-param-binding
 
 # Install custom jupyterlab first 
 WORKDIR /src/jupyterlab
-RUN pip install -e .
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    -e .
 RUN git config --global init.defaultBranch main && \
     git init && \
     git config --global user.email "a@b.com" && \
@@ -104,7 +151,12 @@ RUN jlpm run build
     
 # Install custom nbgrader
 WORKDIR /src/nbgrader
-RUN pip install -e .
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    -e .
 
 # Install thermal design plugin
 WORKDIR /src/jupyterlab-thermal-design
@@ -114,6 +166,12 @@ RUN jlpm install && \
 
 # Install template-based simulation platform plugin
 WORKDIR /src/jupyterlab-simulation-platform
+RUN jlpm install && \
+    jlpm run build && \
+    jupyter labextension develop . --overwrite
+
+# Install generic parameter binding plugin
+WORKDIR /src/jupyterlab-param-binding
 RUN jlpm install && \
     jlpm run build && \
     jupyter labextension develop . --overwrite

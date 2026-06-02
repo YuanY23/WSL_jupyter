@@ -25,6 +25,8 @@ jupyterlab-thermal-design/仿真结果归档/
 jupyterlab-simulation-platform/lib/
 jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/
 jupyterlab-simulation-platform/simulation-platform-results/
+jupyterlab-param-binding/lib/
+jupyterlab-param-binding/jupyterlab_param_binding/labextension/
 
 # Runtime course data, submissions, feedback, and gradebooks
 courses/

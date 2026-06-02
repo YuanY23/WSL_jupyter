@@ -70,11 +70,15 @@ c.DockerSpawner.volumes = {
     # 2. Global shared exchange directory for assignment distribution
     '/srv/nbgrader/exchange': '/srv/nbgrader/exchange',
     
-    # 3. LIVE DEVELOPMENT MOUNT: Map local host code to container
+    # Source-mount development mode for extension testing.
     '/home/yuan/my_project/nbgrader': '/src/nbgrader',
-
-    # 4. LIVE DEVELOPMENT MOUNT: Map local host jupyterlab code to container
     '/home/yuan/my_project/jupyterlab': '/opt/jupyterlab',
+    '/home/yuan/my_project/jupyterlab-param-binding': '/src/jupyterlab-param-binding',
+    'jupyterlab-param-binding-node-modules': '/src/jupyterlab-param-binding/node_modules',
+    '/home/yuan/my_project/jupyterlab-simulation-platform': '/src/jupyterlab-simulation-platform',
+    'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
+    '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',
+    'jupyterlab-thermal-design-node-modules': '/src/jupyterlab-thermal-design/node_modules',
 }
 
 # ================= 开发模式临时加的配置 =================

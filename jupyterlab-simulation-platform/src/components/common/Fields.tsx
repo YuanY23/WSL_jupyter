@@ -87,7 +87,11 @@ function emptyParameter(): ParameterDefinition {
     label: '新参数',
     value: 1,
     unit: '-',
-    description: '可编辑参数'
+    description: '可编辑参数',
+    controlType: 'number',
+    min: 0,
+    max: 10,
+    step: 0.1
   };
 }
 
@@ -139,6 +143,10 @@ export function BaseFields(props: BaseFieldsProps): React.ReactElement {
               <th>数值</th>
               <th>单位</th>
               <th>说明</th>
+              <th>控件</th>
+              <th>最小值</th>
+              <th>最大值</th>
+              <th>步长</th>
               <th>操作</th>
             </tr>
           </thead>
@@ -150,6 +158,21 @@ export function BaseFields(props: BaseFieldsProps): React.ReactElement {
                 <td><input type="number" step="any" value={Number.isNaN(parameter.value) ? '' : parameter.value} onChange={event => updateParameter(index, { value: event.target.value === '' ? NaN : Number(event.target.value) })} /></td>
                 <td><input value={parameter.unit} onChange={event => updateParameter(index, { unit: event.target.value })} /></td>
                 <td><input value={parameter.description} onChange={event => updateParameter(index, { description: event.target.value })} /></td>
+                <td>
+                  <select
+                    value={parameter.controlType || 'number'}
+                    onChange={event => updateParameter(index, { controlType: event.target.value as ParameterDefinition['controlType'] })}
+                  >
+                    <option value="number">数字</option>
+                    <option value="slider">滑块</option>
+                    <option value="boolean">开关</option>
+                    <option value="text">文本</option>
+                    <option value="dropdown">下拉</option>
+                  </select>
+                </td>
+                <td><input type="number" step="any" value={parameter.min ?? ''} onChange={event => updateParameter(index, { min: event.target.value === '' ? undefined : Number(event.target.value) })} /></td>
+                <td><input type="number" step="any" value={parameter.max ?? ''} onChange={event => updateParameter(index, { max: event.target.value === '' ? undefined : Number(event.target.value) })} /></td>
+                <td><input type="number" step="any" value={parameter.step ?? ''} onChange={event => updateParameter(index, { step: event.target.value === '' ? undefined : Number(event.target.value) })} /></td>
                 <td>
                   <button
                     className="simulation-platform-button"

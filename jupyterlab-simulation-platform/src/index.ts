@@ -24,17 +24,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
     let widget: MainAreaWidget<Widget> | null = null;
 
     app.commands.addCommand(CommandIDs.openGenerator, {
-      label: '仿真模板生成器',
+      label: '打开通用仿真平台',
       execute: () => {
         if (!widget || widget.isDisposed) {
           const content = new SimulationPlatformWorkbench(app);
           content.id = 'simulation-platform-generator';
-          content.title.label = '仿真模板生成器';
+          content.title.label = '通用仿真平台';
           content.title.closable = true;
 
           widget = new MainAreaWidget({ content });
           widget.id = 'simulation-platform-generator-main';
-          widget.title.label = '仿真模板生成器';
+          widget.title.label = '通用仿真平台';
           widget.title.closable = true;
         }
 
@@ -47,12 +47,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     palette.addItem({
       command: CommandIDs.openGenerator,
-      category: '仿真平台'
+      category: '通用仿真平台'
     });
 
     const simulationMenu = new Menu({ commands: app.commands });
     simulationMenu.id = 'simulation-platform-menu';
-    simulationMenu.title.label = '仿真平台';
+    simulationMenu.title.label = '通用仿真平台';
     simulationMenu.addItem({ command: CommandIDs.openGenerator });
     mainMenu.addMenu(simulationMenu);
   }

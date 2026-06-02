@@ -10,7 +10,7 @@ interface TemplateSelectorProps {
 export function TemplateSelector(props: TemplateSelectorProps): React.ReactElement {
   return (
     <div className="simulation-platform-sidebar">
-      <h2 className="simulation-platform-title">仿真平台</h2>
+      <h2 className="simulation-platform-title">通用仿真平台</h2>
       <p className="simulation-platform-subtitle">仿真模板生成器</p>
       {TEMPLATE_REGISTRY.map(template => (
         <button

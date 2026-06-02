@@ -21,6 +21,9 @@
 !jupyterlab-simulation-platform/
 !jupyterlab-simulation-platform/**
 
+!jupyterlab-param-binding/
+!jupyterlab-param-binding/**
+
 # Never send local dependency installs or package-manager caches.
 **/node_modules
 **/node_modules/**
@@ -68,6 +71,10 @@ jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension
 jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/**
 jupyterlab-simulation-platform/simulation-platform-results
 jupyterlab-simulation-platform/simulation-platform-results/**
+jupyterlab-param-binding/lib
+jupyterlab-param-binding/lib/**
+jupyterlab-param-binding/jupyterlab_param_binding/labextension
+jupyterlab-param-binding/jupyterlab_param_binding/labextension/**
 
 # Runtime course/user data is mounted or created outside the image.
 courses

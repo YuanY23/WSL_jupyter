@@ -5,7 +5,7 @@ import { oneDimensionalTransferGenerator } from '../generators/oneDimensionalTra
 import { optimizationDispatchGenerator } from '../generators/optimizationDispatchGenerator';
 import { secondOrderDynamicGenerator } from '../generators/secondOrderDynamicGenerator';
 import { timeSeriesEnergyBalanceGenerator } from '../generators/timeSeriesEnergyBalanceGenerator';
-import { assumptionsMarkdown, parameterTableMarkdown } from '../generators/helpers';
+import { assumptionsMarkdown, parameterBindingMetadataFromCode, parameterTableMarkdown } from '../generators/helpers';
 import {
   AlgebraicFormulaConfig,
   FirstOrderDynamicConfig,
@@ -63,7 +63,7 @@ export function generateSimulationNotebook(templateId: TemplateId, config: Simul
   }
 
   const parts = generateParts(templateId, config);
-  return makeNotebook([
+  const notebook = makeNotebook([
     markdownCell(`# ${parts.title}`),
     markdownCell(`## 1. 仿真问题说明\n\n${parts.problemDescription}`),
     markdownCell(`## 2. 模型假设\n\n${assumptionsMarkdown(parts.assumptions)}`),
@@ -96,4 +96,9 @@ plt.rcParams['axes.unicode_minus'] = False`),
     markdownCell(`## 11. 可修改参数提示\n\n${parts.modificationHint}`),
     markdownCell(`## 12. 结果分析提示\n\n${parts.analysisHint}`)
   ]);
+  notebook.metadata.simulation_param_bindings = parameterBindingMetadataFromCode(
+    parts.parameterCode,
+    config.parameters
+  );
+  return notebook;
 }
