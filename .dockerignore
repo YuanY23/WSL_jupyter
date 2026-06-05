@@ -24,6 +24,9 @@
 !jupyterlab-param-binding/
 !jupyterlab-param-binding/**
 
+!jupyterlab-official-thermal-examples/
+!jupyterlab-official-thermal-examples/**
+
 # Never send local dependency installs or package-manager caches.
 **/node_modules
 **/node_modules/**
@@ -75,6 +78,10 @@ jupyterlab-param-binding/lib
 jupyterlab-param-binding/lib/**
 jupyterlab-param-binding/jupyterlab_param_binding/labextension
 jupyterlab-param-binding/jupyterlab_param_binding/labextension/**
+jupyterlab-official-thermal-examples/lib
+jupyterlab-official-thermal-examples/lib/**
+jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension
+jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/**
 
 # Runtime course/user data is mounted or created outside the image.
 courses

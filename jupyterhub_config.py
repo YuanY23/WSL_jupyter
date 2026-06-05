@@ -75,6 +75,8 @@ c.DockerSpawner.volumes = {
     # '/home/yuan/my_project/jupyterlab': '/opt/jupyterlab',
     # '/home/yuan/my_project/jupyterlab-param-binding': '/src/jupyterlab-param-binding',
     # 'jupyterlab-param-binding-node-modules': '/src/jupyterlab-param-binding/node_modules',
+    # '/home/yuan/my_project/jupyterlab-official-thermal-examples': '/src/jupyterlab-official-thermal-examples',
+    # 'jupyterlab-official-thermal-examples-node-modules': '/src/jupyterlab-official-thermal-examples/node_modules',
     # '/home/yuan/my_project/jupyterlab-simulation-platform': '/src/jupyterlab-simulation-platform',
     # 'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
     # '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',

@@ -125,12 +125,27 @@ RUN pip install \
     -e .
 RUN jlpm install
 
+COPY --chown=$NB_UID:$NB_GID jupyterlab-official-thermal-examples/setup.py \
+    jupyterlab-official-thermal-examples/package.json \
+    jupyterlab-official-thermal-examples/.yarnrc.yml \
+    /src/jupyterlab-official-thermal-examples/
+COPY --chown=$NB_UID:$NB_GID jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/__init__.py /src/jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/__init__.py
+WORKDIR /src/jupyterlab-official-thermal-examples
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    -e .
+RUN jlpm install
+
 # Copy source code directory (requires nbgrader and jupyterlab folders in build context)
 COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
 COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
 COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-design
 COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform /src/jupyterlab-simulation-platform
 COPY --chown=$NB_UID:$NB_GID jupyterlab-param-binding /src/jupyterlab-param-binding
+COPY --chown=$NB_UID:$NB_GID jupyterlab-official-thermal-examples /src/jupyterlab-official-thermal-examples
 
 # Install custom jupyterlab first 
 WORKDIR /src/jupyterlab
@@ -172,6 +187,12 @@ RUN jlpm install && \
 
 # Install generic parameter binding plugin
 WORKDIR /src/jupyterlab-param-binding
+RUN jlpm install && \
+    jlpm run build && \
+    jupyter labextension develop . --overwrite
+
+# Install official thermal modeling examples plugin
+WORKDIR /src/jupyterlab-official-thermal-examples
 RUN jlpm install && \
     jlpm run build && \
     jupyter labextension develop . --overwrite

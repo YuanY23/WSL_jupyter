@@ -12,6 +12,8 @@ const simulationIndex = read('jupyterlab-simulation-platform/src/index.ts');
 const templateSelector = read('jupyterlab-simulation-platform/src/components/TemplateSelector.tsx');
 const thermalIndex = read('jupyterlab-thermal-design/src/index.ts');
 const thermalControlPanel = read('jupyterlab-thermal-design/src/components/ControlPanel.tsx');
+const officialThermalIndex = read('jupyterlab-official-thermal-examples/src/index.ts');
+const officialThermalApp = read('jupyterlab-official-thermal-examples/src/components/OfficialThermalExamplesApp.tsx');
 
 assert.ok(simulationIndex.includes("category: '通用仿真平台'"));
 assert.ok(simulationIndex.includes("label: '打开通用仿真平台'"));
@@ -36,5 +38,13 @@ assert.equal(thermalIndex.includes('热设计仿真系统'), false);
 assert.equal(thermalIndex.includes('热设计原理仿真工作台'), false);
 assert.equal(thermalControlPanel.includes('热设计平台'), false);
 assert.equal(thermalControlPanel.includes('热设计原理仿真工作台'), false);
+
+assert.ok(officialThermalIndex.includes("category: '官方热力建模示例'"));
+assert.ok(officialThermalIndex.includes("label: '打开官方热力建模示例'"));
+assert.ok(officialThermalIndex.includes("content.title.label = '官方热力建模示例'"));
+assert.ok(officialThermalIndex.includes("widget.title.label = '官方热力建模示例'"));
+assert.ok(officialThermalIndex.includes("officialMenu.title.label = '官方热力建模示例'"));
+assert.ok(officialThermalApp.includes('>官方热力建模示例</p>'));
+assert.ok(officialThermalApp.includes('>槽式太阳能光热发电集热-储热-发电联合过程</h2>'));
 
 console.log('ui label tests passed');

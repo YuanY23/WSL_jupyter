@@ -13,6 +13,7 @@ jupyterhub-proxy.pid
 
 # JavaScript dependencies and package-manager caches
 node_modules/
+**/node_modules
 **/node_modules/
 **/.yarn/cache/
 **/.yarn/install-state.gz
@@ -27,6 +28,8 @@ jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/
 jupyterlab-simulation-platform/simulation-platform-results/
 jupyterlab-param-binding/lib/
 jupyterlab-param-binding/jupyterlab_param_binding/labextension/
+jupyterlab-official-thermal-examples/lib/
+jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/
 
 # Runtime course data, submissions, feedback, and gradebooks
 courses/
