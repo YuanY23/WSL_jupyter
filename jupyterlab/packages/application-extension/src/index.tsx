@@ -1183,9 +1183,10 @@ const jupyterLogo: JupyterFrontEndPlugin<void> = {
     jupyterIcon.element({
       container: logo.node,
       elementPosition: 'center',
-      margin: '2px 2px 2px 8px',
-      height: 'auto',
-      width: '16px'
+      margin: '0',
+      height: '24px',
+      width: '24px',
+      title: 'SimLab'
     });
     logo.id = 'jp-MainLogo';
     shell.add(logo, 'top', { rank: 0 });

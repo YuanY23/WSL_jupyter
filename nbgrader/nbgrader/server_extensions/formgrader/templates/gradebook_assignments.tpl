@@ -12,10 +12,10 @@
 
 {%- block table_header -%}
 <tr>
-  <th>Assignment ID</th>
+  <th>作业编号</th>
   <th class="text-center">截止日期</th>
-  <th class="text-center">Submissions</th>
-  <th class="text-center">Score</th>
+  <th class="text-center">提交份数</th>
+  <th class="text-center">分数</th>
 </tr>
 {%- endblock -%}
 

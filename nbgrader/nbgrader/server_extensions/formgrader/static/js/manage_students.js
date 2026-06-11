@@ -37,7 +37,7 @@ var StudentUI = Backbone.View.extend({
         body.append(tablebody);
         var id = $("<tr/>");
         tablebody.append(id);
-        id.append($("<td/>").addClass("align-middle").text("Student ID"));
+        id.append($("<td/>").addClass("align-middle").text("学生编号"));
         id.append($("<td/>").append($("<input/>")
             .addClass("modal-id")
             .attr("type", "text")
@@ -45,17 +45,17 @@ var StudentUI = Backbone.View.extend({
 
         var first_name = $("<tr/>");
         tablebody.append(first_name);
-        first_name.append($("<td/>").addClass("align-middle").text("First name (optional)"));
+        first_name.append($("<td/>").addClass("align-middle").text("名（可选）"));
         first_name.append($("<td/>").append($("<input/>").addClass("modal-first-name").attr("type", "text")));
 
         var last_name = $("<tr/>");
         tablebody.append(last_name);
-        last_name.append($("<td/>").addClass("align-middle").text("Last name (optional)"));
+        last_name.append($("<td/>").addClass("align-middle").text("姓（可选）"));
         last_name.append($("<td/>").append($("<input/>").addClass("modal-last-name").attr("type", "text")));
 
         var email = $("<tr/>");
         tablebody.append(email);
-        email.append($("<td/>").addClass("align-middle").text("Email (optional)"));
+        email.append($("<td/>").addClass("align-middle").text("邮箱（可选）"));
         email.append($("<td/>").append($("<input/>").addClass("modal-email").attr("type", "text")));
 
         var footer = $("<div/>");
@@ -94,9 +94,9 @@ var StudentUI = Backbone.View.extend({
 
         // student name
         var last_name = this.model.get("last_name");
-        if (last_name === null) last_name = "None";
+        if (last_name === null) last_name = "无";
         var first_name = this.model.get("first_name");
-        if (first_name === null) first_name = "None";
+        if (first_name === null) first_name = "无";
         var name = last_name + ", " + first_name;
         this.$name.attr("data-order", name);
         this.$name.append($("<a/>")
@@ -110,7 +110,7 @@ var StudentUI = Backbone.View.extend({
 
         // email
         var email = this.model.get("email");
-        if (email === null) email = "None";
+        if (email === null) email = "无";
         this.$email.attr("data-order", email);
         this.$email.text(email);
 
@@ -152,7 +152,7 @@ var StudentUI = Backbone.View.extend({
 
     animateSaving: function () {
         if (this.$modal_save) {
-            this.$modal_save.text("Saving...");
+            this.$modal_save.text("保存中...");
         }
     },
 
@@ -226,22 +226,22 @@ var createStudentModal = function () {
     body.append(tablebody);
     var id = $("<tr/>");
     tablebody.append(id);
-    id.append($("<td/>").addClass("align-middle").text("Student ID"));
+    id.append($("<td/>").addClass("align-middle").text("学生编号"));
     id.append($("<td/>").append($("<input/>").addClass("id").attr("type", "text")));
 
     var first_name = $("<tr/>");
     tablebody.append(first_name);
-    first_name.append($("<td/>").addClass("align-middle").text("First name (optional)"));
+    first_name.append($("<td/>").addClass("align-middle").text("名（可选）"));
     first_name.append($("<td/>").append($("<input/>").addClass("first-name").attr("type", "text")));
 
     var last_name = $("<tr/>");
     tablebody.append(last_name);
-    last_name.append($("<td/>").addClass("align-middle").text("Last name (optional)"));
+    last_name.append($("<td/>").addClass("align-middle").text("姓（可选）"));
     last_name.append($("<td/>").append($("<input/>").addClass("last-name").attr("type", "text")));
 
     var email = $("<tr/>");
     tablebody.append(email);
-    email.append($("<td/>").addClass("align-middle").text("Email (optional)"));
+    email.append($("<td/>").addClass("align-middle").text("邮箱（可选）"));
     email.append($("<td/>").append($("<input/>").addClass("email").attr("type", "text")));
 
     var footer = $("<div/>");
@@ -256,7 +256,7 @@ var createStudentModal = function () {
         .attr("data-dismiss", "modal")
         .text("取消"));
 
-    modal = createModal("add-student-modal", "Add New Student", body, footer);
+    modal = createModal("add-student-modal", "添加新学生", body, footer);
 };
 
 var loadStudents = function () {

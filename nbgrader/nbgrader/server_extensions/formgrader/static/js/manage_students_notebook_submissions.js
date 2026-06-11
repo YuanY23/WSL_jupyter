@@ -39,7 +39,7 @@ var StudentSubmittedNotebookUI = Backbone.View.extend({
         var name = this.model.get("name");
         this.$name.attr("data-order", name);
         if (this.model.get("id") === null) {
-            this.$name.append(name + " (file missing)");
+            this.$name.append(name + "（文件缺失）");
         } else {
             this.$name.append($("<a/>")
                 .attr("href", base_url + "/formgrader/submissions/" + this.model.get("id"))
@@ -88,7 +88,7 @@ var StudentSubmittedNotebookUI = Backbone.View.extend({
         
         // needs manual grade?
         if (this.model.get("needs_manual_grade")) {
-            this.$needs_manual_grade.attr("data-search", "needs manual grade");
+            this.$needs_manual_grade.attr("data-search", "需要手动评分");
             this.$needs_manual_grade.attr("data-order", 1);
             this.$needs_manual_grade.append($("<span/>")
                 .addClass("glyphicon glyphicon-ok"));
@@ -99,7 +99,7 @@ var StudentSubmittedNotebookUI = Backbone.View.extend({
 
         // tests failed?
         if (this.model.get("failed_tests")) {
-            this.$tests_failed.attr("data-search", "tests failed");
+            this.$tests_failed.attr("data-search", "测试失败");
             this.$tests_failed.attr("data-order", 1);
             this.$tests_failed.append($("<span/>")
                 .addClass("glyphicon glyphicon-ok"));
@@ -110,7 +110,7 @@ var StudentSubmittedNotebookUI = Backbone.View.extend({
 
         // flagged?
         if (this.model.get("flagged")) {
-            this.$flagged.attr("data-search", "flagged");
+            this.$flagged.attr("data-search", "已标记");
             this.$flagged.attr("data-order", 1);
             this.$flagged.append($("<span/>")
                 .addClass("glyphicon glyphicon-flag"));

@@ -9,7 +9,7 @@ var assignment_id = "{{ assignment_id }}";
 {%- endblock head -%}
 
 {%- block title -%}
-Manage Submissions
+提交管理
 {%- endblock -%}
 
 {%- block sidebar -%}
@@ -20,7 +20,7 @@ Manage Submissions
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li><a href="{{ base_url }}/formgrader/manage_assignments">Assignments</a></li>
+  <li><a href="{{ base_url }}/formgrader/manage_assignments">作业管理</a></li>
   <li class="active">{{ assignment_id }}</li>
 </ol>
 {%- endblock -%}
@@ -38,10 +38,9 @@ Manage Submissions
     <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
       <div class="panel-body">
         <p>
-          <b>Note:</b> Here you can autograde individual students' submissions by
-          clicking on the autograde icons below. If you want to autograde
-          all submissions at once, you will need to do this via the
-          <a target="_blank" href="{{ base_url }}/terminals/1">command line</a>:
+          <b>说明：</b> 在这里可以点击下方的自动评分图标，对单个学生的提交进行自动评分。
+          如果需要一次性自动评分所有提交，请通过
+          <a target="_blank" href="{{ base_url }}/terminals/1">命令行</a> 执行：
         </p>
         <p>
         <pre>
@@ -56,12 +55,12 @@ nbgrader autograde "{{ assignment_id }}"</pre>
 
 {%- block table_header -%}
 <tr>
-  <th>Student Name</th>
-  <th class="text-center">Student ID</th>
-  <th class="text-center">Timestamp</th>
+  <th>学生姓名</th>
+  <th class="text-center">学生编号</th>
+  <th class="text-center">提交时间</th>
   <th class="text-center">状态</th>
-  <th class="text-center">Score</th>
-  <th class="text-center no-sort">Autograde</th>
+  <th class="text-center">分数</th>
+  <th class="text-center no-sort">自动评分</th>
   <th class="text-center no-sort">生成反馈</th>
   <th class="text-center no-sort">发布反馈</th>
 </tr>

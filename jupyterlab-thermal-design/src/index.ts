@@ -1,8 +1,9 @@
 import {
+    ILayoutRestorer,
     JupyterFrontEnd,
     JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { Widget, Menu } from '@lumino/widgets';
 
@@ -20,14 +21,19 @@ const plugin: JupyterFrontEndPlugin<void> = {
     description: 'Thermal Design Simulation',
     autoStart: true,
     requires: [ICommandPalette, IMainMenu],
+    optional: [ILayoutRestorer],
     activate: (
         app: JupyterFrontEnd,
         palette: ICommandPalette,
-        mainMenu: IMainMenu
+        mainMenu: IMainMenu,
+        restorer: ILayoutRestorer | null
     ) => {
         console.log('JupyterLab extension jupyterlab-thermal-design is activated!');
 
-        let widget: MainAreaWidget<Widget>;
+        let widget: MainAreaWidget<Widget> | null = null;
+        const tracker = new WidgetTracker<MainAreaWidget<Widget>>({
+            namespace: 'thermal-design-workbench'
+        });
 
         // Add command
         app.commands.addCommand(CommandIDs.openWorkbench, {
@@ -45,12 +51,26 @@ const plugin: JupyterFrontEndPlugin<void> = {
                     widget.title.closable = true;
                 }
 
+                if (!tracker.has(widget)) {
+                    void tracker.add(widget);
+                }
+
                 if (!widget.isAttached) {
-                    app.shell.add(widget, 'main');
+                    app.shell.add(widget, 'main', {
+                        mode: 'tab-after',
+                        activate: true
+                    });
                 }
                 app.shell.activateById(widget.id);
             }
         });
+
+        if (restorer) {
+            void restorer.restore(tracker, {
+                command: CommandIDs.openWorkbench,
+                name: () => 'main'
+            });
+        }
 
         // Add to palette
         palette.addItem({ command: CommandIDs.openWorkbench, category: 'Thermal Design' });
@@ -61,7 +81,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
         thermalMenu.title.label = '传热仿真平台';
         thermalMenu.addItem({ command: CommandIDs.openWorkbench });
 
-        mainMenu.addMenu(thermalMenu);
+        mainMenu.addMenu(thermalMenu, true, { rank: 6 });
 
     }
 };

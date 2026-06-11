@@ -10,7 +10,7 @@ Distributed under the terms of the Modified BSD License.
 
   <title>{% block title %}{{page_title | escape}}{% endblock %}</title>
 
-  {% block favicon %}<link rel="shortcut icon" type="image/x-icon" href="/static/favicons/favicon.ico">{% endblock %}
+  {% block favicon %}<link rel="shortcut icon" type="image/svg+xml" href="/static/lab/jupyter-favicon.svg">{% endblock %}
 
 </head>
 
@@ -28,7 +28,7 @@ div#header, div#site {
 
 <div class="error">
     {% block h1_error %}
-    <h2>JupyterLab assets not detected, please rebuild</h2>
+    <h2>SimLab assets not detected, please rebuild</h2>
     <script>
     console.error('Missing assets in "{{static_dir | escape}}"');
     </script>

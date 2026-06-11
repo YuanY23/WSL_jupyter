@@ -1,8 +1,9 @@
 import {
+  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { Menu, Widget } from '@lumino/widgets';
 import { SimulationPlatformWorkbench } from './MainWidget';
@@ -16,12 +17,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description: 'Template-based visible-code simulation Notebook generator',
   autoStart: true,
   requires: [ICommandPalette, IMainMenu],
+  optional: [ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
-    mainMenu: IMainMenu
+    mainMenu: IMainMenu,
+    restorer: ILayoutRestorer | null
   ) => {
     let widget: MainAreaWidget<Widget> | null = null;
+    const tracker = new WidgetTracker<MainAreaWidget<Widget>>({
+      namespace: 'simulation-platform-generator'
+    });
 
     app.commands.addCommand(CommandIDs.openGenerator, {
       label: '打开通用仿真平台',
@@ -38,12 +44,26 @@ const plugin: JupyterFrontEndPlugin<void> = {
           widget.title.closable = true;
         }
 
+        if (!tracker.has(widget)) {
+          void tracker.add(widget);
+        }
+
         if (!widget.isAttached) {
-          app.shell.add(widget, 'main');
+          app.shell.add(widget, 'main', {
+            mode: 'tab-after',
+            activate: true
+          });
         }
         app.shell.activateById(widget.id);
       }
     });
+
+    if (restorer) {
+      void restorer.restore(tracker, {
+        command: CommandIDs.openGenerator,
+        name: () => 'main'
+      });
+    }
 
     palette.addItem({
       command: CommandIDs.openGenerator,
@@ -54,7 +74,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     simulationMenu.id = 'simulation-platform-menu';
     simulationMenu.title.label = '通用仿真平台';
     simulationMenu.addItem({ command: CommandIDs.openGenerator });
-    mainMenu.addMenu(simulationMenu);
+    mainMenu.addMenu(simulationMenu, true, { rank: 5 });
   }
 };
 

@@ -22,9 +22,9 @@ class ValidateButton extends ToolbarButton {
     super({
       className: 'validate-button',
       // iconClass: 'fa fa-fast-forward',
-      label: 'Validate',
+      label: '验证作业',
       onClick: () => {this.buttonCallback();},
-      tooltip: 'Validate Assignment'
+      tooltip: '验证作业'
     });
     this.panel = panel;
   }
@@ -60,9 +60,9 @@ class ValidateButton extends ToolbarButton {
 
       if (args !== "completed") {
         showNbGraderDialog({
-          title: "Validation failed",
-          body: "Cannot save notebook",
-          buttons: [Dialog.okButton()],
+          title: "验证失败",
+          body: "无法保存笔记本",
+          buttons: [Dialog.okButton({ label: '确定' })],
           focusNodeSelector: 'input'
         }, true);
         this.setButtonLabel();
@@ -70,7 +70,7 @@ class ValidateButton extends ToolbarButton {
         return;
       }
 
-      this.setButtonLabel('Validating...');
+      this.setButtonLabel('验证中...');
       const notebook_path = this.panel.context.path
       requestAPI<any>(
           'assignments/validate',
@@ -82,9 +82,9 @@ class ValidateButton extends ToolbarButton {
         this.setButtonDisabled(false);
       }).catch(reason => {
         showNbGraderDialog({
-          title: "Validation failed",
-          body: `Cannot validate: ${reason}`,
-          buttons: [Dialog.okButton()],
+          title: "验证失败",
+          body: `无法验证：${reason}`,
+          buttons: [Dialog.okButton({ label: '确定' })],
           focusNodeSelector: 'input'
         }, true);
         this.setButtonLabel();
@@ -97,16 +97,16 @@ class ValidateButton extends ToolbarButton {
     return (data: any) => {
       if (data.success !== true) {
         showNbGraderDialog({
-          title: "Version Mismatch",
+          title: "版本不匹配",
           body: data.message,
-          buttons: [Dialog.okButton()],
+          buttons: [Dialog.okButton({ label: '确定' })],
           focusNodeSelector: 'input'
         }, true);
         return;
       }
 
       this.setButtonDisabled();
-      this.setButtonLabel('Saving...');
+      this.setButtonLabel('保存中...');
       this.panel.context.saveState.connect(this.saveCallback);
       this.panel.context.save();
     }
@@ -123,9 +123,9 @@ class ValidateButton extends ToolbarButton {
       ).catch(reason => {
         // The validate_assignment server extension appears to be missing
         showNbGraderDialog({
-          title: "Validation failed",
-          body: `Cannot check version: ${reason}`,
-          buttons: [Dialog.okButton()],
+          title: "验证失败",
+          body: `无法检查版本：${reason}`,
+          buttons: [Dialog.okButton({ label: '确定' })],
           focusNodeSelector: 'input'
         }, true);
       });
@@ -141,7 +141,7 @@ class ValidateButton extends ToolbarButton {
     }
   }
 
-  private setButtonLabel(label: string = 'Validate'): void {
+  private setButtonLabel(label: string = '验证作业'): void {
     const labelElement = this.node.getElementsByClassName(
         'jp-ToolbarButtonComponent-label')[0] as HTMLElement;
     labelElement.innerText = label;

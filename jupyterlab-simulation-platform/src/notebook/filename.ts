@@ -10,6 +10,6 @@ export function sanitizeFilenamePart(value: string): string {
 }
 
 export function makeNotebookFilename(templateId: string, simulationName: string, date = new Date()): string {
-  const timestamp = date.toISOString().slice(0, 19).replace(/[T:]/g, '-');
+  const timestamp = date.toISOString().slice(0, 23).replace(/[T:.]/g, '-');
   return `${sanitizeFilenamePart(templateId)}_${sanitizeFilenamePart(simulationName)}_${timestamp}.ipynb`;
 }

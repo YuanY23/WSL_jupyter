@@ -37,7 +37,7 @@ export function validate(
         for (let i=0; i<data.type_changed.length; i++) {
           var div = document.createElement('div')
           var paragraph = document.createElement('p')
-          paragraph.innerText = `The following ${data.type_changed[i].old_type} cell has changed to a ${data.type_changed[i].new_type} cell, but it should not have!`;
+          paragraph.innerText = `以下 ${data.type_changed[i].old_type} 单元格被改成了 ${data.type_changed[i].new_type} 单元格，但不允许这样修改！`;
           div.append(paragraph);
           body.append(div);
           var pre = document.createElement('pre');
@@ -51,7 +51,7 @@ export function validate(
         for (var i=0; i<data.changed.length; i++) {
           var div = document.createElement('div')
           var paragraph = document.createElement('p')
-          paragraph.innerText = 'The source of the following cell has changed, but it should not have!';
+          paragraph.innerText = '以下单元格的源码已被修改，但不允许这样修改！';
           div.append(paragraph);
           body.append(div);
           var pre = document.createElement('pre');
@@ -64,7 +64,7 @@ export function validate(
         for (var i=0; i<data.changed.length; i++) {
           var div = document.createElement('div');
           var paragraph = document.createElement('p');
-          paragraph.innerText = 'The following cell passed:';
+          paragraph.innerText = '以下单元格已通过：';
           div.append(paragraph)
           body.append(div)
           var pre = document.createElement('pre');
@@ -78,7 +78,7 @@ export function validate(
         for (var i=0; i<data.failed.length; i++) {
           var div = document.createElement('div');
           var paragraph = document.createElement('p');
-          paragraph.innerText = 'The following cell failed:';
+          paragraph.innerText = '以下单元格未通过：';
           div.append(paragraph);
           body.append(div);
 
@@ -103,7 +103,7 @@ export function validate(
       } else {
         var div = document.createElement('div')
         var paragraph  = document.createElement('p')
-        paragraph.innerText = 'Success! Your notebook passes all the tests.';
+        paragraph.innerText = '验证通过！该笔记本通过了全部测试。';
         div.append(paragraph);
         body.append(div);
 
@@ -115,7 +115,7 @@ export function validate(
     isError = true;
     var div  = document.createElement('div');
     var paragraph = document.createElement('p');
-    paragraph.innerText = 'There was an error running the validate command:';
+    paragraph.innerText = '运行验证命令时出错：';
     div.append(paragraph);
     body.append(div);
     var pre = document.createElement('pre');
@@ -127,9 +127,9 @@ export function validate(
   let b: Widget;
   b = new Widget({node: body});
   showNbGraderDialog<Widget>({
-    title: "Validation Results",
+    title: "验证结果",
     body: b,
-    buttons: [Dialog.okButton()]
+    buttons: [Dialog.okButton({ label: '确定' })]
   }, isError);
 
   return success;

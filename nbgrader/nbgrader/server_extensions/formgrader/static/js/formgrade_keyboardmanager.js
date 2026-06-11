@@ -107,13 +107,13 @@ KeyboardManager.prototype.showHelp = function () {
     header.append($("<button/>")
         .addClass("close")
         .attr("data-dismiss", "modal")
-        .attr("aria-label", "Close")
+        .attr("aria-label", "关闭")
         .append($("<span/>")
             .attr("aria-hidden", "true")
             .html("&times;")));
     header.append($("<h4/>")
         .addClass("modal-title")
-        .text("Keyboard shortcuts"));
+        .text("快捷键"));
 
     var body = $("<div/>").addClass("modal-body");
     content.append(body);
@@ -133,7 +133,7 @@ KeyboardManager.prototype.showHelp = function () {
         .addClass("btn btn-primary")
         .attr("type", "button")
         .attr("data-dismiss", "modal")
-        .text("Close"));
+        .text("关闭"));
 
     // remove the modal on close
     modal.on("hidden.bs.modal", function () {

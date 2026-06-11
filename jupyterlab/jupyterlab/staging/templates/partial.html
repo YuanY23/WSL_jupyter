@@ -14,8 +14,8 @@
   </script>
 
   {% block favicon %}
-  <link rel="icon" type="image/x-icon" href="{{ base_url | escape }}static/favicons/favicon.ico" class="idle favicon">
-  <link rel="" type="image/x-icon" href="{{ base_url | escape }}static/favicons/favicon-busy-1.ico" class="busy favicon">
+  <link rel="icon" type="image/svg+xml" href="{{ base_url | escape }}static/lab/jupyter-favicon.svg" class="idle favicon">
+  <link rel="" type="image/svg+xml" href="{{ base_url | escape }}static/lab/jupyter-favicon.svg" class="busy favicon">
   {% endblock %}
 
   {% if custom_css %}

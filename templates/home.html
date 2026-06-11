@@ -1,5 +1,9 @@
 {% extends "page.html" %}
 
+{% block favicon %}
+<link rel="icon" type="image/svg+xml" href="{{ simlab_favicon_href }}" />
+{% endblock favicon %}
+
 {% block stylesheet %}
 <style>
     :root {

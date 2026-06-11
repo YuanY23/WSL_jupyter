@@ -56,7 +56,7 @@ var AssignmentUI = Backbone.View.extend({
 
         var timezone = $("<tr/>");
         tablebody.append(timezone);
-        timezone.append($("<td/>").addClass("align-middle").text("时区偏移UTC（可选）"));
+        timezone.append($("<td/>").addClass("align-middle").text("协调世界时偏移（可选）"));
         timezone.append($("<td/>").append($("<input/>").addClass("modal-timezone").attr("type", "text")));
 
         var footer = $("<div/>");
@@ -110,8 +110,8 @@ var AssignmentUI = Backbone.View.extend({
         var duedate = this.model.get("duedate");
         var display_duedate = this.model.get("display_duedate");
         if (duedate === null) {
-            duedate = "None";
-            display_duedate = "None";
+            duedate = "无";
+            display_duedate = "无";
         }
         this.$duedate.attr("data-order", duedate);
         this.$duedate.text(display_duedate);
@@ -364,7 +364,7 @@ var AssignmentUI = Backbone.View.extend({
             createLogModal(
                 "error-modal",
                 "错误",
-                "There was an error collecting '" + this.model.get("name") + "':",
+                "收集作业时发生错误 '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -390,7 +390,7 @@ var AssignmentUI = Backbone.View.extend({
 
     animateSaving: function () {
         if (this.$modal_save) {
-            this.$modal_save.text("Saving...");
+            this.$modal_save.text("保存中...");
         }
     },
 
@@ -445,14 +445,14 @@ var AssignmentUI = Backbone.View.extend({
             createLogModal(
                 "success-modal",
                 "成功",
-                "成功发布 feedback of '" + this.model.get("name") + "'.",
+                "成功发布反馈 '" + this.model.get("name") + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
                 "错误",
-                "发布作业时发生错误 feedback of '" + this.model.get("name") + "':",
+                "发布反馈时发生错误 '" + this.model.get("name") + "':",
                 response["log"],
                 response["error"]);
         }
@@ -463,7 +463,7 @@ var AssignmentUI = Backbone.View.extend({
         createModal(
             "error-modal",
             "错误",
-            "发布作业时发生错误 feedback of '" + this.model.get("name") + "'.");
+            "发布反馈时发生错误 '" + this.model.get("name") + "'.");
     },
 
     closeModal: function () {
@@ -561,7 +561,7 @@ var createAssignmentModal = function () {
 
     var timezone = $("<tr/>");
     tablebody.append(timezone);
-    timezone.append($("<td/>").addClass("align-middle").text("时区偏移UTC（可选）"));
+    timezone.append($("<td/>").addClass("align-middle").text("协调世界时偏移（可选）"));
     timezone.append($("<td/>").append($("<input/>").addClass("timezone").attr("type", "text")));
 
     var footer = $("<div/>");

@@ -138,7 +138,7 @@ var CommentUI = Backbone.View.extend({
         this.listenTo(this.model, "request", this.animateSaving);
         this.listenTo(this.model, "sync", this.animateSaved);
 
-        var default_msg = "Type any comments here (supports Markdown and MathJax)";
+        var default_msg = "在此输入评语（支持 Markdown 和 MathJax）";
         this.$comment.attr("placeholder", this.model.get("auto_comment") || default_msg);
 
         this.render();

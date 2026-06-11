@@ -69,7 +69,7 @@ var SubmittedNotebookUI = Backbone.View.extend({
         this.$name.append($("<a/>")
             .addClass("name-hidden")
             .attr("href", base_url + "/formgrader/submissions/" + this.model.get("id"))
-            .text("Submission #" + (this.model.get("index") + 1)));
+            .text("提交 #" + (this.model.get("index") + 1)));
         this.$name.append($("<a/>")
             .addClass("name-shown")
             .attr("href", base_url + "/formgrader/submissions/" + this.model.get("id"))
@@ -117,7 +117,7 @@ var SubmittedNotebookUI = Backbone.View.extend({
         
         // needs manual grade?
         if (this.model.get("needs_manual_grade")) {
-            this.$needs_manual_grade.attr("data-search", "needs manual grade");
+            this.$needs_manual_grade.attr("data-search", "需要手动评分");
             this.$needs_manual_grade.attr("data-order", 1);
             this.$needs_manual_grade.append($("<span/>")
                 .addClass("glyphicon glyphicon-ok"));
@@ -128,7 +128,7 @@ var SubmittedNotebookUI = Backbone.View.extend({
 
         // tests failed?
         if (this.model.get("failed_tests")) {
-            this.$tests_failed.attr("data-search", "tests failed");
+            this.$tests_failed.attr("data-search", "测试未通过");
             this.$tests_failed.attr("data-order", 1);
             this.$tests_failed.append($("<span/>")
                 .addClass("glyphicon glyphicon-ok"));
@@ -139,7 +139,7 @@ var SubmittedNotebookUI = Backbone.View.extend({
 
         // flagged?
         if (this.model.get("flagged")) {
-            this.$flagged.attr("data-search", "flagged");
+            this.$flagged.attr("data-search", "已标记");
             this.$flagged.attr("data-order", 1);
             this.$flagged.append($("<span/>")
                 .addClass("glyphicon glyphicon-flag"));
@@ -182,23 +182,23 @@ var loadSubmittedNotebooks = function () {
                 views.push(view);
             });
             insertDataTable(tbl.parent());
-            $('span.glyphicon.name-hidden').tooltip({title: "Show student name"});
-            $('span.glyphicon.name-shown').tooltip({title: "Hide student name"});
+            $('span.glyphicon.name-hidden').tooltip({title: "显示学生姓名"});
+            $('span.glyphicon.name-shown').tooltip({title: "隐藏学生姓名"});
             models.loaded = true;
         }
     });
 };
 
-// at least one hidden name -> label="Show All Names"
-// no hidden name -> label="Hide All Names"
+// at least one hidden name -> label="显示全部姓名"
+// no hidden name -> label="隐藏全部姓名"
 let updateToggleNamesButtonLabel = function() {
     const button = document.getElementById("toggle_names");
     const icons = document.getElementsByClassName("glyphicon name-hidden");
     const icon_array = [...icons];
     if (icon_array.some(el => $(el).is(':visible'))){
-        button.innerHTML = "Show All Names";
+        button.innerHTML = "显示全部姓名";
     } else{
-        button.innerHTML = "Hide All Names";
+        button.innerHTML = "隐藏全部姓名";
     }
 };
 
@@ -206,7 +206,7 @@ let updateToggleNamesButtonLabel = function() {
 let toggleAllNames = function () {
     let icons;
     const button = document.getElementById("toggle_names");
-    const names_hidden = (button.innerHTML === "Show All Names");
+    const names_hidden = (button.innerHTML === "显示全部姓名");
     if (names_hidden){
         icons = document.getElementsByClassName("glyphicon name-hidden");
     } else {

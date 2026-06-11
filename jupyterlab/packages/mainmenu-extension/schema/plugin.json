@@ -80,6 +80,7 @@
       },
       {
         "id": "jp-mainmenu-view",
+        "disabled": true,
         "label": "View",
         "items": [
           {
@@ -125,6 +126,7 @@
       },
       {
         "id": "jp-mainmenu-kernel",
+        "disabled": true,
         "label": "Kernel",
         "items": [
           {
@@ -180,6 +182,7 @@
       },
       {
         "id": "jp-mainmenu-tabs",
+        "disabled": true,
         "label": "Tabs",
         "items": [
           {
@@ -218,6 +221,7 @@
       },
       {
         "id": "jp-mainmenu-help",
+        "disabled": true,
         "label": "Help",
         "items": [],
         "rank": 1000

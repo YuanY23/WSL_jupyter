@@ -6,17 +6,17 @@
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li class="active">Students</li>
+  <li class="active">学生管理</li>
 </ol>
 {%- endblock -%}
 
 {%- block table_header -%}
 <tr>
   <th>名称</th>
-  <th class="text-center">Student ID</th>
-  <th class="text-center">Email</th>
-  <th class="text-center">Overall Score</th>
-  <th class="text-center no-sort">Edit Student</th>
+  <th class="text-center">学生编号</th>
+  <th class="text-center">邮箱</th>
+  <th class="text-center">总分</th>
+  <th class="text-center no-sort">编辑学生</th>
 </tr>
 {%- endblock -%}
 
@@ -28,7 +28,7 @@
 <tr>
   <td colspan="5">
     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    <a href="#" onClick="createStudentModal();">Add new student...</a>
+    <a href="#" onClick="createStudentModal();">添加新学生...</a>
   </td>
 </tr>
 {%- endblock -%}

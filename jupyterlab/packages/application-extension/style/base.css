@@ -5,7 +5,32 @@
 |----------------------------------------------------------------------------*/
 
 #jp-MainLogo {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
   width: calc(var(--jp-private-sidebar-tab-width) + var(--jp-border-width));
+  min-width: calc(var(--jp-private-sidebar-tab-width) + var(--jp-border-width));
+  height: var(--jp-private-menu-panel-height);
+  overflow: visible;
+  visibility: visible;
+  opacity: 1;
+  flex: 0 0 calc(var(--jp-private-sidebar-tab-width) + var(--jp-border-width));
+}
+
+#jp-MainLogo svg {
+  display: block !important;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}
+
+#jp-MainLogo button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 #jp-top-bar {

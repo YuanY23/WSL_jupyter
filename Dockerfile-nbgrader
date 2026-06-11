@@ -28,7 +28,8 @@ RUN chmod +x /usr/local/bin/before-notebook.d/disable_teacher_extensions.sh
 
 USER $NB_UID
 
-ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+ENV PIP_TRUSTED_HOST=mirrors.aliyun.com
+ARG PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple/
 ARG PIP_EXTRA_INDEX_URL=https://pypi.org/simple
 ARG PIP_DEFAULT_TIMEOUT=300
 ARG PIP_RETRIES=20
@@ -36,8 +37,8 @@ ARG PIP_RETRIES=20
 # Install backend dependencies for nbgrader and custom authenticator.
 # Use PyPI wheels to avoid slow conda solving and GUI packages such as pyside6.
 RUN pip install --no-cache-dir \
-    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    --extra-index-url https://pypi.org/simple \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout 120 \
     --retries 10 \
     'jupyterlab==4.2.7' \
@@ -58,16 +59,16 @@ RUN pip install --no-cache-dir \
 
 # Install Chinese language pack for JupyterLab
 RUN pip install --no-cache-dir \
-    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    --extra-index-url https://pypi.org/simple \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout 120 \
     --retries 10 \
     jupyterlab-language-pack-zh-CN
 
 # Install Python build helpers before source COPY so this layer is reusable.
 RUN pip install --no-cache-dir \
-    --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-    --extra-index-url https://pypi.org/simple \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout 120 \
     --retries 10 \
     'hatchling>=1.21.1' \
@@ -93,6 +94,7 @@ RUN pip install \
     --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout "$PIP_DEFAULT_TIMEOUT" \
     --retries "$PIP_RETRIES" \
+    --no-build-isolation \
     -e .
 RUN jlpm install
 
@@ -108,6 +110,7 @@ RUN pip install \
     --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout "$PIP_DEFAULT_TIMEOUT" \
     --retries "$PIP_RETRIES" \
+    --no-build-isolation \
     -e .
 RUN jlpm install
 
@@ -122,6 +125,7 @@ RUN pip install \
     --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout "$PIP_DEFAULT_TIMEOUT" \
     --retries "$PIP_RETRIES" \
+    --no-build-isolation \
     -e .
 RUN jlpm install
 
@@ -136,6 +140,7 @@ RUN pip install \
     --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout "$PIP_DEFAULT_TIMEOUT" \
     --retries "$PIP_RETRIES" \
+    --no-build-isolation \
     -e .
 RUN jlpm install
 
@@ -146,21 +151,30 @@ COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-d
 COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform /src/jupyterlab-simulation-platform
 COPY --chown=$NB_UID:$NB_GID jupyterlab-param-binding /src/jupyterlab-param-binding
 COPY --chown=$NB_UID:$NB_GID jupyterlab-official-thermal-examples /src/jupyterlab-official-thermal-examples
+COPY --chown=$NB_UID:$NB_GID logo /src/logo
 
 # Install custom jupyterlab first 
 WORKDIR /src/jupyterlab
-RUN pip install \
-    --index-url "$PIP_INDEX_URL" \
-    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
-    --timeout "$PIP_DEFAULT_TIMEOUT" \
-    --retries "$PIP_RETRIES" \
-    -e .
+RUN cp /src/logo/simlab-favicon.svg packages/ui-components/style/icons/jupyter/jupyter-favicon.svg && \
+    cp /src/logo/simlab-logo.svg packages/ui-components/style/icons/jupyter/jupyter.svg && \
+    cp /src/logo/simlab-logo.svg packages/ui-components/style/icons/jupyter/jupyterlab-wordmark.svg && \
+    cp /src/logo/simlab-notebook.svg packages/ui-components/style/icons/filetype/notebook.svg && \
+    cp /src/logo/simlab-folder.svg packages/ui-components/style/icons/filetype/folder.svg && \
+    cp /src/logo/simlab-folder-favorite.svg packages/ui-components/style/icons/filetype/folder-favorite.svg && \
+    cp /src/logo/simlab-file.svg packages/ui-components/style/icons/filetype/file.svg
 RUN git config --global init.defaultBranch main && \
     git init && \
     git config --global user.email "a@b.com" && \
     git config --global user.name "A" && \
     git add . && \
     git commit -m "init"
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    --no-build-isolation \
+    -e .
 RUN jlpm install
 RUN jlpm run build
     
@@ -171,7 +185,11 @@ RUN pip install \
     --extra-index-url "$PIP_EXTRA_INDEX_URL" \
     --timeout "$PIP_DEFAULT_TIMEOUT" \
     --retries "$PIP_RETRIES" \
+    --no-build-isolation \
     -e .
+RUN jlpm install && \
+    jlpm run build && \
+    jupyter labextension develop . --overwrite
 
 # Install thermal design plugin
 WORKDIR /src/jupyterlab-thermal-design
@@ -197,12 +215,28 @@ RUN jlpm install && \
     jlpm run build && \
     jupyter labextension develop . --overwrite
 
+# Fail the image build if source edits were not compiled into the prebuilt
+# labextension bundles that JupyterLab actually loads.
+RUN grep -R "作业评测平台" /src/nbgrader/nbgrader/labextension/static/*.js >/dev/null && \
+    grep -R "mainMenu.addMenu(nbgraderMenu, true, { rank: 8 })" /src/nbgrader/nbgrader/labextension/static/*.js >/dev/null && \
+    grep -R "mainMenu.addMenu(simulationMenu, true, { rank: 5 })" /src/jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/static/*.js >/dev/null && \
+    grep -R "mainMenu.addMenu(thermalMenu, true, { rank: 6 })" /src/jupyterlab-thermal-design/jupyterlab_thermal_design/labextension/static/*.js >/dev/null && \
+    grep -R "mainMenu.addMenu(officialMenu, true, { rank: 7 })" /src/jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/static/*.js >/dev/null
+
 # Overwrite the official SVG icons with our custom ones BEFORE building
 RUN cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter.svg \
        /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
     cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter-favicon.svg \
        /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
     cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyterlab-wordmark.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
+    cp /src/jupyterlab/packages/ui-components/style/icons/filetype/notebook.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
+    cp /src/jupyterlab/packages/ui-components/style/icons/filetype/folder.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
+    cp /src/jupyterlab/packages/ui-components/style/icons/filetype/folder-favorite.svg \
+       /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true && \
+    cp /src/jupyterlab/packages/ui-components/style/icons/filetype/file.svg \
        /opt/conda/share/jupyter/lab/static/ 2>/dev/null || true
 
 # Also overwrite in the installed npm package so `jupyter lab build` picks them up
@@ -214,11 +248,30 @@ RUN UICOMP_DIR=$(find /opt/conda -path "*/labextensions/@jupyterlab/ui-component
          "$UICOMP_DIR/static/" 2>/dev/null || true; \
       cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyterlab-wordmark.svg \
          "$UICOMP_DIR/static/" 2>/dev/null || true; \
+      cp /src/jupyterlab/packages/ui-components/style/icons/filetype/notebook.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
+      cp /src/jupyterlab/packages/ui-components/style/icons/filetype/folder.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
+      cp /src/jupyterlab/packages/ui-components/style/icons/filetype/folder-favorite.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
+      cp /src/jupyterlab/packages/ui-components/style/icons/filetype/file.svg \
+         "$UICOMP_DIR/static/" 2>/dev/null || true; \
     fi
 
 # Rebuild JupyterLab to bake in the custom nbgrader extensions + custom icons
 WORKDIR /home/jovyan
-RUN jupyter lab build --minimize=False
+RUN jupyter lab build --splice-source --minimize=False && \
+    grep -R "#8A2387" /opt/conda/share/jupyter/lab/static/*.js >/dev/null && \
+    grep -R "width: '24px'" /opt/conda/share/jupyter/lab/static/*.js >/dev/null
+
+# Ensure logo/icon redirect targets still exist after the build rewrites static assets.
+RUN cp /src/logo/simlab-favicon.svg /opt/conda/share/jupyter/lab/static/jupyter-favicon.svg && \
+    cp /src/logo/simlab-logo.svg /opt/conda/share/jupyter/lab/static/jupyter.svg && \
+    cp /src/logo/simlab-logo.svg /opt/conda/share/jupyter/lab/static/jupyterlab-wordmark.svg && \
+    cp /src/logo/simlab-notebook.svg /opt/conda/share/jupyter/lab/static/notebook.svg && \
+    cp /src/logo/simlab-folder.svg /opt/conda/share/jupyter/lab/static/folder.svg && \
+    cp /src/logo/simlab-folder-favorite.svg /opt/conda/share/jupyter/lab/static/folder-favorite.svg && \
+    cp /src/logo/simlab-file.svg /opt/conda/share/jupyter/lab/static/file.svg
 
 # Fix: jupyter lab build may produce an empty static/package.json
 # Copy the staging package.json to static so _get_static_data() can parse it
@@ -240,11 +293,11 @@ RUN mkdir -p /opt/conda/share/jupyter/lab/settings && \
       "@jupyterlab/toc-extension:registry": { "enabled": false } \
     }' > /opt/conda/share/jupyter/lab/settings/overrides.json
 
-# Force inject the custom yellow 'Y' logo into the JupyterLab Light & Dark themes
+# Keep the SimLab logo visible in the JupyterLab Light & Dark themes
 RUN for theme in "theme-light-extension" "theme-dark-extension"; do \
       THEME_CSS=$(find /opt/conda/share/jupyter/lab/themes -name "index.css" -path "*/@jupyterlab/$theme/*" | head -1); \
       if [ -n "$THEME_CSS" ]; then \
-        echo '#jp-MainLogo svg { display: none !important; } #jp-MainLogo::before { content: "Y"; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 7px; font-size: 18px; font-weight: 800; color: #1a1a2e; font-family: "Inter", "PingFang SC", sans-serif; letter-spacing: -0.03em; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4); margin: auto 4px; cursor: pointer; flex-shrink: 0; } #jp-MainLogo { display: flex !important; align-items: center !important; } #jp-MainLogo button { background: transparent !important; border: none !important; padding: 0 !important; }' >> "$THEME_CSS"; \
+        echo '#jp-MainLogo svg { display: block !important; width: 28px; height: 28px; margin: auto 4px; cursor: pointer; flex-shrink: 0; } #jp-MainLogo::before { content: none !important; display: none !important; } #jp-MainLogo { display: flex !important; align-items: center !important; } #jp-MainLogo button { background: transparent !important; border: none !important; padding: 0 !important; }' >> "$THEME_CSS"; \
       fi; \
     done
 

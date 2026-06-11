@@ -16,55 +16,49 @@ def load_jupyter_server_extension(serverapp):
     extension.load_config_file()
     extension.update_config(serverapp.config)
     extension.parse_command_line(serverapp.extra_args)
+    simlab_favicon_url = url_path_join(serverapp.base_url, "static/lab/jupyter-favicon.svg")
+    simlab_logo_url = url_path_join(serverapp.base_url, "static/lab/jupyter.svg")
     extension.handlers.extend(
         [
             (
                 r"/static/favicons/favicon.ico",
                 RedirectHandler,
-                {"url": url_path_join(serverapp.base_url, "static/base/images/favicon.ico")},
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/favicons/favicon-busy-1.ico",
                 RedirectHandler,
-                {"url": url_path_join(serverapp.base_url, "static/base/images/favicon-busy-1.ico")},
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/favicons/favicon-busy-2.ico",
                 RedirectHandler,
-                {"url": url_path_join(serverapp.base_url, "static/base/images/favicon-busy-2.ico")},
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/favicons/favicon-busy-3.ico",
                 RedirectHandler,
-                {"url": url_path_join(serverapp.base_url, "static/base/images/favicon-busy-3.ico")},
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/favicons/favicon-file.ico",
                 RedirectHandler,
-                {"url": url_path_join(serverapp.base_url, "static/base/images/favicon-file.ico")},
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/favicons/favicon-notebook.ico",
                 RedirectHandler,
-                {
-                    "url": url_path_join(
-                        serverapp.base_url, "static/base/images/favicon-notebook.ico"
-                    )
-                },
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/favicons/favicon-terminal.ico",
                 RedirectHandler,
-                {
-                    "url": url_path_join(
-                        serverapp.base_url, "static/base/images/favicon-terminal.ico"
-                    )
-                },
+                {"url": simlab_favicon_url},
             ),
             (
                 r"/static/logo/logo.png",
                 RedirectHandler,
-                {"url": url_path_join(serverapp.base_url, "static/base/images/logo.png")},
+                {"url": simlab_logo_url},
             ),
         ]
     )

@@ -80,7 +80,7 @@ var NotebookUI = Backbone.View.extend({
 
         // needs manual grade
         if (this.model.get("needs_manual_grade")) {
-            this.$needs_manual_grade.attr("data-search", "needs manual grade");
+            this.$needs_manual_grade.attr("data-search", "需要手动评分");
             this.$needs_manual_grade.attr("data-order", 1);
             this.$needs_manual_grade.append($("<span/>")
                 .addClass("glyphicon glyphicon-ok"));

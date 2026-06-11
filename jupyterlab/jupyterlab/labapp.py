@@ -157,7 +157,7 @@ class LabBuildApp(JupyterApp, DebugLogFileMixin):
 
     app_dir = Unicode("", config=True, help="The app directory to build in")
 
-    name = Unicode("JupyterLab", config=True, help="The name of the built application")
+    name = Unicode("SimLab", config=True, help="The name of the built application")
 
     version = Unicode("", config=True, help="The version of the built application")
 
@@ -418,7 +418,7 @@ class LabApp(NotebookConfigShimMixin, LabServerApp):
     version = version
 
     name = "lab"
-    app_name = "JupyterLab"
+    app_name = "SimLab"
 
     # Should your extension expose other server extensions when launched directly?
     load_other_extensions = True

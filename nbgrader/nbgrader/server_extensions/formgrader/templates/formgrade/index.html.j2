@@ -30,7 +30,7 @@
       <div class="panel-heading">
         <h4 class="panel-title">
           <span>{{ resources.notebook_id }}</span>
-          <span class="pull-right">Submission {{ resources.index + 1 }} / {{ resources.total }}</span>
+          <span class="pull-right">提交 {{ resources.index + 1 }} / {{ resources.total }}</span>
         </h4>
       </div>
       <div class="panel-body">
@@ -55,15 +55,15 @@
   <span class="glyphicon glyphicon-ok save-icon score-saved"></span>
   <div class="pull-right">
     <span class="btn-group btn-group-sm scoring-buttons" role="group">
-      <button type="button" class="btn btn-warning mark-graded">Resolve</button>
-      <button type="button" class="btn btn-success full-credit">Full credit</button>
-      <button type="button" class="btn btn-danger no-credit">No credit</button>
+      <button type="button" class="btn btn-warning mark-graded">标记已处理</button>
+      <button type="button" class="btn btn-success full-credit">满分</button>
+      <button type="button" class="btn btn-danger no-credit">零分</button>
     </span>
     <span>
       <input class="score tabbable" id="{{ cell.metadata.nbgrader.grade_id }}" style="width: 4em;" type="number" /> / {{ cell.metadata.nbgrader.points | float | round(2) }}
     </span>
     <span style="margin-left: 1em;">
-      + <input class="extra-credit tabbable" id="{{ cell.metadata.nbgrader.grade_id }}_extra_credit" style="width: 3em;" type="number" /> (extra credit)
+      + <input class="extra-credit tabbable" id="{{ cell.metadata.nbgrader.grade_id }}_extra_credit" style="width: 3em;" type="number" /> （额外加分）
     </span>
   </div>
 {%- endmacro %}
@@ -73,9 +73,9 @@
 <div class="panel-heading">
 {%- if cell.metadata.nbgrader.solution or cell.metadata.nbgrader.task -%}
   {%- if cell.metadata.nbgrader.task -%}
-  <span class="nbgrader-label">Student's task</span>
+  <span class="nbgrader-label">学生任务</span>
   {%- else -%}
-  <span class="nbgrader-label">Student's answer</span>
+  <span class="nbgrader-label">学生答案</span>
   {%- endif -%}
   <span class="glyphicon glyphicon-ok comment-saved save-icon"></span>
   {%- if cell.metadata.nbgrader.grade or cell.metadata.nbgrader.task  -%}

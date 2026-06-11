@@ -225,7 +225,7 @@
     "node": ">=20.0.0"
   },
   "jupyterlab": {
-    "name": "JupyterLab",
+    "name": "SimLab",
     "version": "4.2.7",
     "extensions": {
       "@jupyterlab/application-extension": "",

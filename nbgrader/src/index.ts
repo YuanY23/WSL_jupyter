@@ -72,7 +72,7 @@ const availableExtensionsManager: JupyterFrontEndPlugin<void> = {
 
     const nbgraderMenu = new Menu({ commands: app.commands });
     nbgraderMenu.id = 'jp-mainmenu-nbgrader';
-    nbgraderMenu.title.label = 'Nbgrader 评分系统';
+    nbgraderMenu.title.label = '作业评测平台';
 
     if (mainExtensions || labShell) {
       nbgraderMenu.addItem({ command: commandIDs.openAssignmentsList });
@@ -83,19 +83,19 @@ const availableExtensionsManager: JupyterFrontEndPlugin<void> = {
       if (palette) {
         palette.addItem({
           command: commandIDs.openAssignmentsList,
-          category: 'nbgrader'
+          category: '作业评测平台'
         });
         palette.addItem({
           command: commandIDs.openCoursesList,
-          category: 'nbgrader'
+          category: '作业评测平台'
         });
         palette.addItem({
           command: commandIDs.openFormgrader,
-          category: 'nbgrader'
+          category: '作业评测平台'
         });
         palette.addItem({
           command: commandIDs.openFormgraderLocal,
-          category: 'nbgrader'
+          category: '作业评测平台'
         });
       }
     }
@@ -106,12 +106,12 @@ const availableExtensionsManager: JupyterFrontEndPlugin<void> = {
       if (palette) {
         palette.addItem({
           command: commandIDs.openCreateAssignment,
-          category: 'nbgrader'
+          category: '作业评测平台'
         });
       }
     }
 
-    mainMenu.addMenu(nbgraderMenu);
+    mainMenu.addMenu(nbgraderMenu, true, { rank: 8 });
   }
 }
 
@@ -125,7 +125,7 @@ const assignmentListExtension: JupyterFrontEndPlugin<void> = {
   activate: (
     app: JupyterFrontEnd,
     restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null
+    _notebookTree: INotebookTree | null
   ) => {
 
     // Declare a widget variable
@@ -154,11 +154,10 @@ const assignmentListExtension: JupyterFrontEndPlugin<void> = {
 
         // Attach the widget to the main area if it's not there
         if(!widget.isAttached){
-          if (notebookTree){
-            notebookTree.addWidget(widget);
-            notebookTree.currentWidget = widget;
-          }
-          else app.shell.add(widget, 'main');
+          app.shell.add(widget, 'main', {
+            mode: 'tab-after',
+            activate: true
+          });
         }
 
         widget.content.update();
@@ -189,7 +188,7 @@ const courseListExtension: JupyterFrontEndPlugin<void> = {
   activate: (
     app: JupyterFrontEnd,
     restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null
+    _notebookTree: INotebookTree | null
   ) => {
 
     let widget: MainAreaWidget<CourseListWidget>;
@@ -203,7 +202,7 @@ const courseListExtension: JupyterFrontEndPlugin<void> = {
       label: '课程列表',
       execute: () => {
         if (!widget || widget.isDisposed) {
-          const content = new CourseListWidget(app, notebookTree !== null);
+          const content = new CourseListWidget(app, false);
           widget = new MainAreaWidget({content});
           widget.id = 'nbgrader-course-list';
           widget.addClass('nbgrader-mainarea-widget');
@@ -216,11 +215,10 @@ const courseListExtension: JupyterFrontEndPlugin<void> = {
 
         // Attach the widget to the main area if it's not there
         if(!widget.isAttached){
-          if (notebookTree){
-            notebookTree.addWidget(widget);
-            notebookTree.currentWidget = widget;
-          }
-          else app.shell.add(widget, 'main');
+          app.shell.add(widget, 'main', {
+            mode: 'tab-after',
+            activate: true
+          });
         }
 
         widget.content.update();
@@ -257,7 +255,7 @@ const formgraderExtension: JupyterFrontEndPlugin<void> = {
     app: JupyterFrontEnd,
     defaultFileBrowser: IDefaultFileBrowser,
     restorer: ILayoutRestorer | null,
-    notebookTree: INotebookTree | null,
+    _notebookTree: INotebookTree | null,
     router: IRouter | null,
     settings: ISettingRegistry | null
   ) => {
@@ -288,13 +286,11 @@ const formgraderExtension: JupyterFrontEndPlugin<void> = {
       }
 
       // Attach the widget to the main area if it's not there
-      if (notebookTree){
-        if (!widget.isAttached){
-          notebookTree.addWidget(widget);
-        }
-        notebookTree.currentWidget = widget;
-      } else if (!widget.isAttached) {
-        app.shell.add(widget, 'main');
+      if (!widget.isAttached) {
+        app.shell.add(widget, 'main', {
+          mode: 'tab-after',
+          activate: true
+        });
       }
 
       widget.content.update();
@@ -389,8 +385,8 @@ const createAssignmentExtension: JupyterFrontEndPlugin<void> = {
     const createAssignmentWidget = new CreateAssignmentWidget(tracker, labShell);
     panel.addWidget(createAssignmentWidget);
     panel.id = 'nbgrader-create_assignemnt';
-    panel.title.label = 'Create Assignment';
-    panel.title.caption = 'Nbgrader Create Assignment';
+    panel.title.label = '创建作业';
+    panel.title.caption = '作业评测平台创建作业';
 
     app.shell.add(panel, 'right');
 

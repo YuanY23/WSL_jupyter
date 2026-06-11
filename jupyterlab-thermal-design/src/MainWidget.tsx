@@ -1,4 +1,3 @@
-import { Widget } from '@lumino/widgets';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { ControlPanel } from './components/ControlPanel';
 import React from 'react';
@@ -7,16 +6,16 @@ import { showDialog, Dialog } from '@jupyterlab/apputils';
 import { generateNotebook, getScenarioName } from './utils/NotebookGenerator';
 import { THERMAL_RESULTS_DIR } from './utils/resultsDirectory';
 
-class ControlPanelWidget extends ReactWidget {
+export class ThermalDesignWorkbench extends ReactWidget {
     private _app: JupyterFrontEnd;
 
     constructor(app: JupyterFrontEnd) {
         super();
-        this.addClass('thermal-control-panel');
+        this.addClass('thermal-design-workbench');
         this._app = app;
     }
 
-    protected render(): React.ReactElement<any> {
+    protected render(): React.ReactElement {
         return (
             <ControlPanel
                 onExecute={async (scenarioId, params, controls) => {
@@ -29,7 +28,7 @@ class ControlPanelWidget extends ReactWidget {
 
                         // 2. 生成文件名
                         const name = getScenarioName(scenarioId);
-                        const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+                        const timestamp = new Date().toISOString().slice(0, 23).replace(/[T:.]/g, '-');
                         const filename = `热设计仿真_${name}_${timestamp}.ipynb`;
 
                         // 3. 确保目录存在
@@ -51,9 +50,10 @@ class ControlPanelWidget extends ReactWidget {
                             content: nbJson
                         });
 
-                        // 5. 在 JupyterLab 中打开该 notebook
+                        // 5. 在 JupyterLab 中打开该 notebook，设置 activate: false 防止覆盖当前工作区页面
                         await this._app.commands.execute('docmanager:open', {
-                            path: fileModel.path
+                            path: fileModel.path,
+                            options: { activate: false }
                         });
                     } catch (e: any) {
                         showDialog({
@@ -65,21 +65,5 @@ class ControlPanelWidget extends ReactWidget {
                 }}
             />
         );
-    }
-}
-
-export class ThermalDesignWorkbench extends Widget {
-    constructor(app: JupyterFrontEnd) {
-        super();
-        this.addClass('thermal-design-workbench');
-
-        const controlPanel = new ControlPanelWidget(app);
-        controlPanel.node.style.height = '100%';
-        controlPanel.node.style.overflow = 'auto';
-
-        this.node.appendChild(controlPanel.node);
-
-        // ReactWidget needs explicit attach for React rendering
-        (controlPanel as any).processMessage(Widget.Msg.AfterAttach);
     }
 }

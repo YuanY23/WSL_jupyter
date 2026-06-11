@@ -418,7 +418,7 @@ class CellWidget extends Panel {
     lockElement.className = CSS_LOCK_BUTTON;
     const listElement = document.createElement('li');
     listElement.className = 'fa fa-lock';
-    listElement.title = 'Student changes will be overwritten';
+    listElement.title = '学生修改将被覆盖';
     lockElement.appendChild(listElement);
     element.appendChild(lockElement);
     return element;

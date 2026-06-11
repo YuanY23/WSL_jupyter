@@ -116,25 +116,25 @@ span.nbgrader-label {
   <div class="container">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h4>{{ resources.nbgrader.notebook }} (Score: {{ resources.nbgrader.score | float | round(2) }} / {{ resources.nbgrader.max_score | float | round(2) }})</h4>
+        <h4>{{ resources.nbgrader.notebook }}（分数：{{ resources.nbgrader.score | float | round(2) }} / {{ resources.nbgrader.max_score | float | round(2) }}）</h4>
         <div id="toc">
           <ol>
           {% for cell in nb.cells %}
             {% if cell.metadata.nbgrader and cell.metadata.nbgrader.grade and not cell.metadata.nbgrader.solution %}
-            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">Test cell</a> (Score: {{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }})</li>
+            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">测试单元</a>（分数：{{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }}）</li>
             {% elif cell.cell_type == "code" and cell.metadata.nbgrader and cell.metadata.nbgrader.grade %}
-            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">Coding free-response</a> (Score: {{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }})</li>
+            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">代码问答题</a>（分数：{{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }}）</li>
             {% elif cell.cell_type == "markdown" and cell.metadata.nbgrader and cell.metadata.nbgrader.grade %}
-            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">Written response</a> (Score: {{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }})</li>
+            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">文字作答题</a>（分数：{{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }}）</li>
             {% elif cell.cell_type == "markdown" and cell.metadata.nbgrader and cell.metadata.nbgrader.task %}
-            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">Task</a> (Score: {{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }})</li>
+            <li><a href="#{{ cell.metadata.nbgrader.grade_id }}">任务题</a>（分数：{{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }}）</li>
             {% endif %}
             {% if cell.metadata.nbgrader and cell.metadata.nbgrader.comment and cell.metadata.nbgrader.comment %}
-            <li><a href="#comment-{{ cell.metadata.nbgrader.grade_id }}">Comment</a></li>
+            <li><a href="#comment-{{ cell.metadata.nbgrader.grade_id }}">评语</a></li>
             {% endif %}
           {% endfor %}
           {% if resources.nbgrader.late_penalty > 0 %}
-            <li class="late-penalty">Late submission penalty (Score: -{{ resources.nbgrader.late_penalty | float | round(2) }})</li>
+            <li class="late-penalty">迟交扣分（分数：-{{ resources.nbgrader.late_penalty | float | round(2) }}）</li>
           {% endif %}
           </ol>
         </div>
@@ -157,7 +157,7 @@ span.nbgrader-label {
 
 {% macro score(cell) -%}
   <span class="pull-right">
-      Score: {{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }} <a href="#top">(Top)</a>
+      分数：{{ cell.metadata.nbgrader.score | float | round(2) }} / {{ cell.metadata.nbgrader.points | float | round(2) }} <a href="#top">（顶部）</a>
   </span>
 {%- endmacro %}
 
@@ -171,20 +171,20 @@ span.nbgrader-label {
 {%- endif -%}
 <div class="panel-heading">
 {%- if cell.metadata.nbgrader.solution -%}
-  <span class="nbgrader-label">Student's answer</span>
+  <span class="nbgrader-label">学生答案</span>
   {%- if cell.metadata.nbgrader.grade  -%}
   {{ score(cell) }}
   {%- else -%}
-  <span class="pull-right"><a href="#top">(Top)</a></span>
+  <span class="pull-right"><a href="#top">（顶部）</a></span>
   {%- endif -%}
 {%- elif cell.metadata.nbgrader.task -%}
-  <span class="nbgrader-label">Student's task</span>
+  <span class="nbgrader-label">学生任务</span>
   {{ score(cell) }}
 {%- elif cell.metadata.nbgrader.grade -%}
-  <span class="nbgrader-label">Grade cell: <code>{{ cell.metadata.nbgrader.grade_id }}</code></span>
+  <span class="nbgrader-label">评分单元：<code>{{ cell.metadata.nbgrader.grade_id }}</code></span>
   {{ score(cell) }}
 {%- elif cell.metadata.nbgrader.task -%}
-  <span class="nbgrader-label">Task: <code>{{ cell.metadata.nbgrader.grade_id }}</code></span>
+  <span class="nbgrader-label">任务：<code>{{ cell.metadata.nbgrader.grade_id }}</code></span>
   {{ score(cell) }}
 {%- endif -%}
 </div>
@@ -194,7 +194,7 @@ span.nbgrader-label {
 {%- if (cell.metadata.nbgrader.solution and cell.metadata.nbgrader.comment) or (cell.metadata.nbgrader.task and cell.metadata.nbgrader.comment) -%}
 <div class="panel-footer">
   <div>
-    <b>Comments:</b> {{ cell.metadata.nbgrader.comment | markdown2html | strip_files_prefix }}
+    <b>评语：</b> {{ cell.metadata.nbgrader.comment | markdown2html | strip_files_prefix }}
   </div>
 </div>
 {%- endif -%}

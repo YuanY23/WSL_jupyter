@@ -1,7 +1,7 @@
 {%- extends 'base.tpl' -%}
 
 {%- block title -%}
-Manual Grading
+手动评分
 {%- endblock -%}
 
 {%- block sidebar -%}

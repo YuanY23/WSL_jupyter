@@ -634,6 +634,6 @@ export function makeCspNotebookFilename(title: string): string {
     .replace(/\s+/g, '_')
     .replace(/_+/g, '_')
     .slice(0, 80) || 'CSP_双罐熔盐示例';
-  const timestamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-');
+  const timestamp = new Date().toISOString().slice(0, 23).replace(/[T:.]/g, '-');
   return `official-thermal-csp_${cleaned}_${timestamp}.ipynb`;
 }

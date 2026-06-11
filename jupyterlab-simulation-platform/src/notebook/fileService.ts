@@ -30,7 +30,10 @@ export async function saveAndOpenNotebook(app: JupyterFrontEnd, config: Simulati
   });
 
   await app.commands.execute('docmanager:open', {
-    path: fileModel.path
+    path: fileModel.path,
+    options: {
+      activate: false
+    }
   });
 
   return fileModel.path;

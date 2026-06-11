@@ -19,20 +19,20 @@ var notebook_id = "{{ notebook_id }}";
 
 <!-- Button to toggle all student names -->
 {%- block messages -%}
-<button id="toggle_names" onclick="toggleAllNames()">Show All Names</button>
+<button id="toggle_names" onclick="toggleAllNames()">显示全部姓名</button>
 {%- endblock -%}
 
 {%- block table_header -%}
 <tr>
   <th></th>
-  <th>Submission ID</th>
-  <th class="text-center">Overall Score</th>
-  <th class="text-center">Code Score</th>
-  <th class="text-center">Written Score</th>
-  <th class="text-center">Task Score</th>
-  <th class="text-center">Needs Manual Grade?</th>
-  <th class="text-center">Tests Failed?</th>
-  <th class="text-center">Flagged?</th>
+  <th>提交编号</th>
+  <th class="text-center">总分</th>
+  <th class="text-center">代码分数</th>
+  <th class="text-center">文字题分数</th>
+  <th class="text-center">任务题分数</th>
+  <th class="text-center">需要手动评分？</th>
+  <th class="text-center">测试失败？</th>
+  <th class="text-center">已标记？</th>
 </tr>
 {%- endblock -%}
 

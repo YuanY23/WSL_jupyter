@@ -17,12 +17,12 @@ var assignment_id = "{{ assignment_id }}";
 
 {%- block table_header -%}
 <tr>
-  <th>Notebook ID</th>
-  <th class="text-center">Avg. Score</th>
-  <th class="text-center">Avg. Code Score</th>
-  <th class="text-center">Avg. Written Score</th>
-  <th class="text-center">Avg. Task Score</th>
-  <th class="text-center">Needs Manual Grade?</th>
+  <th>笔记本编号</th>
+  <th class="text-center">平均分</th>
+  <th class="text-center">代码平均分</th>
+  <th class="text-center">文字题平均分</th>
+  <th class="text-center">任务题平均分</th>
+  <th class="text-center">需要手动评分？</th>
 </tr>
 {%- endblock -%}
 

@@ -47,8 +47,8 @@ var SubmissionUI = Backbone.View.extend({
         // student name
         var last_name = this.model.get("last_name");
         var first_name = this.model.get("first_name");
-        if (last_name === null) last_name = "None";
-        if (first_name === null) first_name = "None";
+        if (last_name === null) last_name = "无";
+        if (first_name === null) first_name = "无";
         var name = last_name + ", " + first_name;
         this.$student_name.attr("data-order", name);
         if (this.model.get("autograded")) {
@@ -67,8 +67,8 @@ var SubmissionUI = Backbone.View.extend({
         var timestamp = this.model.get("timestamp");
         var display_timestamp = this.model.get("display_timestamp");
         if (timestamp === null) {
-            timestamp = "None";
-            display_timestamp = "None";
+            timestamp = "无";
+            display_timestamp = "无";
         }
         this.$timestamp.attr("data-order", timestamp);
         this.$timestamp.text(display_timestamp);
@@ -78,17 +78,17 @@ var SubmissionUI = Backbone.View.extend({
             this.$status.attr("data-order", 0);
             this.$status.append($("<span/>")
                 .addClass("label label-warning")
-                .text("needs autograding"));
+                .text("需要自动评分"));
         } else if (this.model.get("needs_manual_grade")) {
             this.$status.attr("data-order", 1);
             this.$status.append($("<span/>")
                 .addClass("label label-info")
-                .text("needs manual grading"));
+                .text("需要手动评分"));
         } else {
             this.$status.attr("data-order", 2);
             this.$status.append($("<span/>")
                 .addClass("label label-success")
-                .text("graded"));
+                .text("已评分"));
         }
 
         // score
@@ -149,14 +149,14 @@ var SubmissionUI = Backbone.View.extend({
             createLogModal(
                 "success-modal",
                 "成功",
-                "Successfully autograded '" + assignment + "' for student '" + student + "'.",
+                "已成功为学生 '" + student + "' 自动评分作业 '" + assignment + "'.",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
                 "错误",
-                "There was an error autograding '" + assignment + "' for student '" + student + "':",
+                "为学生 '" + student + "' 自动评分作业 '" + assignment + "' 时发生错误：",
                 response["log"],
                 response["error"]);
         }
@@ -169,7 +169,7 @@ var SubmissionUI = Backbone.View.extend({
         createModal(
             "error-modal",
             "错误",
-            "There was an error autograding '" + assignment + "' for student '" + student + "'.");
+            "为学生 '" + student + "' 自动评分作业 '" + assignment + "' 时发生错误。");
     },
 
     generate_feedback: function () {
@@ -191,14 +191,14 @@ var SubmissionUI = Backbone.View.extend({
             createLogModal(
                 "success-modal",
                 "成功",
-                "Successfully generated feedback for '" + assignment + "' for student '" + student + "'.",
+                "已成功为学生 '" + student + "' 生成作业 '" + assignment + "' 的反馈。",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
                 "错误",
-                "There was an error generating feedback for '" + assignment + "' for student '" + student + "':",
+                "为学生 '" + student + "' 生成作业 '" + assignment + "' 的反馈时发生错误：",
                 response["log"],
                 response["error"]);
         }
@@ -211,7 +211,7 @@ var SubmissionUI = Backbone.View.extend({
         createModal(
             "error-modal",
             "错误",
-            "There was an error generating feedback for '" + assignment + "' for student '" + student + "'.");
+            "为学生 '" + student + "' 生成作业 '" + assignment + "' 的反馈时发生错误。");
     },
 
     release_feedback: function () {
@@ -233,14 +233,14 @@ var SubmissionUI = Backbone.View.extend({
             createLogModal(
                 "success-modal",
                 "成功",
-                "成功发布 feedback for '" + assignment + "' for student '" + student + "'.",
+                "已成功为学生 '" + student + "' 发布作业 '" + assignment + "' 的反馈。",
                 response["log"]);
 
         } else {
             createLogModal(
                 "error-modal",
                 "错误",
-                "发布作业时发生错误 feedback for '" + assignment + "' for student '" + student + "':",
+                "为学生 '" + student + "' 发布作业 '" + assignment + "' 的反馈时发生错误：",
                 response["log"],
                 response["error"]);
         }
@@ -253,7 +253,7 @@ var SubmissionUI = Backbone.View.extend({
         createModal(
             "error-modal",
             "错误",
-            "发布作业时发生错误 feedback for '" + assignment + "' for student '" + student + "'.");
+            "为学生 '" + student + "' 发布作业 '" + assignment + "' 的反馈时发生错误。");
     },
 
 });

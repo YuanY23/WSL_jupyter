@@ -38,8 +38,8 @@ var AssignmentUI = Backbone.View.extend({
         var duedate = this.model.get("duedate");
         var display_duedate = this.model.get("display_duedate");
         if (duedate === null) {
-            duedate = "None";
-            display_duedate = "None";
+            duedate = "无";
+            display_duedate = "无";
         }
         this.$duedate.attr("data-order", duedate);
         this.$duedate.text(display_duedate);

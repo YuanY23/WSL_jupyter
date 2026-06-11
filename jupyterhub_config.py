@@ -1,5 +1,6 @@
 import os
 import sys
+import base64
 
 # ============================================================
 # JupyterHub Configuration for nbgrader Integration
@@ -62,26 +63,33 @@ c.JupyterHub.hub_connect_ip = '172.17.0.1'
 c.DockerSpawner.default_url = '/lab'
 c.DockerSpawner.notebook_dir = '/home/jovyan'
 
-# Base Volumes for EVERY user
-c.DockerSpawner.volumes = {
+# Base Volumes for EVERY user.
+# Production image builds should use the baked labextension bundles. Set
+# SIMLAB_DEV_MOUNTS=1 only when actively developing local extension source.
+base_volumes = {
     # 1. Persist user home directories across restarts
     'jupyterhub-user-{username}': '/home/jovyan',
-    
+
     # 2. Global shared exchange directory for assignment distribution
     '/srv/nbgrader/exchange': '/srv/nbgrader/exchange',
-    
-    # Source-mount development mode for extension testing.
-    # '/home/yuan/my_project/nbgrader': '/src/nbgrader',
-    # '/home/yuan/my_project/jupyterlab': '/opt/jupyterlab',
-    # '/home/yuan/my_project/jupyterlab-param-binding': '/src/jupyterlab-param-binding',
-    # 'jupyterlab-param-binding-node-modules': '/src/jupyterlab-param-binding/node_modules',
-    # '/home/yuan/my_project/jupyterlab-official-thermal-examples': '/src/jupyterlab-official-thermal-examples',
-    # 'jupyterlab-official-thermal-examples-node-modules': '/src/jupyterlab-official-thermal-examples/node_modules',
-    # '/home/yuan/my_project/jupyterlab-simulation-platform': '/src/jupyterlab-simulation-platform',
-    # 'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
-    # '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',
-    # 'jupyterlab-thermal-design-node-modules': '/src/jupyterlab-thermal-design/node_modules',
 }
+
+dev_source_volumes = {
+    '/home/yuan/my_project/nbgrader': '/src/nbgrader',
+    '/home/yuan/my_project/jupyterlab': '/src/jupyterlab',
+    '/home/yuan/my_project/jupyterlab-param-binding': '/src/jupyterlab-param-binding',
+    'jupyterlab-param-binding-node-modules': '/src/jupyterlab-param-binding/node_modules',
+    '/home/yuan/my_project/jupyterlab-official-thermal-examples': '/src/jupyterlab-official-thermal-examples',
+    'jupyterlab-official-thermal-examples-node-modules': '/src/jupyterlab-official-thermal-examples/node_modules',
+    '/home/yuan/my_project/jupyterlab-simulation-platform': '/src/jupyterlab-simulation-platform',
+    'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
+    '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',
+    'jupyterlab-thermal-design-node-modules': '/src/jupyterlab-thermal-design/node_modules',
+}
+
+c.DockerSpawner.volumes = dict(base_volumes)
+if os.environ.get('SIMLAB_DEV_MOUNTS') == '1':
+    c.DockerSpawner.volumes.update(dev_source_volumes)
 
 # ================= 开发模式临时加的配置 =================
 # c.DockerSpawner.args = ['--dev-mode', '--watch'] # 暂时注释掉这行，它会导致启动崩溃
@@ -125,6 +133,18 @@ c.Spawner.start_timeout = 120  # 等待服务器启动的超时（秒）
 
 # --- Template Paths ---
 c.JupyterHub.template_paths = ['/home/yuan/my_project/templates']
+
+_simlab_favicon_path = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    'logo',
+    'simlab-favicon.svg',
+)
+with open(_simlab_favicon_path, 'rb') as _favicon_file:
+    _simlab_favicon_b64 = base64.b64encode(_favicon_file.read()).decode('ascii')
+
+c.JupyterHub.template_vars = {
+    'simlab_favicon_href': f'data:image/svg+xml;base64,{_simlab_favicon_b64}',
+}
 
 # --- RBAC Configuration for nbgrader ---
 # Allow teachers to read users and groups to populate student lists

@@ -559,7 +559,12 @@ class Notebook {
     a.innerText = this.data['notebook_id'];
     a.onclick = function () {
       app.commands.execute('docmanager:open', {
-        path: nb_path
+        path: nb_path,
+        factory: 'Notebook',
+        options: {
+          mode: 'tab-after',
+          activate: true
+        }
       });
     }
 

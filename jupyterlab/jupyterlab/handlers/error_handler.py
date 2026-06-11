@@ -12,10 +12,10 @@ TEMPLATE = """
 <html>
 <head>
     <meta charset="utf-8">
-    <title>JupyterLab Error</title>
+    <title>SimLab Error</title>
 </head>
 <body>
-<h1>JupyterLab Error<h1>
+<h1>SimLab Error<h1>
 %s
 </body>
 """

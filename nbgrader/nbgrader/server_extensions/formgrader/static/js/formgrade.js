@@ -30,48 +30,48 @@ FormGrader.prototype.init = function () {
     this.keyboard_manager.register({
         "handler": _.bind(this.selectNextInput, this),
         "keybinding": "tab",
-        "help": "Move to the next score or comment input"
+        "help": "移动到下一个分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.selectPrevInput, this),
         "keybinding": "shift-tab",
-        "help": "Move to the previous score or comment input"
+        "help": "移动到上一个分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.defocusInput, this),
         "selector": ".tabbable",
         "keybinding": "escape",
-        "help": "Defocus and save the current score or comment input"
+        "help": "取消聚焦并保存当前分数或评语"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.focusInput, this),
         "keybinding": "enter",
-        "help": "Refocus the most recent score or comment input"
+        "help": "重新聚焦最近的分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.nextAssignment, this),
         "keybinding": "control-.",
-        "help": "Move to the same score or comment input of the next submission"
+        "help": "移动到下一份提交中相同位置的分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.nextIncorrectAssignment, this),
         "keybinding": "control-shift-.",
-        "help": "Move to the same score or comment input of the next submission with failed tests"
+        "help": "移动到下一份测试失败提交中相同位置的分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.prevAssignment, this),
         "keybinding": "control-,",
-        "help": "Move to the same score or comment input of the previous submission"
+        "help": "移动到上一份提交中相同位置的分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.prevIncorrectAssignment, this),
         "keybinding": "control-shift-,",
-        "help": "Move to the same score or comment input of the previous submission with failed tests"
+        "help": "移动到上一份测试失败提交中相同位置的分数或评语输入框"
     });
     this.keyboard_manager.register({
         "handler": _.bind(this.flag, this),
         "keybinding": "control-shift-f",
-        "help": "Flag the submission"
+        "help": "标记该提交"
     });
 
     this.loaded = true;
@@ -308,13 +308,13 @@ FormGrader.prototype.flag = function () {
             var elem = $("#statusmessage");
             data = JSON.parse(data);
             if (data.flagged) {
-                elem.text("Submission flagged");
+                elem.text("提交已标记");
                 elem.css({
                     'color': 'rgba(255, 0, 0, 0.6)'
                 });
                 elem.show();
             } else {
-                elem.text("Submission unflagged");
+                elem.text("提交已取消标记");
                 elem.css({
                     'color': 'rgba(0, 100, 0, 0.6)'
                 });

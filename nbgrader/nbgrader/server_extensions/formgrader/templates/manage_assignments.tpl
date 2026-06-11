@@ -9,7 +9,7 @@ var url_prefix = "{{ url_prefix }}";
 {%- endblock -%}
 
 {%- block title -%}
-Manage Assignments
+作业管理
 {%- endblock -%}
 
 {%- block sidebar -%}
@@ -20,7 +20,7 @@ Manage Assignments
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li class="active">Assignments</li>
+  <li class="active">作业管理</li>
 </ol>
 {%- endblock -%}
 
@@ -42,14 +42,12 @@ Manage Assignments
           <li>要<b>编辑作业属性</b>，请点击编辑按钮。</li>
           <li>要<b>生成</b>学生版作业，请点击生成按钮。</li>
           <li>要<b>预览</b>学生版作业，请点击预览按钮。</li>
-          <li><i>(JupyterHub only)</i> 要<b>发布</b>作业给学生，请点击发布按钮。
-          You can "unrelease" an assignment by clicking again, though note some students may have
-          already accessed the assignment. <b>Note</b> that for the release button to become
-          available, the <code>course_id</code> option must be set in <code>nbgrader_config.py</code>.
-          For details, see <a href="http://nbgrader.readthedocs.io/en/stable/configuration/config_options.html">the documentation</a>.</li>
-          <li><i>(JupyterHub only)</i> 要<b>收集</b>学生作业，请点击收集按钮。</li>
-          <li>要<b>自动评分</b>，请点击已收集提交的数量。 You must run
-          the autograder on the submissions before you can manually grade them.</li>
+          <li><i>仅 JupyterHub 环境</i>：要<b>发布</b>作业给学生，请点击发布按钮。
+          再次点击可以取消发布，但请注意，部分学生可能已经访问过该作业。要启用发布按钮，
+          需要在 <code>nbgrader_config.py</code> 中设置 <code>course_id</code> 选项。
+          详情请参考 <a href="http://nbgrader.readthedocs.io/en/stable/configuration/config_options.html">配置文档</a>。</li>
+          <li><i>仅 JupyterHub 环境</i>：要<b>收集</b>学生作业，请点击收集按钮。</li>
+          <li>要<b>自动评分</b>，请点击已收集提交的数量。必须先对提交进行自动评分，之后才能手动评分。</li>
         </ol>
       </div>
     </div>
@@ -73,23 +71,21 @@ Manage Assignments
 {% endif %}
 {% if windows %}
 <div class="alert alert-warning" id="warning-windows">
-Windows operating system detected. Please note that the "release" and "collect"
-functionality will not be available.
+检测到 Windows 操作系统。请注意，“发布”和“收集”功能将不可用。
 </div>
 {% elif exchange_missing %}
 <div class="alert alert-warning" id="warning-exchange">
-The exchange directory at <code>{{ exchange }}</code> does not exist and could
-not be created. The "release" and "collect" functionality will not be available.
-Please see the documentation on
-<a href="http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange">Setting Up The Exchange</a>
-for instructions.
+交换目录 <code>{{ exchange }}</code> 不存在，且无法自动创建。“发布”和“收集”功能将不可用。
+请参考
+<a href="http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange">交换目录配置说明</a>
+进行设置。
 </div>
 {% elif not course_id %}
 <div class="alert alert-warning" id="warning-course-id">
-The course id has not been set in <code>nbgrader_config.py</code>. The "release"
-and "collect" functionality will not be available. Please see the documentation on
-<a href="http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange">Setting Up The Exchange</a>
-for instructions.
+尚未在 <code>nbgrader_config.py</code> 中设置课程编号。“发布”和“收集”功能将不可用。
+请参考
+<a href="http://nbgrader.readthedocs.io/en/stable/user_guide/managing_assignment_files.html#setting-up-the-exchange">交换目录配置说明</a>
+进行设置。
 </div>
 {% endif %}
 {%- endblock -%}

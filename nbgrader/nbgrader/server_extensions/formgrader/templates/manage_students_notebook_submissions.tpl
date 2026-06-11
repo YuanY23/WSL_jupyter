@@ -11,7 +11,7 @@ var assignment_id = "{{ assignment_id }}";
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li><a href="{{ base_url }}/formgrader/manage_students">Students</a></li>
+  <li><a href="{{ base_url }}/formgrader/manage_students">学生管理</a></li>
   <li><a href="{{ base_url }}/formgrader/manage_students/{{ student_id }}">{{ student_id }}</a></li>
   <li class="active">{{ assignment_id }}</li>
 </ol>
@@ -19,14 +19,14 @@ var assignment_id = "{{ assignment_id }}";
 
 {%- block table_header -%}
 <tr>
-  <th>Notebook ID</th>
-  <th class="text-center">Overall Score</th>
-  <th class="text-center">Code Score</th>
-  <th class="text-center">Written Score</th>
-  <th class="text-center">Task Score</th>
-  <th class="text-center">Needs manual grade?</th>
-  <th class="text-center">Tests failed?</th>
-  <th class="text-center">Flagged?</th>
+  <th>笔记本编号</th>
+  <th class="text-center">总分</th>
+  <th class="text-center">代码分数</th>
+  <th class="text-center">文字题分数</th>
+  <th class="text-center">任务题分数</th>
+  <th class="text-center">需要手动评分？</th>
+  <th class="text-center">测试失败？</th>
+  <th class="text-center">已标记？</th>
 </tr>
 {%- endblock -%}
 

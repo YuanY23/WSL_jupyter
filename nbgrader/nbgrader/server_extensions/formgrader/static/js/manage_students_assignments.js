@@ -35,9 +35,9 @@ var StudentSubmissionUI = Backbone.View.extend({
         var name = this.model.get("name");
         this.$name.attr("data-order", name);
         if (!this.model.get("submitted")) {
-            this.$name.text(name + " (no submission)");
+            this.$name.text(name + "（未提交）");
         } else if (!this.model.get("autograded")) {
-            this.$name.text(name + " (not autograded)");
+            this.$name.text(name + "（未自动评分）");
         } else {
             this.$name.append($("<a/>")
                 .attr("href", base_url + "/formgrader/manage_students/" + student_id + "/" + name)
@@ -86,7 +86,7 @@ var StudentSubmissionUI = Backbone.View.extend({
         
         // needs manual grade?
         if (this.model.get("needs_manual_grade")) {
-            this.$needs_manual_grade.attr("data-search", "needs manual grade");
+            this.$needs_manual_grade.attr("data-search", "需要手动评分");
             this.$needs_manual_grade.attr("data-order", 1);
             this.$needs_manual_grade.append($("<span/>")
                 .addClass("glyphicon glyphicon-ok"));

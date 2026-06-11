@@ -1,8 +1,9 @@
 import {
+  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
-import { ICommandPalette, MainAreaWidget } from '@jupyterlab/apputils';
+import { ICommandPalette, MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { Menu, Widget } from '@lumino/widgets';
 import { OfficialThermalExamplesWorkbench } from './MainWidget';
@@ -16,12 +17,17 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description: 'Official visible-code thermal process modeling examples',
   autoStart: true,
   requires: [ICommandPalette, IMainMenu],
+  optional: [ILayoutRestorer],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
-    mainMenu: IMainMenu
+    mainMenu: IMainMenu,
+    restorer: ILayoutRestorer | null
   ) => {
     let widget: MainAreaWidget<Widget> | null = null;
+    const tracker = new WidgetTracker<MainAreaWidget<Widget>>({
+      namespace: 'official-thermal-examples'
+    });
 
     app.commands.addCommand(CommandIDs.openWorkbench, {
       label: '打开官方热力建模示例',
@@ -38,12 +44,26 @@ const plugin: JupyterFrontEndPlugin<void> = {
           widget.title.closable = true;
         }
 
+        if (!tracker.has(widget)) {
+          void tracker.add(widget);
+        }
+
         if (!widget.isAttached) {
-          app.shell.add(widget, 'main');
+          app.shell.add(widget, 'main', {
+            mode: 'tab-after',
+            activate: true
+          });
         }
         app.shell.activateById(widget.id);
       }
     });
+
+    if (restorer) {
+      void restorer.restore(tracker, {
+        command: CommandIDs.openWorkbench,
+        name: () => 'main'
+      });
+    }
 
     palette.addItem({
       command: CommandIDs.openWorkbench,
@@ -54,7 +74,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     officialMenu.id = 'official-thermal-examples-menu';
     officialMenu.title.label = '官方热力建模示例';
     officialMenu.addItem({ command: CommandIDs.openWorkbench });
-    mainMenu.addMenu(officialMenu);
+    mainMenu.addMenu(officialMenu, true, { rank: 7 });
   }
 };
 

@@ -10,19 +10,19 @@ var student_id = "{{ student_id }}";
 
 {%- block breadcrumbs -%}
 <ol class="breadcrumb">
-  <li><a href="{{ base_url }}/formgrader/manage_students">Students</a></li>
+  <li><a href="{{ base_url }}/formgrader/manage_students">学生管理</a></li>
   <li class="active">{{ student_id }}</li>
 </ol>
 {%- endblock -%}
 
 {%- block table_header -%}
 <tr>
-  <th>Assignment ID</th>
-  <th class="text-center">Overall Score</th>
-  <th class="text-center">Code Score</th>
-  <th class="text-center">Written Score</th>
-  <th class="text-center">Task Score</th>
-  <th class="text-center">Needs Manual Grade?</th>
+  <th>作业编号</th>
+  <th class="text-center">总分</th>
+  <th class="text-center">代码分数</th>
+  <th class="text-center">文字题分数</th>
+  <th class="text-center">任务题分数</th>
+  <th class="text-center">需要手动评分？</th>
 </tr>
 {%- endblock -%}
 
