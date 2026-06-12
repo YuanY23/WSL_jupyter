@@ -8,13 +8,13 @@
   display: flex !important;
   align-items: center;
   justify-content: center;
-  width: calc(var(--jp-private-sidebar-tab-width) + var(--jp-border-width));
-  min-width: calc(var(--jp-private-sidebar-tab-width) + var(--jp-border-width));
+  width: 33px !important;
+  min-width: 33px !important;
   height: var(--jp-private-menu-panel-height);
   overflow: visible;
   visibility: visible;
   opacity: 1;
-  flex: 0 0 calc(var(--jp-private-sidebar-tab-width) + var(--jp-border-width));
+  flex: 0 0 33px !important;
 }
 
 #jp-MainLogo svg {
@@ -41,4 +41,16 @@
   box-shadow: none;
   border: none;
   align-items: center;
+}
+
+/* 强制将左侧边栏所有插件图标着色为 SimLab 红色 */
+.jp-SideBar .lm-TabBar-tab .lm-TabBar-tabIcon svg,
+#jp-left-stack .lm-TabBar-tab .lm-TabBar-tabIcon svg {
+  color: #E94057 !important;
+  fill: #E94057 !important;
+}
+
+.jp-SideBar .lm-TabBar-tab .lm-TabBar-tabIcon svg path,
+#jp-left-stack .lm-TabBar-tab .lm-TabBar-tabIcon svg path {
+  fill: #E94057 !important;
 }

@@ -192,6 +192,32 @@ class StudentCollectionHandler(BaseApiHandler):
     @check_xsrf
     @check_notebook_dir
     def get(self):
+        # 1. Automatically sync students from JupyterHub group to local gradebook.db
+        course_id = os.environ.get('NBGRADER_COURSE_ID')
+        hub_api = os.environ.get('JUPYTERHUB_API_URL')
+        hub_token = os.environ.get('NBGRADER_ADMIN_API_TOKEN') or os.environ.get('JUPYTERHUB_API_TOKEN')
+
+        if course_id and hub_api and hub_token:
+            import requests
+            group_name = f"nbgrader-{course_id}"
+            headers = {"Authorization": f"token {hub_token}"}
+            try:
+                resp = requests.get(
+                    f"{hub_api}/groups/{group_name}",
+                    headers=headers,
+                )
+                if resp.status_code == 200:
+                    group_data = resp.json()
+                    usernames = group_data.get("users", [])
+                    for username in usernames:
+                        self.gradebook.update_or_create_student(username)
+                    self.log.info(f"Successfully auto-synced {len(usernames)} students from JupyterHub group {group_name}")
+                else:
+                    self.log.warning(f"Failed to fetch users from group {group_name}: {resp.status_code} {resp.text}")
+            except Exception as e:
+                self.log.error(f"Error auto-syncing students from JupyterHub: {e}")
+
+        # 2. Get and return students list
         students = self.api.get_students()
         self.write(json.dumps(students))
 
@@ -222,7 +248,7 @@ class StudentHandler(BaseApiHandler):
         # ---- Sync student to JupyterHub nbgrader-{course_id} group ----
         course_id = os.environ.get('NBGRADER_COURSE_ID')
         hub_api = os.environ.get('JUPYTERHUB_API_URL')
-        hub_token = os.environ.get('JUPYTERHUB_API_TOKEN')
+        hub_token = os.environ.get('NBGRADER_ADMIN_API_TOKEN') or os.environ.get('JUPYTERHUB_API_TOKEN')
 
         if course_id and hub_api and hub_token:
             import requests

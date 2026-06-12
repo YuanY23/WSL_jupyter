@@ -29,11 +29,6 @@ if course_id:
     c.CourseDirectory.course_id = course_id
     c.CourseDirectory.root = f'/home/jovyan/{course_id}'
 
-# If an admin-level API token is available (teacher containers only),
-# override JUPYTERHUB_API_TOKEN so that JupyterHubAuthPlugin can manage
-# JupyterHub groups (add/remove students from nbgrader-{course_id}).
-# This is safe because OAuth login has already completed by the time
-# this config file is loaded. Student containers don't have this env var.
-admin_token = os.environ.get('NBGRADER_ADMIN_API_TOKEN')
-if admin_token:
-    os.environ['JUPYTERHUB_API_TOKEN'] = admin_token
+# NBGRADER_ADMIN_API_TOKEN is handled directly inside the auth plugin and API handlers
+# without overwriting JUPYTERHUB_API_TOKEN globally.
+

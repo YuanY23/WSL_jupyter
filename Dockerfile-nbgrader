@@ -189,7 +189,8 @@ RUN pip install \
     -e .
 RUN jlpm install && \
     jlpm run build && \
-    jupyter labextension develop . --overwrite
+    jupyter labextension develop . --overwrite && \
+    cd nbgrader/server_extensions/formgrader/static && jlpm install
 
 # Install thermal design plugin
 WORKDIR /src/jupyterlab-thermal-design
@@ -295,10 +296,9 @@ RUN mkdir -p /opt/conda/share/jupyter/lab/settings && \
 
 # Keep the SimLab logo visible in the JupyterLab Light & Dark themes
 RUN for theme in "theme-light-extension" "theme-dark-extension"; do \
-      THEME_CSS=$(find /opt/conda/share/jupyter/lab/themes -name "index.css" -path "*/@jupyterlab/$theme/*" | head -1); \
-      if [ -n "$THEME_CSS" ]; then \
-        echo '#jp-MainLogo svg { display: block !important; width: 28px; height: 28px; margin: auto 4px; cursor: pointer; flex-shrink: 0; } #jp-MainLogo::before { content: none !important; display: none !important; } #jp-MainLogo { display: flex !important; align-items: center !important; } #jp-MainLogo button { background: transparent !important; border: none !important; padding: 0 !important; }' >> "$THEME_CSS"; \
-      fi; \
+      for THEME_CSS in $(find /opt/conda/share/jupyter/ -name "index.css" -path "*/$theme/*"); do \
+        echo '#jp-MainLogo svg { display: block !important; width: 28px; height: 28px; margin: auto 4px; cursor: pointer; flex-shrink: 0; } #jp-MainLogo::before { content: none !important; display: none !important; } #jp-MainLogo { display: flex !important; align-items: center !important; width: 33px !important; min-width: 33px !important; } #jp-MainLogo button { background: transparent !important; border: none !important; padding: 0 !important; }' >> "$THEME_CSS"; \
+      done; \
     done
 
 CMD ["start-singleuser.sh"]
