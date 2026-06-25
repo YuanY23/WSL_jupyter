@@ -10,7 +10,9 @@ import {
   AlgebraicFormulaConfig,
   FirstOrderDynamicConfig,
   GeneratedNotebookParts,
+  GenericSimulationConfig,
   LinearSystemConfig,
+  NotebookCell,
   NotebookModel,
   OneDimensionalTransferConfig,
   OptimizationDispatchConfig,
@@ -21,19 +23,24 @@ import {
 } from '../templates/types';
 import { codeCell, makeNotebook, markdownCell } from './cells';
 
+export const GENERIC_NOTEBOOK_OUTLINE = [
+  '1. 仿真问题说明',
+  '2. 模型假设',
+  '3. 参数说明表',
+  '4. 数学模型或计算规则',
+  '5. 计算环境',
+  '6. 参数层代码',
+  '7. 模型层代码',
+  '8. 求解层代码',
+  '9. 可视化层代码',
+  '10. 关键结果输出',
+  '11. 可修改参数提示',
+  '12. 结果分析提示'
+];
+
 export const NOTEBOOK_OUTLINE = [
   '标题',
-  '仿真问题说明',
-  '模型假设',
-  '参数说明表',
-  '数学模型或计算规则',
-  '参数层代码',
-  '模型层代码',
-  '求解层代码',
-  '结果可视化代码',
-  '关键结果输出',
-  '可修改参数提示',
-  '结果分析提示'
+  ...GENERIC_NOTEBOOK_OUTLINE.map(item => item.replace(/^\d+\.\s/u, ''))
 ];
 
 function generateParts(templateId: TemplateId, config: SimulationConfig): GeneratedNotebookParts {
@@ -57,9 +64,29 @@ function generateParts(templateId: TemplateId, config: SimulationConfig): Genera
   }
 }
 
+function genericCodePlaceholder(title: string): string {
+  return `# ${title}
+# 请在这里填写本部分代码。`;
+}
+
+function generateGenericSimulationNotebook(config: GenericSimulationConfig): NotebookModel {
+  const cells = GENERIC_NOTEBOOK_OUTLINE.reduce((accumulator, title) => {
+    accumulator.push(markdownCell(`## ${title}`));
+    accumulator.push(codeCell(genericCodePlaceholder(title)));
+    return accumulator;
+  }, [] as NotebookCell[]);
+  const notebook = makeNotebook(cells, config.programmingKernel);
+  notebook.metadata.simulation_param_bindings = parameterBindingMetadataFromCode('', config.parameters);
+  return notebook;
+}
+
 export function generateSimulationNotebook(templateId: TemplateId, config: SimulationConfig): NotebookModel {
   if (config.templateId !== templateId) {
     throw new Error(`模板 ID 不匹配: ${templateId} / ${config.templateId}`);
+  }
+
+  if (templateId === 'generic-simulation') {
+    return generateGenericSimulationNotebook(config as GenericSimulationConfig);
   }
 
   const parts = generateParts(templateId, config);

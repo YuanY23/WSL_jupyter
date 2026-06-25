@@ -10,7 +10,7 @@ function sourcesOf(notebook) {
 }
 
 function testAllTemplatesGenerateVisibleCodeNotebooks() {
-  assert.equal(TEMPLATE_REGISTRY.length, 7, 'the platform should expose exactly seven first-version templates');
+  assert.equal(TEMPLATE_REGISTRY.length, 8, 'the platform should expose seven concrete templates plus one generic template');
 
   for (const template of TEMPLATE_REGISTRY) {
     const config = getDefaultConfig(template.id);
@@ -27,6 +27,65 @@ function testAllTemplatesGenerateVisibleCodeNotebooks() {
       !sources.join('\n').includes('run_simulation(params)'),
       `${template.id} should not hide the core calculation behind run_simulation(params)`
     );
+  }
+}
+
+function testGenericTemplateAppearsFirstAndGeneratesEditableSkeleton() {
+  assert.equal(TEMPLATE_REGISTRY[0].id, 'generic-simulation');
+  assert.equal(TEMPLATE_REGISTRY[0].name, '通用仿真模板');
+
+  const config = getDefaultConfig('generic-simulation');
+  const notebook = generateSimulationNotebook('generic-simulation', config);
+  const sources = sourcesOf(notebook);
+  const expectedTitles = [
+    '## 1. 仿真问题说明',
+    '## 2. 模型假设',
+    '## 3. 参数说明表',
+    '## 4. 数学模型或计算规则',
+    '## 5. 计算环境',
+    '## 6. 参数层代码',
+    '## 7. 模型层代码',
+    '## 8. 求解层代码',
+    '## 9. 可视化层代码',
+    '## 10. 关键结果输出',
+    '## 11. 可修改参数提示',
+    '## 12. 结果分析提示'
+  ];
+
+  assert.equal(config.simulationName, '通用仿真模板');
+  assert.deepEqual(config.parameters, []);
+  assert.deepEqual(config.outputs, []);
+
+  for (const title of expectedTitles) {
+    const markdownIndex = sources.findIndex(source => source.includes(title));
+    assert.notEqual(markdownIndex, -1, `${title} should be present`);
+    assert.equal(notebook.cells[markdownIndex + 1].cell_type, 'code', `${title} should be followed by a code cell`);
+  }
+}
+
+function testGenericTemplateCanGenerateJuliaKernelNotebook() {
+  const config = getDefaultConfig('generic-simulation');
+  config.programmingKernel = 'julia';
+
+  const notebook = generateSimulationNotebook('generic-simulation', config);
+
+  assert.equal(notebook.metadata.kernelspec.name, 'julia-1.12');
+  assert.equal(notebook.metadata.kernelspec.display_name, 'Julia 1.12');
+  assert.equal(notebook.metadata.kernelspec.language, 'julia');
+  assert.equal(notebook.metadata.language_info.name, 'julia');
+  assert.equal(notebook.metadata.language_info.file_extension, '.jl');
+}
+
+function testConcreteTemplatesRemainPythonKernelNotebooks() {
+  const concreteTemplates = TEMPLATE_REGISTRY.filter(template => template.id !== 'generic-simulation');
+
+  for (const template of concreteTemplates) {
+    const config = getDefaultConfig(template.id);
+    const notebook = generateSimulationNotebook(template.id, config);
+
+    assert.equal(notebook.metadata.kernelspec.name, 'python3', `${template.id} should keep the Python kernel`);
+    assert.equal(notebook.metadata.kernelspec.language, 'python', `${template.id} should keep Python language metadata`);
+    assert.equal(notebook.metadata.language_info.name, 'python', `${template.id} should keep Python language info`);
   }
 }
 
@@ -76,6 +135,9 @@ function testFilenameSanitization() {
 }
 
 testAllTemplatesGenerateVisibleCodeNotebooks();
+testGenericTemplateAppearsFirstAndGeneratesEditableSkeleton();
+testGenericTemplateCanGenerateJuliaKernelNotebook();
+testConcreteTemplatesRemainPythonKernelNotebooks();
 testGeneratedNotebooksIncludeParamBindingMetadata();
 testGeneratedNumericParametersDefaultToSliderBindings();
 testFormulaValidationRejectsUnknownVariables();

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   AlgebraicFormulaConfig,
   FirstOrderDynamicConfig,
+  GenericSimulationConfig,
   LinearSystemConfig,
   OneDimensionalTransferConfig,
   OptimizationDispatchConfig,
@@ -15,6 +16,24 @@ import { formatMatrix, formatNumberArray, formatStringArray, parseMatrix, parseN
 interface ConfigFormProps<TConfig extends SimulationConfig> {
   config: TConfig;
   onChange: (config: SimulationConfig) => void;
+}
+
+function GenericSimulationForm(props: ConfigFormProps<GenericSimulationConfig>): React.ReactElement {
+  const { config, onChange } = props;
+  return (
+    <div className="simulation-platform-generic-note">
+      <h3 className="simulation-platform-section-title">通用仿真模板</h3>
+      <SelectField
+        label="编程内核"
+        value={config.programmingKernel}
+        options={[{ label: 'Python', value: 'python' }, { label: 'Julia', value: 'julia' }]}
+        onChange={programmingKernel => onChange({ ...config, programmingKernel: programmingKernel as GenericSimulationConfig['programmingKernel'] })}
+      />
+      <p>
+        该模板不预设具体仿真问题、参数表、公式或规则。生成 Notebook 后，请在 12 个标题下方的代码单元中自行填写各部分仿真代码。
+      </p>
+    </div>
+  );
 }
 
 function AlgebraicFormulaForm(props: ConfigFormProps<AlgebraicFormulaConfig>): React.ReactElement {
@@ -186,6 +205,8 @@ function OptimizationDispatchForm(props: ConfigFormProps<OptimizationDispatchCon
 
 export function TemplateForm(props: ConfigFormProps<SimulationConfig>): React.ReactElement {
   switch (props.config.templateId) {
+    case 'generic-simulation':
+      return <GenericSimulationForm config={props.config} onChange={props.onChange} />;
     case 'algebraic-formula':
       return <AlgebraicFormulaForm config={props.config} onChange={props.onChange} />;
     case 'first-order-dynamic':

@@ -1,5 +1,7 @@
 import { NotebookCell, NotebookModel } from '../templates/types';
 
+export type NotebookLanguage = 'python' | 'julia';
+
 function splitSource(source: string): string[] {
   return source.split('\n').map(line => `${line}\n`);
 }
@@ -22,22 +24,42 @@ export function codeCell(source: string): NotebookCell {
   };
 }
 
-export function makeNotebook(cells: NotebookCell[]): NotebookModel {
-  return {
-    cells,
-    metadata: {
+function notebookMetadata(language: NotebookLanguage): Record<string, unknown> {
+  if (language === 'julia') {
+    return {
       kernelspec: {
-        display_name: 'Python 3 (ipykernel)',
-        language: 'python',
-        name: 'python3'
+        display_name: 'Julia 1.12',
+        language: 'julia',
+        name: 'julia-1.12'
       },
       language_info: {
-        name: 'python',
-        version: '3.10.0',
-        mimetype: 'text/x-python',
-        file_extension: '.py'
+        name: 'julia',
+        version: '1.12',
+        mimetype: 'application/julia',
+        file_extension: '.jl'
       }
+    };
+  }
+
+  return {
+    kernelspec: {
+      display_name: 'Python 3 (ipykernel)',
+      language: 'python',
+      name: 'python3'
     },
+    language_info: {
+      name: 'python',
+      version: '3.10.0',
+      mimetype: 'text/x-python',
+      file_extension: '.py'
+    }
+  };
+}
+
+export function makeNotebook(cells: NotebookCell[], language: NotebookLanguage = 'python'): NotebookModel {
+  return {
+    cells,
+    metadata: notebookMetadata(language),
     nbformat: 4,
     nbformat_minor: 5
   };

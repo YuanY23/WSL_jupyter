@@ -1,4 +1,5 @@
 export type TemplateId =
+  | 'generic-simulation'
   | 'algebraic-formula'
   | 'first-order-dynamic'
   | 'second-order-dynamic'
@@ -6,6 +7,8 @@ export type TemplateId =
   | 'one-dimensional-transfer'
   | 'time-series-energy-balance'
   | 'optimization-dispatch';
+
+export type ProgrammingKernel = 'python' | 'julia';
 
 export interface ParameterDefinition {
   name: string;
@@ -27,6 +30,11 @@ export interface BaseSimulationConfig {
   assumptions: string[];
   parameters: ParameterDefinition[];
   outputs: string[];
+}
+
+export interface GenericSimulationConfig extends BaseSimulationConfig {
+  templateId: 'generic-simulation';
+  programmingKernel: ProgrammingKernel;
 }
 
 export interface AlgebraicFormulaConfig extends BaseSimulationConfig {
@@ -121,6 +129,7 @@ export interface OptimizationDispatchConfig extends BaseSimulationConfig {
 }
 
 export type SimulationConfig =
+  | GenericSimulationConfig
   | AlgebraicFormulaConfig
   | FirstOrderDynamicConfig
   | SecondOrderDynamicConfig

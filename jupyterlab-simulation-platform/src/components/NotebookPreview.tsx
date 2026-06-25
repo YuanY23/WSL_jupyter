@@ -1,5 +1,5 @@
 import React from 'react';
-import { NOTEBOOK_OUTLINE } from '../notebook/notebookFactory';
+import { GENERIC_NOTEBOOK_OUTLINE, NOTEBOOK_OUTLINE } from '../notebook/notebookFactory';
 import { SimulationConfig } from '../templates/types';
 
 interface NotebookPreviewProps {
@@ -7,11 +7,15 @@ interface NotebookPreviewProps {
 }
 
 export function NotebookPreview(props: NotebookPreviewProps): React.ReactElement {
+  const outline = props.config.templateId === 'generic-simulation'
+    ? GENERIC_NOTEBOOK_OUTLINE.map(item => item.replace(/^\d+\.\s/u, ''))
+    : NOTEBOOK_OUTLINE;
+
   return (
     <div className="simulation-platform-preview">
       <h3 className="simulation-platform-section-title">Notebook 结构预览</h3>
       <ol>
-        {NOTEBOOK_OUTLINE.map(item => (
+        {outline.map(item => (
           <li key={item}>{item}</li>
         ))}
       </ol>

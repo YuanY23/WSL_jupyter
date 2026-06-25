@@ -10,8 +10,8 @@ interface SimulationPlatformAppProps {
 }
 
 export function SimulationPlatformApp(props: SimulationPlatformAppProps): React.ReactElement {
-  const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('algebraic-formula');
-  const [config, setConfig] = useState<SimulationConfig>(() => getDefaultConfig('algebraic-formula'));
+  const [activeTemplateId, setActiveTemplateId] = useState<TemplateId>('generic-simulation');
+  const [config, setConfig] = useState<SimulationConfig>(() => getDefaultConfig('generic-simulation'));
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [statusKind, setStatusKind] = useState<'success' | 'error'>('success');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -55,7 +55,11 @@ export function SimulationPlatformApp(props: SimulationPlatformAppProps): React.
         <div>
           <div className="simulation-platform-editor">
             <h2 className="simulation-platform-title">仿真模板生成器</h2>
-            <p className="simulation-platform-subtitle">选择模板，填写仿真问题、参数、公式或规则，然后生成可运行、可修改、代码可见的 Notebook。</p>
+            <p className="simulation-platform-subtitle">
+              {activeTemplateId === 'generic-simulation'
+                ? '生成空白通用 Notebook 后，用户自行在各标题下填写仿真代码。'
+                : '选择模板，填写仿真问题、参数、公式或规则，然后生成可运行、可修改、代码可见的 Notebook。'}
+            </p>
             <TemplateForm config={config} onChange={nextConfig => setConfig(nextConfig)} />
             {!validation.valid && (
               <div className="simulation-platform-error">

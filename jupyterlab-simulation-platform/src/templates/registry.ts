@@ -1,6 +1,7 @@
 import {
   AlgebraicFormulaConfig,
   FirstOrderDynamicConfig,
+  GenericSimulationConfig,
   LinearSystemConfig,
   OneDimensionalTransferConfig,
   OptimizationDispatchConfig,
@@ -15,6 +16,16 @@ import { validateParameters, validatePositiveNumber, validateRange, mergeValidat
 import { validateFormulaExpression } from '../validators/formula';
 import { validateLinearSystemDimensions } from '../validators/matrix';
 import { validateEqualLengthSeries, validateSocBounds } from '../validators/timeSeries';
+
+const genericSimulationDefault: GenericSimulationConfig = {
+  templateId: 'generic-simulation',
+  simulationName: '通用仿真模板',
+  problemDescription: '该模板不预设具体仿真问题，用户生成 Notebook 后自行填写仿真说明和代码。',
+  assumptions: [],
+  parameters: [],
+  outputs: [],
+  programmingKernel: 'python'
+};
 
 const algebraicFormulaDefault: AlgebraicFormulaConfig = {
   templateId: 'algebraic-formula',
@@ -160,6 +171,12 @@ const optimizationDefault: OptimizationDispatchConfig = {
 
 export const TEMPLATE_REGISTRY: TemplateDefinition[] = [
   {
+    id: 'generic-simulation',
+    name: '通用仿真模板',
+    summary: '用户自行填写各部分代码',
+    defaultConfig: genericSimulationDefault
+  },
+  {
     id: 'algebraic-formula',
     name: '代数方程 / 经验公式',
     summary: '公式计算、参数扫描、曲线或柱状结果',
@@ -223,6 +240,8 @@ export function validateSimulationConfig(config: SimulationConfig): ValidationRe
   ];
 
   switch (config.templateId) {
+    case 'generic-simulation':
+      return { valid: true, messages: [] };
     case 'algebraic-formula':
       return mergeValidationResults([
         ...baseResults,
