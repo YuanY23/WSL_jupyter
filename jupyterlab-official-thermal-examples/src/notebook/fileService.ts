@@ -1,5 +1,10 @@
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import {
+  CaesExampleConfig,
+  generateCaesNotebook,
+  makeCaesNotebookFilename
+} from '../caes/caesNotebookGenerator';
+import {
   CspExampleConfig,
   generateCspNotebook,
   makeCspNotebookFilename
@@ -23,6 +28,27 @@ export async function saveAndOpenCspNotebook(app: JupyterFrontEnd, config: CspEx
 
   const notebook = generateCspNotebook(config);
   const filename = makeCspNotebookFilename(config.exampleName);
+  const filePath = `${RESULTS_DIR}/${filename}`;
+
+  const fileModel = await contents.save(filePath, {
+    type: 'notebook',
+    format: 'json',
+    content: notebook
+  });
+
+  await app.commands.execute('docmanager:open', {
+    path: fileModel.path
+  });
+
+  return fileModel.path;
+}
+
+export async function saveAndOpenCaesNotebook(app: JupyterFrontEnd, config: CaesExampleConfig): Promise<string> {
+  const contents = app.serviceManager.contents;
+  await ensureDirectory(app, RESULTS_DIR);
+
+  const notebook = generateCaesNotebook(config);
+  const filename = makeCaesNotebookFilename(config);
   const filePath = `${RESULTS_DIR}/${filename}`;
 
   const fileModel = await contents.save(filePath, {

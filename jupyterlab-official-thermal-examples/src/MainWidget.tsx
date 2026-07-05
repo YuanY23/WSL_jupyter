@@ -1,8 +1,11 @@
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { ReactWidget } from '@jupyterlab/apputils';
 import React from 'react';
-import { OfficialThermalExamplesApp } from './components/OfficialThermalExamplesApp';
-import { saveAndOpenCspNotebook } from './notebook/fileService';
+import {
+  OfficialThermalExampleRequest,
+  OfficialThermalExamplesApp
+} from './components/OfficialThermalExamplesApp';
+import { saveAndOpenCaesNotebook, saveAndOpenCspNotebook } from './notebook/fileService';
 
 export class OfficialThermalExamplesWorkbench extends ReactWidget {
   private readonly app: JupyterFrontEnd;
@@ -14,11 +17,17 @@ export class OfficialThermalExamplesWorkbench extends ReactWidget {
   }
 
   protected render(): React.ReactElement {
+    const handleGenerate = async (request: OfficialThermalExampleRequest): Promise<void> => {
+      if (request.kind === 'caes') {
+        await saveAndOpenCaesNotebook(this.app, request.config);
+        return;
+      }
+      await saveAndOpenCspNotebook(this.app, request.config);
+    };
+
     return (
       <OfficialThermalExamplesApp
-        onGenerate={async config => {
-          await saveAndOpenCspNotebook(this.app, config);
-        }}
+        onGenerate={handleGenerate}
       />
     );
   }

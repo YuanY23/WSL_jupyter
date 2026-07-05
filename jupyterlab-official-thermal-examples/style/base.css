@@ -2,7 +2,7 @@
   height: 100%;
   overflow: auto;
   color: var(--jp-ui-font-color1);
-  background: #f6f4ee;
+  background: #f4f6f4;
 }
 
 .official-thermal-panel {
@@ -12,22 +12,49 @@
   font-family: var(--jp-ui-font-family);
 }
 
+.official-thermal-tabs {
+  display: inline-flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 4px;
+  border: 1px solid #c8d0d6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.official-thermal-tabs button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #4b5862;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.official-thermal-tabs button.active {
+  background: #1f6f8b;
+  color: #ffffff;
+}
+
 .official-thermal-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(240px, 360px);
   gap: 24px;
   align-items: stretch;
   padding: 22px 24px;
-  border: 1px solid #d5cec0;
+  border: 1px solid #c8d0d6;
   border-radius: 8px;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.72)),
-    repeating-linear-gradient(135deg, rgba(142, 103, 48, 0.08) 0 1px, transparent 1px 14px);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.76)),
+    repeating-linear-gradient(135deg, rgba(34, 107, 139, 0.08) 0 1px, transparent 1px 14px);
 }
 
 .official-thermal-kicker {
   margin: 0 0 8px;
-  color: #8a5a16;
+  color: #236b5f;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0;
@@ -35,7 +62,8 @@
 
 .official-thermal-hero h2,
 .official-thermal-editor h3,
-.official-thermal-process h3 {
+.official-thermal-process h3,
+.official-thermal-parameter-group h4 {
   margin: 0;
   color: #24313d;
   letter-spacing: 0;
@@ -56,7 +84,7 @@
 
 .official-thermal-metrics {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(106px, 1fr));
   gap: 10px;
 }
 
@@ -64,9 +92,9 @@
   display: flex;
   min-height: 118px;
   padding: 14px;
-  border: 1px solid #cfc7ba;
+  border: 1px solid #c8d0d6;
   border-radius: 8px;
-  background: #fffefa;
+  background: #ffffff;
   flex-direction: column;
   justify-content: center;
 }
@@ -85,7 +113,7 @@
 
 .official-thermal-metrics em {
   margin-top: 5px;
-  color: #8a5a16;
+  color: #236b5f;
   font-size: 12px;
   font-style: normal;
   font-weight: 700;
@@ -100,9 +128,9 @@
 
 .official-thermal-editor,
 .official-thermal-process {
-  border: 1px solid #d5cec0;
+  border: 1px solid #c8d0d6;
   border-radius: 8px;
-  background: #fffefa;
+  background: #ffffff;
 }
 
 .official-thermal-editor {
@@ -113,6 +141,22 @@
 .official-thermal-process h3 {
   margin-bottom: 16px;
   font-size: 16px;
+}
+
+.official-thermal-parameter-group {
+  padding: 14px 0 2px;
+  border-top: 1px solid #e1e6ea;
+}
+
+.official-thermal-parameter-group:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.official-thermal-parameter-group h4 {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .official-thermal-field {
@@ -160,7 +204,7 @@
 }
 
 .official-thermal-number-control b {
-  color: #7d642b;
+  color: #236b5f;
   font-size: 12px;
 }
 
@@ -174,9 +218,9 @@
 .official-thermal-button {
   min-height: 34px;
   padding: 0 14px;
-  border: 1px solid #b8b0a1;
+  border: 1px solid #b8c1c8;
   border-radius: 6px;
-  background: #f7f2e8;
+  background: #f3f6f7;
   color: #27313a;
   font-size: 13px;
   font-weight: 700;
@@ -229,8 +273,8 @@
   align-items: center;
   min-height: 52px;
   padding: 10px 12px;
-  border-left: 4px solid #b9781f;
-  background: #f7f2e8;
+  border-left: 4px solid #236b5f;
+  background: #f1f7f5;
 }
 
 .official-thermal-process li:nth-child(2n) {

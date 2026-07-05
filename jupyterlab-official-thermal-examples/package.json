@@ -30,7 +30,7 @@
     "build:lib": "tsc --sourceMap",
     "build:lib:prod": "tsc",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "test": "npm run build:lib && node tests/csp-example.test.js"
+    "test": "npm run build:lib && node tests/csp-example.test.js && node tests/caes-example.test.js"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.2.7",
