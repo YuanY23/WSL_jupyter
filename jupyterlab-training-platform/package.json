@@ -29,7 +29,7 @@
     "build:lib": "tsc --sourceMap",
     "build:lib:prod": "tsc",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "test": "npm run build:lib && node tests/api-client.test.js && node tests/admin-api-client.test.js && node tests/tutorial-metadata.test.js && node tests/copy-tutorial.test.js && node tests/comment-visibility.test.js"
+    "test": "npm run build:lib && node tests/api-client.test.js && node tests/admin-api-client.test.js && node tests/tutorial-metadata.test.js && node tests/copy-tutorial.test.js && node tests/comment-visibility.test.js && node tests/media-insertion.test.js && node tests/simlab-video-directive.test.js && node tests/simlab-video-player.test.js && node tests/simlab-markdown-renderer.test.js"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.2.7",
@@ -37,6 +37,7 @@
     "@jupyterlab/coreutils": "^6.2.7",
     "@jupyterlab/mainmenu": "^4.2.7",
     "@jupyterlab/notebook": "^4.2.7",
+    "@jupyterlab/rendermime": "^4.2.7",
     "@jupyterlab/services": "^7.2.7",
     "@lumino/widgets": "^2.3.1",
     "react": "^18.2.0",
@@ -46,6 +47,7 @@
     "@jupyterlab/builder": "^4.2.7",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "jsdom": "^29.1.1",
     "npm-run-all": "^4.1.5",
     "rimraf": "^5.0.5",
     "typescript": "~5.0.4"

@@ -270,7 +270,10 @@ RUN grep -R "作业评测平台" /src/nbgrader/nbgrader/labextension/static/*.js
     grep -R "mainMenu.addMenu(thermalMenu, true, { rank: 6 })" /src/jupyterlab-thermal-design/jupyterlab_thermal_design/labextension/static/*.js >/dev/null && \
     grep -R "mainMenu.addMenu(officialMenu, true, { rank: 7 })" /src/jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/static/*.js >/dev/null && \
     grep -R "学习课程" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
+    grep -R "管理员工具" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
     grep -R "课程管理" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
+    grep -R "上传媒体资源" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
+    grep -R "插入媒体资源" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
     grep -R "评论" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null
 
 # Overwrite the official SVG icons with our custom ones BEFORE building

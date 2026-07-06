@@ -55,6 +55,18 @@ export interface TutorialComment {
   replies: TutorialComment[];
 }
 
+export interface MediaResource {
+  id: string;
+  title: string;
+  original_filename: string;
+  mime_type: string;
+  file_size: number;
+  status: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TutorialImportRequest {
   course_id: string;
   section_id: string;
@@ -105,4 +117,8 @@ export interface PatchTutorialRequest {
   sort_order?: number;
   status?: string;
   comments_locked?: boolean;
+}
+
+export interface PatchMediaResourceRequest {
+  title: string;
 }

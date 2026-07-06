@@ -5,19 +5,25 @@ import {
 import { ICommandPalette, MainAreaWidget, ReactWidget, WidgetTracker } from '@jupyterlab/apputils';
 import { IMainMenu } from '@jupyterlab/mainmenu';
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 import { Menu, Widget } from '@lumino/widgets';
 import React from 'react';
 import { TrainingApiClient } from './api/client';
 import { CurrentUser, TrainingCourse, TrainingSection, TutorialSummary } from './api/types';
 import { AdminManager } from './components/AdminManager';
 import { CommentPanel } from './components/CommentPanel';
+import { MediaInsertPanel } from './components/MediaInsertPanel';
+import { MediaUploadPanel } from './components/MediaUploadPanel';
 import { TrainingBrowser } from './components/TrainingBrowser';
 import { copyTutorialToWorkspace } from './notebook/copyTutorial';
+import { createSimlabMarkdownRendererFactory } from './notebook/simlabMarkdownRenderer';
 import { extractTutorialMetadata, shouldOpenCommentPanel, TutorialMetadata } from './notebook/tutorialMetadata';
 
 const CommandIDs = {
   openTrainingBrowser: 'training-platform:open-browser',
-  openAdminManager: 'training-platform:open-admin',
+  openCourseManager: 'training-platform:open-course-manager',
+  openMediaUpload: 'training-platform:open-media-upload',
+  openMediaInsertPanel: 'training-platform:open-media-insert',
   openCommentPanel: 'training-platform:open-comments'
 };
 
@@ -48,6 +54,35 @@ class AdminManagerWidget extends ReactWidget {
 
   protected render(): React.ReactElement {
     return <AdminManager api={this.api} />;
+  }
+}
+
+class MediaUploadWidget extends ReactWidget {
+  constructor(private readonly api: TrainingApiClient) {
+    super();
+    this.addClass('training-platform-widget');
+  }
+
+  protected render(): React.ReactElement {
+    return <MediaUploadPanel api={this.api} />;
+  }
+}
+
+class MediaInsertPanelWidget extends ReactWidget {
+  constructor(
+    private readonly app: JupyterFrontEnd,
+    private readonly api: TrainingApiClient,
+    private readonly notebookTracker: INotebookTracker
+  ) {
+    super();
+    this.id = 'training-platform-media-insert-panel';
+    this.title.label = '插入媒体资源';
+    this.title.caption = '插入媒体资源到当前 Notebook cell';
+    this.addClass('training-media-insert-widget');
+  }
+
+  protected render(): React.ReactElement {
+    return <MediaInsertPanel api={this.api} app={this.app} notebookTracker={this.notebookTracker} />;
   }
 }
 
@@ -120,14 +155,16 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab-training-platform:plugin',
   description: 'Public training tutorial browser, admin manager, and tutorial comments',
   autoStart: true,
-  requires: [ICommandPalette, IMainMenu, INotebookTracker],
+  requires: [ICommandPalette, IMainMenu, INotebookTracker, IRenderMimeRegistry],
   activate: async (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
     mainMenu: IMainMenu,
-    notebookTracker: INotebookTracker
+    notebookTracker: INotebookTracker,
+    rendermime: IRenderMimeRegistry
   ) => {
     const api = new TrainingApiClient();
+    rendermime.addFactory(createSimlabMarkdownRendererFactory(api), 60);
     let currentUser: CurrentUser | null = null;
     try {
       currentUser = await api.getMe();
@@ -141,9 +178,16 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const adminTracker = new WidgetTracker<MainAreaWidget<Widget>>({
       namespace: 'training-platform-admin'
     });
+    const mediaUploadTracker = new WidgetTracker<MainAreaWidget<Widget>>({
+      namespace: 'training-platform-media-upload'
+    });
     let browserWidget: MainAreaWidget<Widget> | null = null;
     let adminWidget: MainAreaWidget<Widget> | null = null;
+    let mediaUploadWidget: MainAreaWidget<Widget> | null = null;
     const commentsWidget = new CommentPanelWidget(api);
+    const mediaInsertWidget = currentUser?.is_admin
+      ? new MediaInsertPanelWidget(app, api, notebookTracker)
+      : null;
     commentsWidget.setUser(currentUser);
 
     app.commands.addCommand(CommandIDs.openTrainingBrowser, {
@@ -169,8 +213,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
     });
 
-    app.commands.addCommand(CommandIDs.openAdminManager, {
-      label: '打开课程管理',
+    app.commands.addCommand(CommandIDs.openCourseManager, {
+      label: '课程管理',
       isVisible: () => Boolean(currentUser?.is_admin),
       execute: () => {
         if (!adminWidget || adminWidget.isDisposed) {
@@ -193,6 +237,44 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
     });
 
+    app.commands.addCommand(CommandIDs.openMediaUpload, {
+      label: '上传媒体资源',
+      isVisible: () => Boolean(currentUser?.is_admin),
+      execute: () => {
+        if (!mediaUploadWidget || mediaUploadWidget.isDisposed) {
+          const content = new MediaUploadWidget(api);
+          content.id = 'training-platform-media-upload';
+          content.title.label = '上传媒体资源';
+          content.title.closable = true;
+          mediaUploadWidget = new MainAreaWidget({ content });
+          mediaUploadWidget.id = 'training-platform-media-upload-main';
+          mediaUploadWidget.title.label = '上传媒体资源';
+          mediaUploadWidget.title.closable = true;
+        }
+        if (!mediaUploadTracker.has(mediaUploadWidget)) {
+          void mediaUploadTracker.add(mediaUploadWidget);
+        }
+        if (!mediaUploadWidget.isAttached) {
+          app.shell.add(mediaUploadWidget, 'main', { mode: 'tab-after', activate: true });
+        }
+        app.shell.activateById(mediaUploadWidget.id);
+      }
+    });
+
+    app.commands.addCommand(CommandIDs.openMediaInsertPanel, {
+      label: '插入媒体资源',
+      isVisible: () => Boolean(currentUser?.is_admin),
+      execute: () => {
+        if (!mediaInsertWidget) {
+          return;
+        }
+        if (!mediaInsertWidget.isAttached) {
+          app.shell.add(mediaInsertWidget, 'right', { rank: 660 });
+        }
+        app.shell.activateById(mediaInsertWidget.id);
+      }
+    });
+
     app.commands.addCommand(CommandIDs.openCommentPanel, {
       label: '评论',
       execute: () => {
@@ -209,7 +291,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     palette.addItem({ command: CommandIDs.openTrainingBrowser, category: '学习课程' });
     if (currentUser?.is_admin) {
-      palette.addItem({ command: CommandIDs.openAdminManager, category: '课程管理' });
+      palette.addItem({ command: CommandIDs.openCourseManager, category: '管理员工具' });
+      palette.addItem({ command: CommandIDs.openMediaUpload, category: '管理员工具' });
+      palette.addItem({ command: CommandIDs.openMediaInsertPanel, category: '管理员工具' });
     }
 
     const trainingMenu = new Menu({ commands: app.commands });
@@ -221,8 +305,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
     if (currentUser?.is_admin) {
       const adminMenu = new Menu({ commands: app.commands });
       adminMenu.id = 'training-platform-admin-menu';
-      adminMenu.title.label = '课程管理';
-      adminMenu.addItem({ command: CommandIDs.openAdminManager });
+      adminMenu.title.label = '管理员工具';
+      adminMenu.addItem({ command: CommandIDs.openCourseManager });
+      adminMenu.addItem({ command: CommandIDs.openMediaUpload });
+      adminMenu.addItem({ command: CommandIDs.openMediaInsertPanel });
       mainMenu.addMenu(adminMenu, true, { rank: 7.6 });
     }
 

@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from .config import Settings
 from .db import make_session_factory
 from .routes_admin import router as admin_router
+from .routes_media_admin import router as media_admin_router
+from .routes_media_public import router as media_public_router
 from .routes_public import router as public_router
 from .storage import TutorialStorage
 
@@ -25,10 +27,14 @@ def create_app(*, settings: Settings | None = None, session_factory=None) -> Fas
 
     app.include_router(public_router)
     app.include_router(admin_router)
+    app.include_router(media_admin_router)
+    app.include_router(media_public_router)
     service_prefix = app_settings.jupyterhub_service_prefix.rstrip("/")
     if service_prefix:
         app.include_router(public_router, prefix=service_prefix)
         app.include_router(admin_router, prefix=service_prefix)
+        app.include_router(media_admin_router, prefix=service_prefix)
+        app.include_router(media_public_router, prefix=service_prefix)
     return app
 
 

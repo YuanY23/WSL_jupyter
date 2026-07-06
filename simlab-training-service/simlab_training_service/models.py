@@ -23,6 +23,10 @@ def new_id() -> str:
     return str(uuid.uuid4())
 
 
+def new_media_id() -> str:
+    return f"vid_{uuid.uuid4().hex[:12]}"
+
+
 def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
@@ -105,6 +109,23 @@ class TutorialVersion(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
 
     tutorial = relationship("Tutorial", back_populates="versions")
+
+
+class MediaResource(Base):
+    __tablename__ = "media_resources"
+    __table_args__ = (Index("ix_media_resources_created_at", "created_at"),)
+
+    id = Column(String(32), primary_key=True, default=new_media_id)
+    title = Column(Text, nullable=False)
+    original_filename = Column(Text, nullable=False)
+    mime_type = Column(String(255), nullable=False)
+    file_size = Column(Integer, nullable=False)
+    object_key = Column(Text, nullable=False)
+    file_sha256 = Column(String(64), nullable=False)
+    status = Column(String(32), nullable=False, default="available")
+    created_by = Column(String(255), nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
 
 
 class Comment(Base):

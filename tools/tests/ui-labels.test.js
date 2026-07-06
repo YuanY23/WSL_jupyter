@@ -128,13 +128,21 @@ assert.ok(officialThermalApp.includes("'槽式太阳能光热发电集热-储热
 assert.ok(officialThermalApp.includes("'压缩空气储能仿真'"));
 
 assert.ok(trainingPlatformIndex.includes("trainingMenu.title.label = '学习课程'"));
-assert.ok(trainingPlatformIndex.includes("adminMenu.title.label = '课程管理'"));
+assert.ok(trainingPlatformIndex.includes("label: '课程管理'"));
+assert.ok(trainingPlatformIndex.includes("label: '上传媒体资源'"));
+assert.ok(trainingPlatformIndex.includes("label: '插入媒体资源'"));
+assert.ok(trainingPlatformIndex.includes("content.title.label = '课程管理'"));
+assert.ok(trainingPlatformIndex.includes("mediaUploadWidget.title.label = '上传媒体资源'"));
+assert.ok(trainingPlatformIndex.includes("this.title.label = '插入媒体资源'"));
+assert.ok(trainingPlatformIndex.includes("adminMenu.title.label = '管理员工具'"));
+assert.equal(trainingPlatformIndex.includes("label: '打开管理员工具'"), false);
 assert.ok(!trainingPlatformIndex.includes("label: '打开评论'"));
 assert.ok(!trainingPlatformIndex.includes('trainingMenu.addItem({ command: CommandIDs.openCommentPanel })'));
 assert.ok(trainingPlatformIndex.includes("this.title.label = '评论'"));
 assert.ok(trainingPlatformIndex.includes('mainMenu.addMenu(trainingMenu, true, { rank: 7.5 })'));
 assert.ok(trainingPlatformIndex.includes('mainMenu.addMenu(adminMenu, true, { rank: 7.6 })'));
 assert.ok(trainingPlatformAdmin.includes('>课程管理</h2>'));
+assert.equal(trainingPlatformAdmin.includes('>管理员工具</h2>'), false);
 assert.ok(trainingPlatformComments.includes('>发布评论</button>'));
 assert.ok(trainingPlatformBaseCss.includes('#1976d2'), 'training platform should use the shared blue accent');
 assert.ok(officialThermalBaseCss.includes('#1976d2'), 'official thermal examples should use the shared blue accent');
@@ -174,9 +182,11 @@ if (officialThermalLabextensionStatic.includes('官方热力建模示例')) {
   assert.ok(compact(officialThermalLabextensionStatic).includes('mainMenu.addMenu(officialMenu,true,{rank:7})'));
   assert.equal(compact(officialThermalLabextensionStatic).includes('mainMenu.addMenu(officialMenu);'), false);
 }
-if (trainingPlatformLabextensionStatic) {
+if (trainingPlatformLabextensionStatic.includes('管理员工具')) {
   assert.ok(trainingPlatformLabextensionStatic.includes('学习课程'));
   assert.ok(trainingPlatformLabextensionStatic.includes('课程管理'));
+  assert.ok(trainingPlatformLabextensionStatic.includes('上传媒体资源'));
+  assert.ok(trainingPlatformLabextensionStatic.includes('插入媒体资源'));
   assert.ok(!trainingPlatformLabextensionStatic.includes('打开评论'));
   assert.ok(trainingPlatformLabextensionStatic.includes('评论'));
   assert.ok(compact(trainingPlatformLabextensionStatic).includes('mainMenu.addMenu(trainingMenu,true,{rank:7.5})'));
@@ -255,7 +265,10 @@ assert.ok(dockerfile.includes('grep -R "作业评测平台" /src/nbgrader/nbgrad
 assert.ok(dockerfile.includes('grep -R "mainMenu.addMenu(nbgraderMenu, true, { rank: 8 })" /src/nbgrader/nbgrader/labextension/static/*.js'));
 assert.ok(dockerfile.includes('WORKDIR /src/jupyterlab-training-platform'));
 assert.ok(dockerfile.includes('grep -R "学习课程" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
+assert.ok(dockerfile.includes('grep -R "管理员工具" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
 assert.ok(dockerfile.includes('grep -R "课程管理" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
+assert.ok(dockerfile.includes('grep -R "上传媒体资源" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
+assert.ok(dockerfile.includes('grep -R "插入媒体资源" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
 assert.ok(dockerfile.includes('grep -R "评论" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
 assert.ok(dockerfile.includes('simlab-folder.svg'));
 assert.ok(dockerfile.includes('simlab-file.svg'));

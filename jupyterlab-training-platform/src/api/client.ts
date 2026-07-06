@@ -3,7 +3,9 @@ import {
   CreateCourseRequest,
   CreateSectionRequest,
   CurrentUser,
+  MediaResource,
   PatchCourseRequest,
+  PatchMediaResourceRequest,
   PatchSectionRequest,
   PatchTutorialRequest,
   TrainingCourse,
@@ -18,6 +20,7 @@ type RequestBody =
   | CreateCourseRequest
   | CreateSectionRequest
   | PatchCourseRequest
+  | PatchMediaResourceRequest
   | PatchSectionRequest
   | PatchTutorialRequest;
 
@@ -146,6 +149,44 @@ export class TrainingApiClient {
     });
   }
 
+  async adminListMedia(): Promise<MediaResource[]> {
+    return this.get<MediaResource[]>('/admin/media');
+  }
+
+  async adminUploadMedia(file: File | Blob, title: string): Promise<MediaResource> {
+    const form = new FormData();
+    form.append('title', title);
+    form.append('file', file);
+    return this.requestForm<MediaResource>('/admin/media', form);
+  }
+
+  async adminRenameMedia(mediaId: string, title: string): Promise<MediaResource> {
+    return this.patch<MediaResource>(`/admin/media/${encodeURIComponent(mediaId)}`, { title });
+  }
+
+  async adminDeleteMedia(mediaId: string): Promise<void> {
+    await this.request(`/admin/media/${encodeURIComponent(mediaId)}`, { method: 'DELETE' });
+  }
+
+  mediaContentUrl(mediaId: string): string {
+    return `${this.baseUrl}/media/${encodeURIComponent(mediaId)}/content`;
+  }
+
+  async fetchMediaBlob(mediaId: string): Promise<Blob> {
+    const response = await fetch(this.mediaContentUrl(mediaId), {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: {
+        ...authorizationHeaderFromToken()
+      }
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`请求失败 ${response.status}: ${detail}`);
+    }
+    return response.blob();
+  }
+
   private async get<T>(path: string): Promise<T> {
     return this.request<T>(path, { method: 'GET' });
   }
@@ -162,6 +203,22 @@ export class TrainingApiClient {
       method: 'PATCH',
       body: JSON.stringify(body)
     });
+  }
+
+  private async requestForm<T>(path: string, body: FormData): Promise<T> {
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      body,
+      headers: {
+        ...authorizationHeaderFromToken()
+      }
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`请求失败 ${response.status}: ${detail}`);
+    }
+    return response.json() as Promise<T>;
   }
 
   private async request<T = void>(path: string, init: RequestInit): Promise<T> {
