@@ -27,6 +27,9 @@
 !jupyterlab-official-thermal-examples/
 !jupyterlab-official-thermal-examples/**
 
+!jupyterlab-training-platform/
+!jupyterlab-training-platform/**
+
 # Never send local dependency installs or package-manager caches.
 **/node_modules
 **/node_modules/**
@@ -82,6 +85,10 @@ jupyterlab-official-thermal-examples/lib
 jupyterlab-official-thermal-examples/lib/**
 jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension
 jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/**
+jupyterlab-training-platform/lib
+jupyterlab-training-platform/lib/**
+jupyterlab-training-platform/jupyterlab_training_platform/labextension
+jupyterlab-training-platform/jupyterlab_training_platform/labextension/**
 
 # Runtime course/user data is mounted or created outside the image.
 courses

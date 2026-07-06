@@ -3,6 +3,8 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.pytest_cache/
+**/.pytest_cache/
 *.egg-info/
 *.egg-info/**
 
@@ -30,10 +32,13 @@ jupyterlab-param-binding/lib/
 jupyterlab-param-binding/jupyterlab_param_binding/labextension/
 jupyterlab-official-thermal-examples/lib/
 jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/
+jupyterlab-training-platform/lib/
+jupyterlab-training-platform/jupyterlab_training_platform/labextension/
 
 # Runtime course data, submissions, feedback, and gradebooks
 courses/
 course_test/
+simlab-runtime/
 **/gradebook.db
 **/submission_secret.txt
 **/.ipynb_checkpoints/

@@ -167,6 +167,22 @@ RUN pip install \
     -e .
 RUN jlpm install
 
+COPY --chown=$NB_UID:$NB_GID jupyterlab-training-platform/setup.py \
+    jupyterlab-training-platform/package.json \
+    jupyterlab-training-platform/package-lock.json \
+    jupyterlab-training-platform/.yarnrc.yml \
+    /src/jupyterlab-training-platform/
+COPY --chown=$NB_UID:$NB_GID jupyterlab-training-platform/jupyterlab_training_platform/__init__.py /src/jupyterlab-training-platform/jupyterlab_training_platform/__init__.py
+WORKDIR /src/jupyterlab-training-platform
+RUN pip install \
+    --index-url "$PIP_INDEX_URL" \
+    --extra-index-url "$PIP_EXTRA_INDEX_URL" \
+    --timeout "$PIP_DEFAULT_TIMEOUT" \
+    --retries "$PIP_RETRIES" \
+    --no-build-isolation \
+    -e .
+RUN npm ci
+
 # Copy source code directory (requires nbgrader and jupyterlab folders in build context)
 COPY --chown=$NB_UID:$NB_GID nbgrader /src/nbgrader
 COPY --chown=$NB_UID:$NB_GID jupyterlab /src/jupyterlab
@@ -174,6 +190,7 @@ COPY --chown=$NB_UID:$NB_GID jupyterlab-thermal-design /src/jupyterlab-thermal-d
 COPY --chown=$NB_UID:$NB_GID jupyterlab-simulation-platform /src/jupyterlab-simulation-platform
 COPY --chown=$NB_UID:$NB_GID jupyterlab-param-binding /src/jupyterlab-param-binding
 COPY --chown=$NB_UID:$NB_GID jupyterlab-official-thermal-examples /src/jupyterlab-official-thermal-examples
+COPY --chown=$NB_UID:$NB_GID jupyterlab-training-platform /src/jupyterlab-training-platform
 COPY --chown=$NB_UID:$NB_GID logo /src/logo
 
 # Install custom jupyterlab first 
@@ -239,13 +256,22 @@ RUN jlpm install && \
     jlpm run build && \
     jupyter labextension develop . --overwrite
 
+# Install public training tutorial platform plugin
+WORKDIR /src/jupyterlab-training-platform
+RUN npm ci && \
+    npm run build && \
+    jupyter labextension develop . --overwrite
+
 # Fail the image build if source edits were not compiled into the prebuilt
 # labextension bundles that JupyterLab actually loads.
 RUN grep -R "作业评测平台" /src/nbgrader/nbgrader/labextension/static/*.js >/dev/null && \
     grep -R "mainMenu.addMenu(nbgraderMenu, true, { rank: 8 })" /src/nbgrader/nbgrader/labextension/static/*.js >/dev/null && \
     grep -R "mainMenu.addMenu(simulationMenu, true, { rank: 5 })" /src/jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/static/*.js >/dev/null && \
     grep -R "mainMenu.addMenu(thermalMenu, true, { rank: 6 })" /src/jupyterlab-thermal-design/jupyterlab_thermal_design/labextension/static/*.js >/dev/null && \
-    grep -R "mainMenu.addMenu(officialMenu, true, { rank: 7 })" /src/jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/static/*.js >/dev/null
+    grep -R "mainMenu.addMenu(officialMenu, true, { rank: 7 })" /src/jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/static/*.js >/dev/null && \
+    grep -R "学习课程" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
+    grep -R "课程管理" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null && \
+    grep -R "评论" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js >/dev/null
 
 # Overwrite the official SVG icons with our custom ones BEFORE building
 RUN cp /src/jupyterlab/packages/ui-components/style/icons/jupyter/jupyter.svg \

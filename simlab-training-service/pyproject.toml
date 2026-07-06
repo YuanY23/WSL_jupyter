@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simlab-training-service"
+version = "0.1.0"
+description = "Public SimLab tutorial and comment service"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "sqlalchemy",
+  "psycopg[binary]",
+  "alembic",
+  "python-multipart",
+  "requests",
+  "nbformat",
+  "pydantic",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "httpx",
+]
+
+[tool.setuptools.packages.find]
+include = ["simlab_training_service*"]

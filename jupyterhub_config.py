@@ -42,11 +42,18 @@ c.ConfigurableHTTPProxy.command = [
 # Admin API token for nbgrader to manage groups (add/remove students)
 import secrets
 _nbgrader_api_token = secrets.token_hex(32)
+_simlab_training_api_token = os.environ.get('SIMLAB_TRAINING_API_TOKEN') or secrets.token_hex(32)
 c.JupyterHub.services = [
     {
         'name': 'nbgrader',
         'api_token': _nbgrader_api_token,
         'admin': True,
+    },
+    {
+        'name': 'simlab-training',
+        'url': os.environ.get('SIMLAB_TRAINING_SERVICE_URL', 'http://127.0.0.1:8090'),
+        'api_token': _simlab_training_api_token,
+        'oauth_no_confirm': True,
     }
 ]
 
@@ -85,6 +92,8 @@ dev_source_volumes = {
     'jupyterlab-simulation-platform-node-modules': '/src/jupyterlab-simulation-platform/node_modules',
     '/home/yuan/my_project/jupyterlab-thermal-design': '/src/jupyterlab-thermal-design',
     'jupyterlab-thermal-design-node-modules': '/src/jupyterlab-thermal-design/node_modules',
+    '/home/yuan/my_project/jupyterlab-training-platform': '/src/jupyterlab-training-platform',
+    'jupyterlab-training-platform-node-modules': '/src/jupyterlab-training-platform/node_modules',
 }
 
 c.DockerSpawner.volumes = dict(base_volumes)

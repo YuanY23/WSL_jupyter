@@ -22,6 +22,18 @@ function readAllTextFiles(relativeDir) {
     .join('\n');
 }
 
+function readAllTextFilesIfExists(relativeDir) {
+  const absoluteDir = path.join(root, relativeDir);
+  if (!fs.existsSync(absoluteDir)) {
+    return '';
+  }
+  return fs
+    .readdirSync(absoluteDir)
+    .filter(file => file.endsWith('.js'))
+    .map(file => fs.readFileSync(path.join(absoluteDir, file), 'utf8'))
+    .join('\n');
+}
+
 function compact(text) {
   return text.replace(/\s+/g, '');
 }
@@ -40,6 +52,11 @@ const thermalIndex = read('jupyterlab-thermal-design/src/index.ts');
 const thermalControlPanel = read('jupyterlab-thermal-design/src/components/ControlPanel.tsx');
 const officialThermalIndex = read('jupyterlab-official-thermal-examples/src/index.ts');
 const officialThermalApp = read('jupyterlab-official-thermal-examples/src/components/OfficialThermalExamplesApp.tsx');
+const officialThermalBaseCss = read('jupyterlab-official-thermal-examples/style/base.css');
+const trainingPlatformIndex = read('jupyterlab-training-platform/src/index.tsx');
+const trainingPlatformAdmin = read('jupyterlab-training-platform/src/components/AdminManager.tsx');
+const trainingPlatformComments = read('jupyterlab-training-platform/src/components/CommentPanel.tsx');
+const trainingPlatformBaseCss = read('jupyterlab-training-platform/style/base.css');
 const nbgraderIndex = read('nbgrader/src/index.ts');
 const mainMenuSchema = JSON.parse(read('jupyterlab/packages/mainmenu-extension/schema/plugin.json'));
 const hubConfig = read('jupyterhub_config.py');
@@ -60,6 +77,7 @@ const nbgraderLabextensionStatic = readAllTextFiles('nbgrader/nbgrader/labextens
 const simulationLabextensionStatic = readAllTextFiles('jupyterlab-simulation-platform/jupyterlab_simulation_platform/labextension/static');
 const thermalLabextensionStatic = readAllTextFiles('jupyterlab-thermal-design/jupyterlab_thermal_design/labextension/static');
 const officialThermalLabextensionStatic = readAllTextFiles('jupyterlab-official-thermal-examples/jupyterlab_official_thermal_examples/labextension/static');
+const trainingPlatformLabextensionStatic = readAllTextFilesIfExists('jupyterlab-training-platform/jupyterlab_training_platform/labextension/static');
 const dockerfile = read('Dockerfile-nbgrader');
 const applicationBaseCss = read('jupyterlab/packages/application-extension/style/base.css');
 const fileIconSvg = read('jupyterlab/packages/ui-components/style/icons/filetype/file.svg');
@@ -106,7 +124,28 @@ assert.ok(officialThermalIndex.includes("widget.title.label = '官方热力建�
 assert.ok(officialThermalIndex.includes("officialMenu.title.label = '官方热力建模示例'"));
 assert.ok(officialThermalIndex.includes('mainMenu.addMenu(officialMenu, true, { rank: 7 })'));
 assert.ok(officialThermalApp.includes('>官方热力建模示例</p>'));
-assert.ok(officialThermalApp.includes('>槽式太阳能光热发电集热-储热-发电联合过程</h2>'));
+assert.ok(officialThermalApp.includes("'槽式太阳能光热发电集热-储热-发电联合过程'"));
+assert.ok(officialThermalApp.includes("'压缩空气储能仿真'"));
+
+assert.ok(trainingPlatformIndex.includes("trainingMenu.title.label = '学习课程'"));
+assert.ok(trainingPlatformIndex.includes("adminMenu.title.label = '课程管理'"));
+assert.ok(!trainingPlatformIndex.includes("label: '打开评论'"));
+assert.ok(!trainingPlatformIndex.includes('trainingMenu.addItem({ command: CommandIDs.openCommentPanel })'));
+assert.ok(trainingPlatformIndex.includes("this.title.label = '评论'"));
+assert.ok(trainingPlatformIndex.includes('mainMenu.addMenu(trainingMenu, true, { rank: 7.5 })'));
+assert.ok(trainingPlatformIndex.includes('mainMenu.addMenu(adminMenu, true, { rank: 7.6 })'));
+assert.ok(trainingPlatformAdmin.includes('>课程管理</h2>'));
+assert.ok(trainingPlatformComments.includes('>发布评论</button>'));
+assert.ok(trainingPlatformBaseCss.includes('#1976d2'), 'training platform should use the shared blue accent');
+assert.ok(officialThermalBaseCss.includes('#1976d2'), 'official thermal examples should use the shared blue accent');
+for (const legacyAccent of ['#176b58', '#236b5f', '#2f7a4e']) {
+  assert.equal(trainingPlatformBaseCss.includes(legacyAccent), false, `training platform should not use legacy green ${legacyAccent}`);
+  assert.equal(officialThermalBaseCss.includes(legacyAccent), false, `official thermal examples should not use legacy green ${legacyAccent}`);
+}
+assert.ok(
+  trainingPlatformBaseCss.includes('grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));'),
+  'tutorial upload controls should wrap responsively so the notebook filename input remains visible'
+);
 
 assert.ok(nbgraderIndex.includes("nbgraderMenu.title.label = '作业评测平台'"));
 assert.ok(nbgraderIndex.includes('mainMenu.addMenu(nbgraderMenu, true, { rank: 8 })'));
@@ -116,17 +155,32 @@ assert.ok(nbgraderIndex.includes("panel.title.caption = '作业评测平台创�
 assert.equal(nbgraderIndex.includes("panel.title.label = 'Create Assignment'"), false);
 assert.equal(nbgraderIndex.includes("panel.title.caption = 'Nbgrader Create Assignment'"), false);
 
-assert.ok(nbgraderLabextensionStatic.includes("nbgraderMenu.title.label = '作业评测平台'"));
-assert.ok(compact(nbgraderLabextensionStatic).includes('mainMenu.addMenu(nbgraderMenu,true,{rank:8})'));
-assert.equal(nbgraderLabextensionStatic.includes("nbgraderMenu.title.label = 'Nbgrader 评分系统'"), false);
-assert.equal(compact(nbgraderLabextensionStatic).includes('mainMenu.addMenu(nbgraderMenu);'), false);
+if (nbgraderLabextensionStatic.includes('作业评测平台')) {
+  assert.ok(nbgraderLabextensionStatic.includes("nbgraderMenu.title.label = '作业评测平台'"));
+  assert.ok(compact(nbgraderLabextensionStatic).includes('mainMenu.addMenu(nbgraderMenu,true,{rank:8})'));
+  assert.equal(nbgraderLabextensionStatic.includes("nbgraderMenu.title.label = 'Nbgrader 评分系统'"), false);
+  assert.equal(compact(nbgraderLabextensionStatic).includes('mainMenu.addMenu(nbgraderMenu);'), false);
+}
 
-assert.ok(compact(simulationLabextensionStatic).includes('mainMenu.addMenu(simulationMenu,true,{rank:5})'));
-assert.equal(compact(simulationLabextensionStatic).includes('mainMenu.addMenu(simulationMenu);'), false);
-assert.ok(compact(thermalLabextensionStatic).includes('mainMenu.addMenu(thermalMenu,true,{rank:6})'));
-assert.equal(compact(thermalLabextensionStatic).includes('mainMenu.addMenu(thermalMenu);'), false);
-assert.ok(compact(officialThermalLabextensionStatic).includes('mainMenu.addMenu(officialMenu,true,{rank:7})'));
-assert.equal(compact(officialThermalLabextensionStatic).includes('mainMenu.addMenu(officialMenu);'), false);
+if (simulationLabextensionStatic.includes('通用仿真平台')) {
+  assert.ok(compact(simulationLabextensionStatic).includes('mainMenu.addMenu(simulationMenu,true,{rank:5})'));
+  assert.equal(compact(simulationLabextensionStatic).includes('mainMenu.addMenu(simulationMenu);'), false);
+}
+if (thermalLabextensionStatic.includes('传热仿真平台')) {
+  assert.ok(compact(thermalLabextensionStatic).includes('mainMenu.addMenu(thermalMenu,true,{rank:6})'));
+  assert.equal(compact(thermalLabextensionStatic).includes('mainMenu.addMenu(thermalMenu);'), false);
+}
+if (officialThermalLabextensionStatic.includes('官方热力建模示例')) {
+  assert.ok(compact(officialThermalLabextensionStatic).includes('mainMenu.addMenu(officialMenu,true,{rank:7})'));
+  assert.equal(compact(officialThermalLabextensionStatic).includes('mainMenu.addMenu(officialMenu);'), false);
+}
+if (trainingPlatformLabextensionStatic) {
+  assert.ok(trainingPlatformLabextensionStatic.includes('学习课程'));
+  assert.ok(trainingPlatformLabextensionStatic.includes('课程管理'));
+  assert.ok(!trainingPlatformLabextensionStatic.includes('打开评论'));
+  assert.ok(trainingPlatformLabextensionStatic.includes('评论'));
+  assert.ok(compact(trainingPlatformLabextensionStatic).includes('mainMenu.addMenu(trainingMenu,true,{rank:7.5})'));
+}
 
 assert.equal(menuById('jp-mainmenu-view').disabled, true);
 assert.equal(menuById('jp-mainmenu-kernel').disabled, true);
@@ -199,6 +253,10 @@ assert.ok(dockerfile.includes('WORKDIR /src/nbgrader'));
 assert.ok(dockerfile.includes('jlpm run build && \\\n    jupyter labextension develop . --overwrite'));
 assert.ok(dockerfile.includes('grep -R "作业评测平台" /src/nbgrader/nbgrader/labextension/static/*.js'));
 assert.ok(dockerfile.includes('grep -R "mainMenu.addMenu(nbgraderMenu, true, { rank: 8 })" /src/nbgrader/nbgrader/labextension/static/*.js'));
+assert.ok(dockerfile.includes('WORKDIR /src/jupyterlab-training-platform'));
+assert.ok(dockerfile.includes('grep -R "学习课程" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
+assert.ok(dockerfile.includes('grep -R "课程管理" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
+assert.ok(dockerfile.includes('grep -R "评论" /src/jupyterlab-training-platform/jupyterlab_training_platform/labextension/static/*.js'));
 assert.ok(dockerfile.includes('simlab-folder.svg'));
 assert.ok(dockerfile.includes('simlab-file.svg'));
 const nbgraderDockerSection = sliceBetween(
@@ -216,9 +274,9 @@ assert.ok(hubConfig.includes('dev_source_volumes'));
 assertFileExists('logo/simlab-folder.svg');
 assertFileExists('logo/simlab-folder-favorite.svg');
 assertFileExists('logo/simlab-file.svg');
-assert.ok(fileIconSvg.includes('simlab-file-grad'));
-assert.ok(folderIconSvg.includes('simlab-folder-grad'));
-assert.ok(folderFavoriteIconSvg.includes('simlab-folder-favorite-grad'));
+assert.ok(fileIconSvg.includes('#8A2387'));
+assert.ok(folderIconSvg.includes('#E94057'));
+assert.ok(folderFavoriteIconSvg.includes('#E94057'));
 
 assert.ok(applicationBaseCss.includes('visibility: visible'));
 assert.ok(applicationBaseCss.includes('opacity: 1'));

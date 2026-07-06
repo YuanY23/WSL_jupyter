@@ -2,7 +2,7 @@
   height: 100%;
   overflow: auto;
   color: var(--jp-ui-font-color1);
-  background: #f4f6f4;
+  background: #f3f5f7;
 }
 
 .official-thermal-panel {
@@ -35,7 +35,7 @@
 }
 
 .official-thermal-tabs button.active {
-  background: #1f6f8b;
+  background: #1976d2;
   color: #ffffff;
 }
 
@@ -49,12 +49,12 @@
   border-radius: 8px;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.76)),
-    repeating-linear-gradient(135deg, rgba(34, 107, 139, 0.08) 0 1px, transparent 1px 14px);
+    repeating-linear-gradient(135deg, rgba(25, 118, 210, 0.08) 0 1px, transparent 1px 14px);
 }
 
 .official-thermal-kicker {
   margin: 0 0 8px;
-  color: #236b5f;
+  color: #1976d2;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0;
@@ -106,14 +106,14 @@
 
 .official-thermal-metrics strong {
   margin-top: 6px;
-  color: #1f4f73;
+  color: #0f5ea8;
   font-size: 30px;
   line-height: 1;
 }
 
 .official-thermal-metrics em {
   margin-top: 5px;
-  color: #236b5f;
+  color: #1976d2;
   font-size: 12px;
   font-style: normal;
   font-weight: 700;
@@ -194,7 +194,7 @@
 
 .official-thermal-number-control input[type='range'] {
   width: 100%;
-  accent-color: #1f6f8b;
+  accent-color: #1976d2;
 }
 
 .official-thermal-number-control input[type='number'] {
@@ -204,7 +204,7 @@
 }
 
 .official-thermal-number-control b {
-  color: #236b5f;
+  color: #0f5ea8;
   font-size: 12px;
 }
 
@@ -228,8 +228,8 @@
 }
 
 .official-thermal-button.primary {
-  border-color: #1f6f8b;
-  background: #1f6f8b;
+  border-color: #1976d2;
+  background: #1976d2;
   color: #ffffff;
 }
 
@@ -241,10 +241,10 @@
 .official-thermal-status {
   margin-top: 14px;
   padding: 10px 12px;
-  border: 1px solid #7da984;
+  border: 1px solid #8cbff2;
   border-radius: 6px;
-  background: #eef8ef;
-  color: #245a30;
+  background: #e4f1ff;
+  color: #0f5ea8;
   font-size: 13px;
 }
 
@@ -273,18 +273,18 @@
   align-items: center;
   min-height: 52px;
   padding: 10px 12px;
-  border-left: 4px solid #236b5f;
-  background: #f1f7f5;
+  border-left: 4px solid #1976d2;
+  background: #eaf4ff;
 }
 
 .official-thermal-process li:nth-child(2n) {
-  border-left-color: #1f6f8b;
+  border-left-color: #1976d2;
   background: #eef5f7;
 }
 
 .official-thermal-process li:nth-child(3n) {
-  border-left-color: #2f7a4e;
-  background: #eff6ef;
+  border-left-color: #6aa5df;
+  background: #eef5ff;
 }
 
 .official-thermal-process span {

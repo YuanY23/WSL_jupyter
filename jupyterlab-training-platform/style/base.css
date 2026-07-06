@@ -1,0 +1,537 @@
+.training-platform {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
+  background: #f3f5f7;
+  color: #202a33;
+  font-family: "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+
+.training-sidebar {
+  border-right: 1px solid #c8d0d8;
+  background: #e9edf2;
+  padding: 14px;
+  overflow: auto;
+}
+
+.training-sidebar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #5c6b78;
+  margin-bottom: 10px;
+}
+
+.training-nav-item {
+  width: 100%;
+  min-height: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #202a33;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.training-nav-item.active,
+.training-nav-item:hover {
+  background: #ffffff;
+  border-color: #8cbff2;
+}
+
+.training-main {
+  min-width: 0;
+  padding: 18px;
+  overflow: auto;
+}
+
+.training-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.training-header h2,
+.training-admin-band h3,
+.comment-panel-header h3 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.training-header p,
+.training-tutorial-row p,
+.comment-panel-header p {
+  margin: 5px 0 0;
+  color: #667684;
+  line-height: 1.5;
+}
+
+.training-button,
+.training-section-tabs button,
+.comment-actions button,
+.comment-reply-box button {
+  min-height: 32px;
+  border: 1px solid #bcc7d2;
+  background: #ffffff;
+  color: #202a33;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.training-button.primary,
+.training-section-tabs button.active {
+  background: #1976d2;
+  border-color: #1976d2;
+  color: #ffffff;
+}
+
+.training-button.danger {
+  background: #fff7f4;
+  border-color: #d49a8a;
+  color: #8a2f1d;
+}
+
+.training-button:disabled,
+.comment-reply-box button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.training-section-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.training-tutorial-list,
+.comment-list {
+  display: grid;
+  gap: 10px;
+}
+
+.training-tutorial-row,
+.training-admin-band,
+.comment-thread,
+.comment-compose,
+.training-status {
+  background: #ffffff;
+  border: 1px solid #cfd7df;
+  padding: 12px;
+}
+
+.training-tutorial-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.training-tutorial-row h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.training-empty,
+.training-status {
+  color: #5c6b78;
+}
+
+.training-admin-band {
+  margin-bottom: 14px;
+}
+
+.training-admin-workbench {
+  grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
+}
+
+.training-course-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.training-course-list {
+  min-height: 0;
+  overflow: auto;
+}
+
+.training-rail-create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.training-admin-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.training-admin-header {
+  flex: 0 0 auto;
+}
+
+.training-admin-layout {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(280px, 360px);
+  gap: 14px;
+  align-items: start;
+}
+
+.training-admin-column {
+  min-width: 0;
+}
+
+.training-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.training-panel-heading p {
+  margin: 4px 0 0;
+  color: #667684;
+}
+
+.training-upload-band {
+  border-top: 3px solid #1976d2;
+}
+
+.training-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  align-items: center;
+}
+
+.training-upload-actions,
+.training-inspector-actions,
+.training-inline-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.training-upload-actions {
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.training-file-chip {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid #cfd7df;
+  background: #f1f4f8;
+  color: #4b5a68;
+  padding: 4px 8px;
+}
+
+.training-structure-band {
+  display: grid;
+  gap: 10px;
+}
+
+.training-section-card {
+  border: 1px solid #cfd7df;
+  background: #fbfcfb;
+}
+
+.training-section-card.active {
+  border-color: #8cbff2;
+  box-shadow: inset 3px 0 0 #1976d2;
+}
+
+.training-section-card-head {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 0;
+  border-bottom: 1px solid #e5e9ee;
+  background: transparent;
+  color: #202a33;
+  font-weight: 700;
+  padding: 9px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.training-admin-tutorial-list {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+}
+
+.training-admin-tutorial {
+  min-height: 48px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #202a33;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.training-admin-tutorial.active,
+.training-admin-tutorial:hover {
+  border-color: #8cbff2;
+  background: #eaf4ff;
+}
+
+.training-admin-tutorial span,
+.training-admin-tutorial strong,
+.training-admin-tutorial em {
+  min-width: 0;
+}
+
+.training-admin-tutorial span {
+  display: grid;
+  gap: 3px;
+}
+
+.training-admin-tutorial strong,
+.training-admin-tutorial em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.training-admin-tutorial em {
+  color: #667684;
+  font-style: normal;
+}
+
+.training-status-badge {
+  flex: 0 0 auto;
+  border: 1px solid #cfd7d2;
+  background: #f1f2f0;
+  color: #687786;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.training-status-badge.published {
+  border-color: #9cc7f0;
+  background: #e4f1ff;
+  color: #0f5ea8;
+}
+
+.training-inspector {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.training-field {
+  display: grid;
+  gap: 5px;
+  color: #4b5a68;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.training-field input,
+.training-field select,
+.training-field textarea,
+.training-rail-create input,
+.training-inline-compact input,
+.training-upload-grid input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  border: 1px solid #c4ced8;
+  background: #ffffff;
+  color: #202a33;
+  padding: 6px 8px;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.training-upload-grid input[type="file"] {
+  min-width: 0;
+}
+
+.training-field textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.training-two-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.training-lock-row {
+  justify-content: flex-start;
+  margin-top: 2px;
+}
+
+.training-empty.compact {
+  padding: 4px 2px;
+  font-size: 12px;
+}
+
+.training-inline-form,
+.comment-reply-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.training-inline-form input,
+.training-inline-form select,
+.training-form-grid input,
+.training-form-grid select,
+.training-admin-band textarea,
+.comment-compose textarea,
+.comment-reply-box input {
+  box-sizing: border-box;
+  min-height: 32px;
+  border: 1px solid #c4ced8;
+  background: #ffffff;
+  color: #202a33;
+  padding: 6px 8px;
+}
+
+.training-upload-band textarea {
+  width: 100%;
+  min-height: 58px;
+  margin-top: 8px;
+  resize: vertical;
+}
+
+.training-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.training-admin-band textarea,
+.comment-compose textarea {
+  width: 100%;
+  min-height: 70px;
+  margin-top: 8px;
+  resize: vertical;
+}
+
+.training-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #4b5a68;
+}
+
+@media (max-width: 900px) {
+  .training-admin-workbench {
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  }
+
+  .training-admin-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .training-inspector {
+    position: static;
+  }
+
+  .training-upload-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.training-outline-course {
+  padding: 8px 0;
+  border-top: 1px solid #e5e9ee;
+}
+
+.training-outline-section {
+  margin: 6px 0 0 14px;
+  color: #4b5a68;
+}
+
+.training-outline-section em {
+  display: block;
+  margin: 3px 0 0 14px;
+  color: #6a7682;
+  font-style: normal;
+}
+
+.training-comment-widget {
+  min-width: 320px;
+}
+
+.comment-panel {
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 12px;
+  background: #f3f5f7;
+  color: #202a33;
+}
+
+.comment-panel-header {
+  margin-bottom: 10px;
+}
+
+.comment-thread.pinned {
+  border-color: #1976d2;
+}
+
+.comment-thread header {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.comment-thread p {
+  line-height: 1.55;
+  margin: 8px 0;
+}
+
+.comment-badge {
+  background: #e4f1ff;
+  color: #0f5ea8;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.comment-badge.pinned {
+  background: #d8ebff;
+  color: #0f5ea8;
+}
+
+.comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.comment-replies {
+  margin: 10px 0 0 16px;
+  display: grid;
+  gap: 8px;
+}

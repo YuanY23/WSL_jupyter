@@ -1,0 +1,40 @@
+services:
+  simlab-training-postgres:
+    image: postgres:16
+    container_name: simlab-training-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: simlab_training
+      POSTGRES_USER: simlab
+      POSTGRES_PASSWORD: simlab_training_password
+    volumes:
+      - simlab-training-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U simlab -d simlab_training"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  simlab-training-service:
+    build:
+      context: ./simlab-training-service
+    container_name: simlab-training-service
+    restart: unless-stopped
+    depends_on:
+      simlab-training-postgres:
+        condition: service_healthy
+    environment:
+      SIMLAB_TRAINING_DATABASE_URL: postgresql+psycopg://simlab:simlab_training_password@simlab-training-postgres:5432/simlab_training
+      SIMLAB_TRAINING_STORAGE_DIR: /srv/simlab/tutorials
+      SIMLAB_TUTORIAL_ADMINS: ${SIMLAB_TUTORIAL_ADMINS:-yuan}
+      JUPYTERHUB_API_URL: ${JUPYTERHUB_API_URL:-http://host.docker.internal:8000/hub/api}
+      JUPYTERHUB_SERVICE_PREFIX: /services/simlab-training/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - ./simlab-runtime/tutorials:/srv/simlab/tutorials
+
+volumes:
+  simlab-training-postgres-data:
