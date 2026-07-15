@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from .config import Settings
 from .db import make_session_factory
+from .media_security import require_secret
 from .routes_admin import router as admin_router
 from .routes_media_admin import router as media_admin_router
 from .routes_media_public import router as media_public_router
@@ -13,6 +14,9 @@ from .storage import TutorialStorage
 
 def create_app(*, settings: Settings | None = None, session_factory=None) -> FastAPI:
     app_settings = settings or Settings()
+    if app_settings.media_encrypted_hls_enabled:
+        require_secret(app_settings.media_master_key, "SIMLAB_MEDIA_MASTER_KEY")
+        require_secret(app_settings.media_playback_secret, "SIMLAB_MEDIA_PLAYBACK_SECRET")
     app = FastAPI(title="SimLab Training Service")
     if session_factory is None:
         session_factory, _engine = make_session_factory(app_settings.database_url)

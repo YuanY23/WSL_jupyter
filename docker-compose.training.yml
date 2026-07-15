@@ -18,6 +18,8 @@ services:
   simlab-training-service:
     build:
       context: ./simlab-training-service
+    env_file:
+      - ${HOME}/.config/simlab-training.env
     container_name: simlab-training-service
     restart: unless-stopped
     depends_on:
@@ -29,12 +31,46 @@ services:
       SIMLAB_TUTORIAL_ADMINS: ${SIMLAB_TUTORIAL_ADMINS:-yuan}
       JUPYTERHUB_API_URL: ${JUPYTERHUB_API_URL:-http://host.docker.internal:8000/hub/api}
       JUPYTERHUB_SERVICE_PREFIX: /services/simlab-training/
+      SIMLAB_MEDIA_PLAYBACK_TTL_SECONDS: ${SIMLAB_MEDIA_PLAYBACK_TTL_SECONDS:-3600}
+      SIMLAB_MEDIA_TRANSCODE_TIMEOUT_SECONDS: ${SIMLAB_MEDIA_TRANSCODE_TIMEOUT_SECONDS:-43200}
+      SIMLAB_MEDIA_JOB_LEASE_SECONDS: ${SIMLAB_MEDIA_JOB_LEASE_SECONDS:-300}
+      SIMLAB_MEDIA_JOB_MAX_ATTEMPTS: ${SIMLAB_MEDIA_JOB_MAX_ATTEMPTS:-3}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
       - "127.0.0.1:8090:8090"
     volumes:
       - ./simlab-runtime/tutorials:/srv/simlab/tutorials
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  simlab-training-media-worker:
+    build:
+      context: ./simlab-training-service
+    env_file:
+      - ${HOME}/.config/simlab-training.env
+    container_name: simlab-training-media-worker
+    restart: unless-stopped
+    command: ["python", "-m", "simlab_training_service.media_worker"]
+    depends_on:
+      simlab-training-postgres:
+        condition: service_healthy
+      simlab-training-service:
+        condition: service_healthy
+    environment:
+      SIMLAB_TRAINING_DATABASE_URL: postgresql+psycopg://simlab:simlab_training_password@simlab-training-postgres:5432/simlab_training
+      SIMLAB_TRAINING_STORAGE_DIR: /srv/simlab/tutorials
+      SIMLAB_MEDIA_TRANSCODE_TIMEOUT_SECONDS: ${SIMLAB_MEDIA_TRANSCODE_TIMEOUT_SECONDS:-43200}
+      SIMLAB_MEDIA_WORKER_POLL_SECONDS: ${SIMLAB_MEDIA_WORKER_POLL_SECONDS:-5}
+      SIMLAB_MEDIA_JOB_LEASE_SECONDS: ${SIMLAB_MEDIA_JOB_LEASE_SECONDS:-300}
+      SIMLAB_MEDIA_JOB_MAX_ATTEMPTS: ${SIMLAB_MEDIA_JOB_MAX_ATTEMPTS:-3}
+    volumes:
+      - ./simlab-runtime/tutorials:/srv/simlab/tutorials
 
 volumes:
   simlab-training-postgres-data:
+    external: true
+    name: simlab-training-postgres-data

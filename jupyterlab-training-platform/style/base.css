@@ -610,6 +610,30 @@
   background: #111820;
 }
 
+.training-video-quality {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  color: #44515d;
+  font-size: 12px;
+}
+
+.training-video-quality label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.training-video-quality select {
+  min-width: 88px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #bcc7d2;
+  border-radius: 3px;
+  color: #202a33;
+  background: #ffffff;
+}
+
 .training-video-status,
 .training-video-error {
   min-height: 44px;

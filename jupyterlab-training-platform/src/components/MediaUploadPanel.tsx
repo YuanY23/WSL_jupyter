@@ -50,7 +50,7 @@ export function MediaUploadPanel(props: MediaUploadPanelProps): React.ReactEleme
       setItems(current => [media, ...current]);
       setFile(null);
       setTitle('');
-      setStatus('媒体资源已上传。');
+      setStatus(media.status === 'processing' ? '媒体资源已上传，已加入转码加密队列。' : '媒体资源已上传。');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : String(error));
     } finally {
@@ -126,6 +126,8 @@ export function MediaUploadPanel(props: MediaUploadPanelProps): React.ReactEleme
               )}
               <span>{media.id}</span>
               <em>{media.original_filename}</em>
+              {media.status === 'processing' && <em>正在转码加密</em>}
+              {media.status === 'failed' && <em>转码失败，请删除后重新上传</em>}
             </div>
             <div className="training-media-actions">
               {editingId === media.id ? (

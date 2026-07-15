@@ -120,6 +120,14 @@ async function testMediaContentUrlUsesPublicMediaEndpoint() {
   );
 }
 
+async function testCreatesMediaPlaybackDescriptor() {
+  const call = await captureRequest(client => client.createMediaPlayback('vid_123'));
+
+  assert.equal(call.url, '/api/media/vid_123/playback');
+  assert.equal(call.init.method, 'POST');
+  assert.deepEqual(JSON.parse(call.init.body), {});
+}
+
 async function testFetchMediaBlobUsesAuthorizationHeaders() {
   const calls = [];
   const blob = new Blob(['fake-video'], { type: 'video/mp4' });
@@ -154,6 +162,7 @@ async function run() {
   await testAdminRenamesMediaResource();
   await testAdminDeletesMediaResource();
   await testMediaContentUrlUsesPublicMediaEndpoint();
+  await testCreatesMediaPlaybackDescriptor();
   await testFetchMediaBlobUsesAuthorizationHeaders();
   console.log('training admin API client tests passed');
 }

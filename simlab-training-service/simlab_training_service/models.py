@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean,
+    BigInteger,
     Column,
     DateTime,
     ForeignKey,
@@ -119,13 +120,50 @@ class MediaResource(Base):
     title = Column(Text, nullable=False)
     original_filename = Column(Text, nullable=False)
     mime_type = Column(String(255), nullable=False)
-    file_size = Column(Integer, nullable=False)
+    file_size = Column(BigInteger, nullable=False)
     object_key = Column(Text, nullable=False)
     file_sha256 = Column(String(64), nullable=False)
+    hls_playlist_object_key = Column(Text, nullable=True)
+    hls_key_id = Column(String(64), nullable=True)
+    hls_iv = Column(String(32), nullable=True)
+    hls_transcode_version = Column(Integer, nullable=True)
+    processing_error = Column(Text, nullable=True)
     status = Column(String(32), nullable=False, default="available")
     created_by = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
+
+    transcode_jobs = relationship(
+        "MediaTranscodeJob",
+        back_populates="media",
+        cascade="all, delete-orphan",
+    )
+
+
+class MediaTranscodeJob(Base):
+    __tablename__ = "media_transcode_jobs"
+    __table_args__ = (
+        Index("ix_media_transcode_jobs_claim", "status", "available_at", "created_at"),
+    )
+
+    id = Column(String(36), primary_key=True, default=new_id)
+    media_id = Column(
+        String(32),
+        ForeignKey("media_resources.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    status = Column(String(32), nullable=False, default="queued")
+    attempts = Column(Integer, nullable=False, default=0)
+    max_attempts = Column(Integer, nullable=False, default=3)
+    available_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
+    lease_expires_at = Column(DateTime(timezone=True), nullable=True)
+    worker_id = Column(String(255), nullable=True)
+    last_error = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, default=utcnow)
+    updated_at = Column(DateTime(timezone=True), nullable=False, default=utcnow, onupdate=utcnow)
+
+    media = relationship("MediaResource", back_populates="transcode_jobs")
 
 
 class Comment(Base):

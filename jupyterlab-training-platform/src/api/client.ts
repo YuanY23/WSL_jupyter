@@ -3,6 +3,7 @@ import {
   CreateCourseRequest,
   CreateSectionRequest,
   CurrentUser,
+  MediaPlayback,
   MediaResource,
   PatchCourseRequest,
   PatchMediaResourceRequest,
@@ -166,6 +167,10 @@ export class TrainingApiClient {
 
   async adminDeleteMedia(mediaId: string): Promise<void> {
     await this.request(`/admin/media/${encodeURIComponent(mediaId)}`, { method: 'DELETE' });
+  }
+
+  async createMediaPlayback(mediaId: string): Promise<MediaPlayback> {
+    return this.post<MediaPlayback>(`/media/${encodeURIComponent(mediaId)}/playback`, {});
   }
 
   mediaContentUrl(mediaId: string): string {

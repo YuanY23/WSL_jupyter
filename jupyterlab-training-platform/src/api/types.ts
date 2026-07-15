@@ -62,10 +62,27 @@ export interface MediaResource {
   mime_type: string;
   file_size: number;
   status: string;
+  hls_ready?: boolean;
+  hls_transcode_version?: number | null;
+  processing_error?: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
 }
+
+export interface BlobMediaPlayback {
+  mode: 'blob';
+  content_url: string;
+}
+
+export interface HlsMediaPlayback {
+  mode: 'hls';
+  manifest_url: string;
+  playback_token: string;
+  expires_at: number;
+}
+
+export type MediaPlayback = BlobMediaPlayback | HlsMediaPlayback;
 
 export interface TutorialImportRequest {
   course_id: string;
