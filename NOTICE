@@ -1,0 +1,34 @@
+# Attribution and licensing notice
+
+This repository combines project-specific integration and extension code with
+checked-in upstream open-source components. The root `LICENSE` applies to the
+project-specific code and documentation authored for this repository, except
+where an individual file or directory states otherwise.
+
+## Upstream components
+
+- `jupyterlab/` contains JupyterLab source code. Copyright belongs to Project
+  Jupyter contributors. Its applicable license is retained at
+  [`jupyterlab/LICENSE`](jupyterlab/LICENSE).
+- `nbgrader/` contains nbgrader source code. Copyright belongs to Project
+  Jupyter contributors. Its applicable license is retained at
+  [`nbgrader/LICENSE`](nbgrader/LICENSE).
+
+These components remain their respective upstream projects. Their inclusion
+supports reproducible local integration, extension development, and teaching
+platform builds; it does not transfer authorship or imply endorsement by their
+maintainers.
+
+## Project-specific work
+
+The project-specific areas include JupyterHub integration and configuration,
+custom authentication and templates, container build configuration, and the
+custom JupyterLab extension directories listed in the root README. Those
+components are released under the root BSD 3-Clause License unless a more
+specific notice applies.
+
+## Third-party dependencies
+
+Package-manager dependencies and generated artifacts may be governed by their
+own licenses. When redistributing a built image or binary artifact, preserve
+all applicable dependency notices and license terms.
