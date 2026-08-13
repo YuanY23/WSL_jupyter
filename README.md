@@ -1,8 +1,8 @@
-# WSL Jupyter Teaching & Thermal Simulation Platform
+# Open-source Jupyter-based Engineering Education and Simulation Platform
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 
-一个面向工程教育的开源 JupyterHub 平台参考实现，集成了 JupyterLab、nbgrader、DockerSpawner 与可见源码的热力学仿真工作流。项目旨在帮助教师部署课程环境、发布与评阅 Notebook 作业，并让学生从交互式界面进入可复现、可阅读的科学计算过程。
+一个面向工程教育与仿真的开源 Jupyter 平台参考实现，集成了 JupyterHub、JupyterLab、nbgrader、DockerSpawner 与可见源码的热力学仿真工作流。项目旨在帮助教师部署课程环境、发布与评阅 Notebook 作业，并让学生从交互式界面进入可复现、可阅读的科学计算过程。
 
 > **项目状态：** 参考实现，持续维护中。仓库优先服务于教学部署、课程实验与 JupyterLab 扩展开发；它不是 JupyterLab 或 nbgrader 的替代发行版。
 
